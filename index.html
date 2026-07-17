@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Livret'Easy - Créer un Livret d'Accueil</title>
-    <!-- Tailwind CSS (Version stable pour éviter les conflits de scripts) -->
+    <!-- Tailwind CSS stable -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Script de téléchargement PDF robuste -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- INJECTION DIRECTE DE LA LIBRAIRIE DE TÉLÉCHARGEMENT (Pour contourner les blocages GitHub) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        /* Image de fond "Bureau/RH" intégrée proprement en bas du site */
         .bg-illustration {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23e2e8f0' fill-opacity='0.4' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,186.7C960,192,1056,160,1152,144C1248,128,1344,128,1392,128L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat;
@@ -30,7 +32,7 @@
             <span class="font-bold text-lg tracking-wide">LIVRET'<span class="text-emerald-400">EASY</span></span>
         </div>
         <nav class="hidden md:flex items-center gap-6 text-sm text-slate-300">
-            <button onclick="changerEtape Direct(1)" class="text-white font-medium border-b-2 border-emerald-400 pb-1 flex items-center gap-1 cursor-pointer">📝 Créer un Livret</button>
+            <button onclick="document.location.reload()" class="text-white font-medium border-b-2 border-emerald-400 pb-1 flex items-center gap-1 cursor-pointer">📝 Créer un Livret</button>
             <button onclick="alert('Mes modèles (Fonctionnalité PRO DEMO)')" class="hover:text-white flex items-center gap-1 cursor-pointer">📁 Mes Modèles</button>
             <button onclick="alert('Paramètres de l\'entreprise')" class="hover:text-white flex items-center gap-1 cursor-pointer">⚙️ Paramètres</button>
         </nav>
@@ -46,7 +48,7 @@
         <p class="text-sm text-slate-500 mt-1">Suivez les étapes pour générer votre document personnalisé.</p>
     </div>
 
-    <!-- 3. ZONE PRINCIPALE (FORMULAIRE À ÉTAPES) -->
+    <!-- 3. ZONE PRINCIPALE -->
     <main class="max-w-7xl mx-auto w-full px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
         
         <!-- PANNEAU DE GAUCHE : FORMULAIRE -->
@@ -102,7 +104,7 @@
                     </label>
                 </div>
                 
-                <!-- BOUTON DE TÉLÉCHARGEMENT CORRIGÉ -->
+                <!-- NOUVEAU BOUTON SECURE -->
                 <button type="button" onclick="telechargerVraiPDF()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer mt-4">
                     📥 Télécharger le livret d'accueil en PDF
                 </button>
@@ -120,7 +122,6 @@
             <h3 class="text-sm font-semibold text-slate-700 mb-3">Prévisualisation en temps réel</h3>
             
             <div class="bg-slate-100 rounded-xl p-4 flex gap-4 min-h-[450px]">
-                <!-- Conteneur Cible pour l'export PDF -->
                 <div id="pdfSource" class="flex-1 bg-white border border-slate-300 rounded-lg p-6 shadow-sm flex flex-col justify-between text-slate-800">
                     
                     <div class="text-center border-b-2 border-emerald-500 pb-3">
@@ -132,7 +133,7 @@
                         <div class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-500/20 text-center">
                             <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Nouveau Membre</p>
                             <h5 id="pdfNom" class="text-lg font-bold text-emerald-600 mt-0.5">THOMAS DUBOIS</h5>
-                            <p id="pdfPoste" class="text-xs font-medium text-slate-700">[Développeur Fullstack]</p>
+                            <p id="pdfPoste" class="text-xs font-medium text-slate-700 mt-0.5">[Développeur Fullstack]</p>
                             <p id="pdfDate" class="text-[11px] text-slate-500 italic mt-0.5">Date d'entrée prévue : 01/08/2026</p>
                         </div>
 
@@ -170,11 +171,12 @@
         </button>
     </div>
 
-    <!-- LOGIQUE JAVASCRIPT RECOUDÉE ET SÉCURISÉE -->
+    <!-- LOGIQUE LOGICIELLE SANS FAILLE -->
     <script>
         let currentStep = 1;
         const totalSteps = 3;
 
+        // Synchronisation des textes à l'écran
         function synchroDonnees() {
             const nom = document.getElementById('inputNom').value;
             const poste = document.getElementById('inputPoste').value;
@@ -201,12 +203,11 @@
             document.getElementById('pdfSecuBlock').style.display = (checkIncendie || checkSecu) ? 'block' : 'none';
         }
 
+        // Système d'Étapes Corrigé pour rester fluide
         function changerEtape(direction) {
-            // Sécurité : On ne va pas au-delà des étapes existantes
-            if ((currentStep === 3 && direction === 1) || (currentStep === 1 && direction === -1)) {
-                if (currentStep === 3 && direction === 1) {
-                    alert("🎉 Félicitations ! Votre livret est entièrement configuré. Utilisez le bouton vert pour récupérer votre PDF.");
-                }
+            // Empêcher de sortir des limites
+            if (currentStep === 3 && direction === 1) {
+                alert("🎉 Document prêt ! Cliquez sur le bouton vert au-dessus pour le télécharger.");
                 return;
             }
 
@@ -214,13 +215,12 @@
             currentStep += direction;
             document.getElementById(`step${currentStep}`).classList.remove('hidden');
 
-            // Mise à jour de l'interface
+            // Mise à jour graphique
             document.getElementById('stepIndicator').innerText = `Étape ${currentStep} / ${totalSteps} : ` + 
                 (currentStep === 1 ? "Informations de Base" : currentStep === 2 ? "Culture et Équipe" : "Consignes & Validation");
             
             document.getElementById('progressBar').style.width = `${(currentStep / totalSteps) * 100}%`;
 
-            // Gestion de l'activation des boutons
             const btnPrev = document.getElementById('btnPrev');
             const btnNext = document.getElementById('btnNext');
 
@@ -239,26 +239,29 @@
             }
         }
 
-        // FONCTION DE TÉLÉCHARGEMENT COMPLÈTEMENT CORRIGÉE
+        // ALTERNATIVE NATIF PDF ULTRA-SÉCURISÉE SANS CONFLIT GITHUB
         function telechargerVraiPDF() {
+            const { jsPDF } = window.jspdf;
             const element = document.getElementById('pdfSource');
             const nomSalarie = document.getElementById('inputNom').value || 'Salarie';
-            
-            const options = {
-                margin:       15,
-                filename:     `Livret_Accueil_${nomSalarie.replace(/\s+/g, '_')}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, logging: false, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
 
-            // Exécution propre de la promesse de téléchargement
-            html2pdf().set(options).from(element).save()
-                .then(() => { console.log("Téléchargement réussi !"); })
-                .catch(err => { alert("Erreur lors de la génération. Réessayez."); console.error(err); });
+            // html2canvas capture l'élément HTML comme image haute définition
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 210; // Largeur A4 mm
+                const pageHeight = 295; // Hauteur A4 mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                pdf.save(`Livret_Accueil_${nomSalarie.replace(/\s+/g, '_')}.pdf`);
+            }).catch(err => {
+                alert("Erreur de rendu. Essayez un autre navigateur.");
+                console.error(err);
+            });
         }
 
-        // Lancement au démarrage
         window.onload = function() {
             synchroDonnees();
         };
