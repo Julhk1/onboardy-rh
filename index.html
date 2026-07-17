@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Livret'Easy - Créer un Livret d'Accueil</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS stable -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- INJECTION DIRECTE DU MOTEUR PDF ET DE CAPTURE (Version CDN ultra-stable) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .bg-illustration {
@@ -16,38 +20,6 @@
             background-repeat: no-repeat;
             background-position: bottom;
             background-size: contain;
-        }
-
-        /* 🖨️ LE FIX D'IMPRESSION ABSOLU */
-        @media print {
-            /* 1. On cache absolument tout sauf la zone du livret */
-            body *, header, section, div, button {
-                display: none !important;
-            }
-            /* 2. On affiche uniquement la cible et ses enfants */
-            #pdfSource, #pdfSource * {
-                display: block !important;
-                -webkit-print-color-adjust: exact !important; /* Pour Chrome / Safari */
-                print-color-adjust: exact !important;         /* Pour Firefox */
-            }
-            /* 3. On remet en place la structure flex interne du livret pour le rendu */
-            #pdfSource {
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                border: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                position: fixed;
-                top: 0;
-                left: 0;
-            }
-            /* Ajustement pour la grille de sécurité */
-            #pdfSecuList, #pdfSecuList li {
-                display: list-item !important;
-            }
         }
     </style>
 </head>
@@ -131,6 +103,7 @@
                     </label>
                 </div>
                 
+                <!-- BOUTON DE TÉLÉCHARGEMENT COMPLÈTEMENT SÉCURISÉ EN COPIE BRUTE CANVAS -->
                 <button type="button" onclick="telechargerVraiPDF()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer mt-4">
                     📥 Télécharger le livret d'accueil en PDF
                 </button>
@@ -148,33 +121,36 @@
             <h3 class="text-sm font-semibold text-slate-700 mb-3">Prévisualisation en temps réel</h3>
             
             <div class="bg-slate-100 rounded-xl p-4 flex gap-4 min-h-[450px]">
-                <div id="pdfSource" class="flex-1 bg-white border border-slate-300 rounded-lg p-6 shadow-sm flex flex-col justify-between text-slate-800">
+                <!-- Zone capturée pour le PDF -->
+                <div id="pdfSource" class="flex-1 bg-white border border-slate-300 rounded-lg p-6 shadow-sm flex flex-col justify-between text-slate-800 bg-white" style="background-color: #ffffff !important;">
                     
                     <div class="text-center border-b-2 border-emerald-500 pb-3">
-                        <h4 class="text-xl font-bold tracking-wide uppercase text-slate-900">LIVRET D'ACCUEIL SALARIÉ</h4>
+                        <h4 class="text-xl font-bold tracking-wide uppercase text-slate-900" style="color: #0f172a !important;">LIVRET D'ACCUEIL SALARIÉ</h4>
                         <p class="text-xs text-slate-400 mt-0.5">Bienvenue dans l'entreprise</p>
                     </div>
 
                     <div class="my-4 space-y-3 flex-1">
-                        <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-500/20 text-center">
+                        <!-- Box verte -->
+                        <div class="p-3 rounded-xl border border-emerald-500/20 text-center" style="background-color: #f0fdf4 !important; border-color: #bbf7d0 !important;">
                             <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Nouveau Membre</p>
-                            <h5 id="pdfNom" class="text-lg font-bold text-emerald-600 mt-0.5">THOMAS DUBOIS</h5>
-                            <p id="pdfPoste" class="text-xs font-medium text-slate-700 mt-0.5">[Développeur Fullstack]</p>
+                            <h5 id="pdfNom" class="text-lg font-bold text-emerald-600 mt-0.5" style="color: #059669 !important;">THOMAS DUBOIS</h5>
+                            <p id="pdfPoste" class="text-xs font-medium text-slate-700 mt-0.5" style="color: #334155 !important;">[Développeur Fullstack]</p>
                             <p id="pdfDate" class="text-[11px] text-slate-500 italic mt-0.5">Date d'entrée prévue : 01/08/2026</p>
                         </div>
 
                         <div class="space-y-1">
-                            <h6 class="text-[11px] font-bold text-slate-900 uppercase tracking-wide">📖 Qui sommes-nous ?</h6>
-                            <p id="pdfCulture" class="text-xs text-slate-600 leading-relaxed text-justify">Notre mission chez InnovCorp est de digitaliser le quotidien des RH avec passion.</p>
+                            <h6 class="text-[11px] font-bold text-slate-900 uppercase tracking-wide" style="color: #0f172a !important;">📖 Qui sommes-nous ?</h6>
+                            <p id="pdfCulture" class="text-xs text-slate-600 leading-relaxed text-justify" style="color: #475569 !important;">Notre mission chez InnovCorp est de digitaliser le quotidien des RH avec passion.</p>
                         </div>
 
-                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs">
-                            <span class="font-bold">🛜 Accès WiFi :</span> <span id="pdfWifi" class="font-mono text-slate-700">InnovCorp_Guest_2026!</span>
+                        <!-- Box WiFi grise -->
+                        <div class="p-2.5 rounded-lg border border-slate-200 text-xs" style="background-color: #f8fafc !important; border-color: #e2e8f0 !important;">
+                            <span class="font-bold" style="color: #0f172a !important;">🛜 Accès WiFi :</span> <span id="pdfWifi" class="font-mono text-slate-700">InnovCorp_Guest_2026!</span>
                         </div>
 
                         <div id="pdfSecuBlock" class="space-y-1 pt-1">
-                            <h6 class="text-[11px] font-bold text-rose-600 uppercase tracking-wide">⚠️ Consignes Obligatoires</h6>
-                            <ul id="pdfSecuList" class="text-[11px] text-slate-600 list-disc pl-4 space-y-0.5">
+                            <h6 class="text-[11px] font-bold text-rose-600 uppercase tracking-wide" style="color: #e11d48 !important;">⚠️ Consignes Obligatoires</h6>
+                            <ul id="pdfSecuList" class="text-[11px] text-slate-600 list-disc pl-4 space-y-0.5" style="color: #475569 !important;">
                                 <li id="pdfIncendie">En cas d'incendie : évacuation vers le point de rassemblement extérieur.</li>
                                 <li id="pdfSecu">Port du badge d'accès obligatoire dans les locaux de la boîte.</li>
                             </ul>
@@ -257,8 +233,35 @@
             }
         }
 
+        // 🚀 ALGORITHME DE CAPTURE PHOTO RENDER - ADAPTÉ ET SÉCURISÉ POUR GITHUB PAGES
         function telechargerVraiPDF() {
-            window.print();
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('pdfSource');
+            const nomSalarie = document.getElementById('inputNom').value || 'Salarie';
+
+            // Options forcées pour empêcher le blocage CSS de Chrome
+            const options = {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#ffffff",
+                logging: false
+            };
+
+            html2canvas(element, options).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 210; // Format A4 standard Largeur (mm)
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                // Injection forcée du rendu dans le flux binaire de téléchargement du navigateur
+                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
+                pdf.save(`Livret_Accueil_${nomSalarie.replace(/\s+/g, '_')}.pdf`);
+            }).catch(err => {
+                alert("Erreur technique de sécurité locale. Contactez l'administrateur.");
+                console.error(err);
+            });
         }
 
         window.onload = function() {
