@@ -9,10 +9,6 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- INJECTION DIRECTE DE LA LIBRAIRIE DE TÉLÉCHARGEMENT (Pour contourner les blocages GitHub) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .bg-illustration {
@@ -20,6 +16,34 @@
             background-repeat: no-repeat;
             background-position: bottom;
             background-size: contain;
+        }
+
+        /* CONFIGURATION SPÉCIALE IMPRESSION PDF */
+        @media print {
+            /* On cache tout ce qui ne fait pas partie du livret d'accueil */
+            body, header, section:first-of-type, div.fixed, h2, p, main > div {
+                display: none !important;
+            }
+            main {
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            #pdfWrapper {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+            #pdfSource {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                width: 100% !important;
+                min-height: 100% !important;
+            }
         }
     </style>
 </head>
@@ -104,7 +128,7 @@
                     </label>
                 </div>
                 
-                <!-- NOUVEAU BOUTON SECURE -->
+                <!-- BOUTON DE TÉLÉCHARGEMENT DIRECT IMPRIMANTE/PDF NATIVE -->
                 <button type="button" onclick="telechargerVraiPDF()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer mt-4">
                     📥 Télécharger le livret d'accueil en PDF
                 </button>
@@ -118,7 +142,7 @@
         </section>
 
         <!-- PANNEAU DE DROITE : PREVIEW PDF -->
-        <section class="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm z-10">
+        <section id="pdfWrapper" class="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm z-10">
             <h3 class="text-sm font-semibold text-slate-700 mb-3">Prévisualisation en temps réel</h3>
             
             <div class="bg-slate-100 rounded-xl p-4 flex gap-4 min-h-[450px]">
@@ -176,7 +200,6 @@
         let currentStep = 1;
         const totalSteps = 3;
 
-        // Synchronisation des textes à l'écran
         function synchroDonnees() {
             const nom = document.getElementById('inputNom').value;
             const poste = document.getElementById('inputPoste').value;
@@ -203,11 +226,9 @@
             document.getElementById('pdfSecuBlock').style.display = (checkIncendie || checkSecu) ? 'block' : 'none';
         }
 
-        // Système d'Étapes Corrigé pour rester fluide
         function changerEtape(direction) {
-            // Empêcher de sortir des limites
             if (currentStep === 3 && direction === 1) {
-                alert("🎉 Document prêt ! Cliquez sur le bouton vert au-dessus pour le télécharger.");
+                alert("🎉 Document prêt ! Cliquez sur le bouton vert au-dessus pour lancer la mise en page PDF.");
                 return;
             }
 
@@ -215,7 +236,6 @@
             currentStep += direction;
             document.getElementById(`step${currentStep}`).classList.remove('hidden');
 
-            // Mise à jour graphique
             document.getElementById('stepIndicator').innerText = `Étape ${currentStep} / ${totalSteps} : ` + 
                 (currentStep === 1 ? "Informations de Base" : currentStep === 2 ? "Culture et Équipe" : "Consignes & Validation");
             
@@ -239,27 +259,10 @@
             }
         }
 
-        // ALTERNATIVE NATIF PDF ULTRA-SÉCURISÉE SANS CONFLIT GITHUB
+        // SOLUTION UNIVERSELLE : UTILISATION DE LA COMMANDE PRINT DU SYSTÈME
         function telechargerVraiPDF() {
-            const { jsPDF } = window.jspdf;
-            const element = document.getElementById('pdfSource');
-            const nomSalarie = document.getElementById('inputNom').value || 'Salarie';
-
-            // html2canvas capture l'élément HTML comme image haute définition
-            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const imgWidth = 210; // Largeur A4 mm
-                const pageHeight = 295; // Hauteur A4 mm
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
-                pdf.save(`Livret_Accueil_${nomSalarie.replace(/\s+/g, '_')}.pdf`);
-            }).catch(err => {
-                alert("Erreur de rendu. Essayez un autre navigateur.");
-                console.error(err);
-            });
+            // Déclenche instantanément la boîte système pour "Enregistrer au format PDF"
+            window.print();
         }
 
         window.onload = function() {
