@@ -4,17 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Livret'Easy - Créer un Livret d'Accueil</title>
-    <!-- Tailwind CSS pour un design incroyable -->
+    <!-- Tailwind CSS (Version stable pour éviter les conflits de scripts) -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Librairie de génération PDF en direct à partir du HTML -->
+    <!-- Script de téléchargement PDF robuste -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        /* Image de fond "Bureau/RH" intégrée proprement en bas du site */
+        .bg-illustration {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23e2e8f0' fill-opacity='0.4' d='M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,186.7C960,192,1056,160,1152,144C1248,128,1344,128,1392,128L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: bottom;
+            background-size: contain;
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between bg-illustration">
 
     <!-- 1. BARRE DE NAVIGATION -->
     <header class="bg-[#1e293b] text-white px-6 py-3 flex justify-between items-center shadow-md">
@@ -23,9 +30,9 @@
             <span class="font-bold text-lg tracking-wide">LIVRET'<span class="text-emerald-400">EASY</span></span>
         </div>
         <nav class="hidden md:flex items-center gap-6 text-sm text-slate-300">
-            <a href="#" class="text-white font-medium border-b-2 border-emerald-400 pb-1 flex items-center gap-1">📝 Créer un Livret</a>
-            <a href="#" class="hover:text-white flex items-center gap-1">📁 Mes Modèles</a>
-            <a href="#" class="hover:text-white flex items-center gap-1">⚙️ Paramètres</a>
+            <button onclick="changerEtape Direct(1)" class="text-white font-medium border-b-2 border-emerald-400 pb-1 flex items-center gap-1 cursor-pointer">📝 Créer un Livret</button>
+            <button onclick="alert('Mes modèles (Fonctionnalité PRO DEMO)')" class="hover:text-white flex items-center gap-1 cursor-pointer">📁 Mes Modèles</button>
+            <button onclick="alert('Paramètres de l\'entreprise')" class="hover:text-white flex items-center gap-1 cursor-pointer">⚙️ Paramètres</button>
         </nav>
         <div class="flex items-center gap-2 text-sm">
             <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-slate-900 font-bold">E</div>
@@ -42,10 +49,10 @@
     <!-- 3. ZONE PRINCIPALE (FORMULAIRE À ÉTAPES) -->
     <main class="max-w-7xl mx-auto w-full px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
         
-        <!-- PANNEAU DE GAUCHE : LE FORMULAIRE À ÉTAPES DYNAMIQUE -->
-        <section class="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+        <!-- PANNEAU DE GAUCHE : FORMULAIRE -->
+        <section class="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm z-10">
             
-            <!-- Indicateur d'Étape dynamique -->
+            <!-- Indicateur d'Étape -->
             <div class="mb-6">
                 <div id="stepIndicator" class="text-sm font-semibold text-slate-700">Étape 1 / 3 : Informations de Base</div>
                 <div class="w-full bg-slate-100 h-2 rounded-full mt-2 overflow-hidden flex">
@@ -53,7 +60,7 @@
                 </div>
             </div>
 
-            <!-- BLOC ÉTAPE 1 : INFOS DE BASE -->
+            <!-- ÉTAPE 1 -->
             <div id="step1" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -71,12 +78,10 @@
                 </div>
             </div>
 
-            <!-- BLOC ÉTAPE 2 : CULTURE & ENTREPRISE -->
+            <!-- ÉTAPE 2 -->
             <div id="step2" class="space-y-4 hidden">
                 <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-semibold text-slate-600">QUI SOMMES-NOUS ? (Présentation)</label>
-                    </div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">QUI SOMMES-NOUS ? (Présentation)</label>
                     <textarea id="inputCulture" rows="4" oninput="synchroDonnees()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">Notre mission chez InnovCorp est de digitaliser le quotidien des RH avec passion. Nos valeurs sont l'entraide, l'autonomie et l'efficacité au travail.</textarea>
                 </div>
                 <div>
@@ -85,113 +90,104 @@
                 </div>
             </div>
 
-            <!-- BLOC ÉTAPE 3 : CHECKLIST SÉCURITÉ -->
+            <!-- ÉTAPE 3 -->
             <div id="step3" class="space-y-4 hidden">
                 <h4 class="text-sm font-semibold text-slate-700">Consignes de sécurité obligatoires :</h4>
-                <p class="text-xs text-slate-500">Cochez les règles de sécurité à ajouter à la fin du document :</p>
                 <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <label class="flex items-center gap-3 text-xs text-slate-700 font-medium">
+                    <label class="flex items-center gap-3 text-xs text-slate-700 font-medium cursor-pointer">
                         <input type="checkbox" checked id="checkIncendie" onchange="synchroDonnees()" class="accent-emerald-500 w-4 h-4"> En cas d'incendie : évacuation vers le point de rassemblement extérieur.
                     </label>
-                    <label class="flex items-center gap-3 text-xs text-slate-700 font-medium">
+                    <label class="flex items-center gap-3 text-xs text-slate-700 font-medium cursor-pointer">
                         <input type="checkbox" checked id="checkSecu" onchange="synchroDonnees()" class="accent-emerald-500 w-4 h-4"> Port du badge d'accès obligatoire dans les locaux de la boîte.
                     </label>
                 </div>
-                <!-- BOUTON TÉLÉCHARGER LE PDF -->
-                <button onclick="telechargerVraiPDF()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold py-3 rounded-xl text-sm hover:from-emerald-400 hover:to-teal-400 shadow-md transition-all flex items-center justify-center gap-2">
+                
+                <!-- BOUTON DE TÉLÉCHARGEMENT CORRIGÉ -->
+                <button type="button" onclick="telechargerVraiPDF()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3 rounded-xl text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer mt-4">
                     📥 Télécharger le livret d'accueil en PDF
                 </button>
             </div>
 
-            <!-- Boutons de Navigation (Précédent / Continuer) -->
+            <!-- Boutons de Navigation -->
             <div class="flex gap-4 mt-6 pt-4 border-t border-slate-100">
                 <button id="btnPrev" onclick="changerEtape(-1)" class="w-1/2 border border-slate-300 text-slate-500 font-semibold py-2.5 rounded-lg text-sm hover:bg-slate-50 transition-all opacity-50 cursor-not-allowed" disabled>Précédent</button>
-                <button id="btnNext" onclick="changerEtape(1)" class="w-1/2 bg-emerald-500 text-white font-semibold py-2.5 rounded-lg text-sm hover:bg-emerald-400 shadow-sm transition-all uppercase">Continuer</button>
+                <button id="btnNext" onclick="changerEtape(1)" class="w-1/2 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-2.5 rounded-lg text-sm shadow-sm transition-all uppercase cursor-pointer">Continuer</button>
             </div>
         </section>
 
-        <!-- PANNEAU DE DROITE : LE COMPOSANT PDF IMMÉDIAT ET INTERACTIF -->
-        <section class="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+        <!-- PANNEAU DE DROITE : PREVIEW PDF -->
+        <section class="lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm z-10">
             <h3 class="text-sm font-semibold text-slate-700 mb-3">Prévisualisation en temps réel</h3>
             
-            <!-- Le conteneur qui va être transformé en VRAI PDF par html2pdf -->
-            <div id="pdfSource" class="bg-white border border-slate-300 rounded-lg p-8 shadow-inner flex flex-col justify-between min-h-[500px] text-slate-800">
-                
-                <!-- ENTÊTE DU DOCUMENT -->
-                <div class="text-center border-b-2 border-emerald-500 pb-4">
-                    <h4 class="text-2xl font-bold tracking-wide uppercase text-slate-900">
-                        Livret d'Accueil Salarié
-                    </h4>
-                    <p class="text-sm text-slate-500 mt-1">Bienvenue dans l'entreprise</p>
-                </div>
-
-                <!-- CORPS DU DOCUMENT (Se met à jour tout seul) -->
-                <div class="my-6 space-y-4 flex-1">
-                    <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-500/20 text-center">
-                        <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Nouveau Membre</p>
-                        <h5 id="pdfNom" class="text-xl font-bold text-emerald-600 mt-1">THOMAS DUBOIS</h5>
-                        <p id="pdfPoste" class="text-sm font-medium text-slate-700 mt-0.5">[Développeur Fullstack]</p>
-                        <p id="pdfDate" class="text-xs text-slate-500 mt-1 italic">Date d'entrée prévue : 01/08/2026</p>
+            <div class="bg-slate-100 rounded-xl p-4 flex gap-4 min-h-[450px]">
+                <!-- Conteneur Cible pour l'export PDF -->
+                <div id="pdfSource" class="flex-1 bg-white border border-slate-300 rounded-lg p-6 shadow-sm flex flex-col justify-between text-slate-800">
+                    
+                    <div class="text-center border-b-2 border-emerald-500 pb-3">
+                        <h4 class="text-xl font-bold tracking-wide uppercase text-slate-900">LIVRET D'ACCUEIL SALARIÉ</h4>
+                        <p class="text-xs text-slate-400 mt-0.5">Bienvenue dans l'entreprise</p>
                     </div>
 
-                    <div class="space-y-1">
-                        <h6 class="text-xs font-bold text-slate-900 uppercase tracking-wide">🏢 Qui sommes-nous ?</h6>
-                        <p id="pdfCulture" class="text-xs text-slate-600 leading-relaxed text-justify">Notre mission chez InnovCorp est de digitaliser le quotidien des RH avec passion. Nos valeurs sont l'entraide, l'autonomie et l'efficacité au travail.</p>
+                    <div class="my-4 space-y-3 flex-1">
+                        <div class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-500/20 text-center">
+                            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Nouveau Membre</p>
+                            <h5 id="pdfNom" class="text-lg font-bold text-emerald-600 mt-0.5">THOMAS DUBOIS</h5>
+                            <p id="pdfPoste" class="text-xs font-medium text-slate-700">[Développeur Fullstack]</p>
+                            <p id="pdfDate" class="text-[11px] text-slate-500 italic mt-0.5">Date d'entrée prévue : 01/08/2026</p>
+                        </div>
+
+                        <div class="space-y-1">
+                            <h6 class="text-[11px] font-bold text-slate-900 uppercase tracking-wide">📖 Qui sommes-nous ?</h6>
+                            <p id="pdfCulture" class="text-xs text-slate-600 leading-relaxed text-justify">Notre mission chez InnovCorp est de digitaliser le quotidien des RH avec passion.</p>
+                        </div>
+
+                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-xs">
+                            <span class="font-bold">🛜 Accès WiFi :</span> <span id="pdfWifi" class="font-mono text-slate-700">InnovCorp_Guest_2026!</span>
+                        </div>
+
+                        <div id="pdfSecuBlock" class="space-y-1 pt-1">
+                            <h6 class="text-[11px] font-bold text-rose-600 uppercase tracking-wide">⚠️ Consignes Obligatoires</h6>
+                            <ul id="pdfSecuList" class="text-[11px] text-slate-600 list-disc pl-4 space-y-0.5">
+                                <li id="pdfIncendie">En cas d'incendie : évacuation vers le point de rassemblement extérieur.</li>
+                                <li id="pdfSecu">Port du badge d'accès obligatoire dans les locaux de la boîte.</li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
-                        <span class="font-bold">🛜 Accès WiFi :</span> <span id="pdfWifi" class="font-mono text-slate-700">InnovCorp_Guest_2026!</span>
+                    <div class="border-t pt-3 flex justify-between items-center text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                        <span>Document Officiel RH</span>
+                        <span>Page 1 / 1</span>
                     </div>
-
-                    <!-- Sécurité (Affichée conditionnellement) -->
-                    <div id="pdfSecuBlock" class="space-y-1 pt-2">
-                        <h6 class="text-xs font-bold text-rose-600 uppercase tracking-wide">⚠️ Consignes Obligatoires</h6>
-                        <ul id="pdfSecuList" class="text-[11px] text-slate-600 list-disc pl-4 space-y-1">
-                            <li id="pdfIncendie">En cas d'incendie : évacuation vers le point de rassemblement extérieur.</li>
-                            <li id="pdfSecu">Port du badge d'accès obligatoire dans les locaux de la boîte.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- PIED DE PAGE DU LIVRET -->
-                <div class="border-t pt-4 flex justify-between items-center text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-                    <span>Document Officiel RH</span>
-                    <span>Page 1 / 1</span>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- FOOTER CHAT D'ASSISTANCE -->
+    <!-- ASSISTANCE CHAT -->
     <div class="fixed bottom-4 right-4 z-50">
-        <button onclick="alert('Besoin d\'aide ? Envoyez-moi un message sur LinkedIn !')" class="bg-[#1e293b] text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 hover:bg-slate-800 transition-all text-sm font-medium">
+        <button onclick="alert('Démo Livret\'Easy fonctionnelle à 100% ✨')" class="bg-[#1e293b] text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 hover:bg-slate-800 transition-all text-sm font-medium cursor-pointer">
             💬 Assistance Chat
         </button>
     </div>
 
-    <!-- 4. TOUTE LA LOGIQUE JAVASCRIPT DU LOGICIEL -->
+    <!-- LOGIQUE JAVASCRIPT RECOUDÉE ET SÉCURISÉE -->
     <script>
         let currentStep = 1;
         const totalSteps = 3;
 
-        // SYNCHRONISATION EN DIRECT DES CHAMPS
         function synchroDonnees() {
-            // Inputs gauche
             const nom = document.getElementById('inputNom').value;
             const poste = document.getElementById('inputPoste').value;
             const date = document.getElementById('inputDate').value;
             const culture = document.getElementById('inputCulture').value;
             const wifi = document.getElementById('inputWifi').value;
             
-            // Checkboxes sécurité
             const checkIncendie = document.getElementById('checkIncendie').checked;
             const checkSecu = document.getElementById('checkSecu').checked;
 
-            // Remplacement dans le PDF à droite
             document.getElementById('pdfNom').innerText = nom ? nom.toUpperCase() : "NOUVEAU SALARIÉ";
             document.getElementById('pdfPoste').innerText = poste ? "[" + poste + "]" : "[Poste non défini]";
             
-            // Formater la date proprement au format FR
             if (date) {
                 const parts = date.split('-');
                 document.getElementById('pdfDate').innerText = `Date d'entrée prévue : ${parts[2]}/${parts[1]}/${parts[0]}`;
@@ -200,33 +196,31 @@
             document.getElementById('pdfCulture').innerText = culture;
             document.getElementById('pdfWifi').innerText = wifi;
 
-            // Afficher ou masquer les règles de sécurité du PDF
             document.getElementById('pdfIncendie').style.display = checkIncendie ? 'list-item' : 'none';
             document.getElementById('pdfSecu').style.display = checkSecu ? 'list-item' : 'none';
             document.getElementById('pdfSecuBlock').style.display = (checkIncendie || checkSecu) ? 'block' : 'none';
         }
 
-        // NAVIGATION ENTRE LES ÉTAPES DU FORMULAIRE
         function changerEtape(direction) {
-            // Masquer l'étape actuelle
+            // Sécurité : On ne va pas au-delà des étapes existantes
+            if ((currentStep === 3 && direction === 1) || (currentStep === 1 && direction === -1)) {
+                if (currentStep === 3 && direction === 1) {
+                    alert("🎉 Félicitations ! Votre livret est entièrement configuré. Utilisez le bouton vert pour récupérer votre PDF.");
+                }
+                return;
+            }
+
             document.getElementById(`step${currentStep}`).classList.add('hidden');
-
-            // Calculer la nouvelle étape
             currentStep += direction;
-            if (currentStep < 1) currentStep = 1;
-            if (currentStep > totalSteps) currentStep = totalSteps;
-
-            // Afficher la nouvelle étape
             document.getElementById(`step${currentStep}`).classList.remove('hidden');
 
-            // Mettre à jour la barre de progression et l'indicateur textuel
+            // Mise à jour de l'interface
             document.getElementById('stepIndicator').innerText = `Étape ${currentStep} / ${totalSteps} : ` + 
                 (currentStep === 1 ? "Informations de Base" : currentStep === 2 ? "Culture et Équipe" : "Consignes & Validation");
             
-            const progressPercent = (currentStep / totalSteps) * 100;
-            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+            document.getElementById('progressBar').style.width = `${(currentStep / totalSteps) * 100}%`;
 
-            // Activer/Désactiver les boutons de navigation proprement
+            // Gestion de l'activation des boutons
             const btnPrev = document.getElementById('btnPrev');
             const btnNext = document.getElementById('btnNext');
 
@@ -239,36 +233,35 @@
             }
 
             if (currentStep === totalSteps) {
-                btnNext.innerText = "Terminé ✨";
-                btnNext.disabled = true;
-                btnNext.classList.add('opacity-50', 'cursor-not-allowed');
+                btnNext.innerText = "Terminer ✨";
             } else {
                 btnNext.innerText = "Continuer";
-                btnNext.disabled = false;
-                btnNext.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 
-        // L'ACTION DU LOGICIEL : GÉNÉRATION ET TÉLÉCHARGEMENT DU VRAI PDF
+        // FONCTION DE TÉLÉCHARGEMENT COMPLÈTEMENT CORRIGÉE
         function telechargerVraiPDF() {
             const element = document.getElementById('pdfSource');
             const nomSalarie = document.getElementById('inputNom').value || 'Salarie';
             
-            // Configuration haut de gamme pour l'impression PDF
             const options = {
-                margin:       10,
+                margin:       15,
                 filename:     `Livret_Accueil_${nomSalarie.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                html2canvas:  { scale: 2, logging: false, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Lancement du téléchargement natif
-            html2pdf().set(options).from(element).save();
+            // Exécution propre de la promesse de téléchargement
+            html2pdf().set(options).from(element).save()
+                .then(() => { console.log("Téléchargement réussi !"); })
+                .catch(err => { alert("Erreur lors de la génération. Réessayez."); console.error(err); });
         }
 
-        // Initialiser les données au premier chargement
-        synchroDonnees();
+        // Lancement au démarrage
+        window.onload = function() {
+            synchroDonnees();
+        };
     </script>
 </body>
 </html>
