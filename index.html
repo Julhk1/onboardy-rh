@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboardy Studio - RH</title>
+    <!-- Tailwind CSS pour un design magnifique -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Confettis -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <!-- TOP BAR -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="bg-emerald-500 p-2 rounded-xl text-slate-950 font-bold text-xl">⚡</div>
+            <h1 class="font-bold text-xl tracking-tight text-white">
+                Onboardy <span class="text-xs font-medium text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full bg-emerald-500/5">Studio TPE</span>
+            </h1>
+        </div>
+        <button onclick="lancerConfetti()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-4 py-2 rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-95">
+            Tester le succès 🎉
+        </button>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="max-w-6xl mx-auto p-6 w-full grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+        
+        <!-- CARTE 1 : ONBOARDING -->
+        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/40 transition-all group">
+            <div class="text-3xl mb-4">🚀</div>
+            <h3 class="text-lg font-bold text-white mb-2">Timeline d'Onboarding</h3>
+            <p class="text-xs text-slate-400 mb-4">Générez un livret d'accueil interactif et suivez l'arrivée du salarié pas à pas (façon Story).</p>
+            <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 space-y-2 mb-4 text-xs">
+                <div class="flex items-center gap-2 text-emerald-400">✓ Livret PDF généré</div>
+                <div class="flex items-center gap-2 text-emerald-400">✓ Signature sécurité OK</div>
+                <div class="flex items-center gap-2 text-amber-400 animate-pulse">⏳ Café d'équipe (10h30)</div>
+            </div>
+            <button onclick="ouvrirOutil('Onboarding')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 rounded-xl text-xs transition-all">Lancer le parcours</button>
+        </div>
+
+        <!-- CARTE 2 : ENTRETIEN CHAT -->
+        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/40 transition-all group">
+            <div class="text-3xl mb-4">💬</div>
+            <h3 class="text-lg font-bold text-white mb-2">Entretien Annuel "Chat"</h3>
+            <p class="text-xs text-slate-400 mb-4">Fini les longs formulaires Word. Le salarié prépare son bilan sur son téléphone via un chat ludique en 4 min.</p>
+            <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 text-xs h-[76px] flex flex-col justify-between">
+                <div class="text-slate-400 italic">"Bonjour ! Quel est ton moral dans l'équipe sur une échelle de 1 à 5 ?"</div>
+                <div class="text-right text-emerald-400 font-medium">Réponse par SMS →</div>
+            </div>
+            <button onclick="ouvrirOutil('Entretien SMS')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 rounded-xl text-xs transition-all mt-4">Simuler le Chat</button>
+        </div>
+
+        <!-- CARTE 3 : BOUTON ROUGE -->
+        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 hover:border-rose-500/40 transition-all group">
+            <div class="text-3xl mb-4">🚨</div>
+            <h3 class="text-lg font-bold text-white mb-2">Le Bouton Rouge</h3>
+            <p class="text-xs text-slate-400 mb-4">Un employé s'en va ? Planifiez proprement la coupure des accès (Slack, mail) et générez la check-list de départ.</p>
+            <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 text-xs flex items-center justify-center h-[76px]">
+                <span class="text-rose-500 font-semibold tracking-wider animate-pulse">PROCÉDURE SÉCURISÉE</span>
+            </div>
+            <button onclick="declencherBoutonRouge()" class="w-full bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-medium py-2 rounded-xl text-xs transition-all border border-rose-600/30 mt-4">Activer l'Offboarding</button>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/60 bg-slate-950/50 py-4 text-center text-xs text-slate-500 w-full">
+        <p>© 2026 Onboardy Studio - Conçu pour simplifier les PME françaises 🇫🇷</p>
+    </footer>
+
+    <!-- LOGIQUE INTERACTIVE JAVASCRIPT -->
+    <script>
+        function lancerConfetti() {
+            confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+        }
+        function ouvrirOutil(nom) {
+            alert("💻 Outil [" + nom + "] initialisé avec succès pour la démo RH !");
+            lancerConfetti();
+        }
+        function declencherBoutonRouge() {
+            alert("🚨 Alerte Offboarding : Coupure des accès Slack/Mail planifiée et e-mail de départ bienveillant rédigé !");
+            lancerConfetti();
+        }
+    </script>
+</body>
+</html>
