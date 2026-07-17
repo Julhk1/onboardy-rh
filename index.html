@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DayOne OS — Système d'Onboarding & Organigramme</title>
+    <title>DayOne OS — Système d'Onboarding Global & Portail Salarié</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Google Fonts -->
@@ -14,272 +14,258 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500/20">
 
-    <!-- HEADER -->
+    <!-- HEADER GLOBAL -->
     <header class="border-b border-slate-800 bg-slate-950 px-8 py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <div class="bg-emerald-500 text-slate-950 font-bold p-2 rounded-xl text-sm">⚡</div>
-            <h1 class="font-bold text-lg text-white">DayOne <span class="text-xs text-emerald-400 font-medium px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20">OS Élite</span></h1>
+            <h1 class="font-bold text-lg text-white">DayOne <span class="text-xs text-emerald-400 font-medium px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20">OS Élite v2</span></h1>
         </div>
-        <div class="text-xs text-slate-400 flex items-center gap-2">
-            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span> Système Connecté
+        
+        <!-- SÉLECTEUR DE VUE DÉMO (Pour simuler le parcours RH vs Employé) -->
+        <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+            <button id="viewRhBtn" onclick="basculerVue('RH')" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition-all cursor-pointer shadow-md">
+                🖥️ Vue Tableau de Bord RH
+            </button>
+            <button id="viewEmpBtn" onclick="basculerVue('Employee')" class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer">
+                📱 Vue Espace Perso Employé
+            </button>
         </div>
     </header>
 
-    <!-- MAIN GRID -->
-    <main class="max-w-7xl mx-auto w-full p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
-        
-        <!-- PANNEAU DE CONTRÔLE (GÀUCHE - 5 Colonnes) -->
+    <!-- CONTAINER 1 : TABLEAU DE BORD RH -->
+    <div id="containerRH" class="max-w-7xl mx-auto w-full p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
+        <!-- PANNEAU GAUCHE CONTRÔLE RH -->
         <div class="lg:col-span-5 space-y-6">
-            
-            <!-- 1. CONFIGURATION DE L'ENTREPRISE -->
-            <section class="bg-slate-950 border border-slate-800/80 rounded-2xl p-5 space-y-4">
+            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800 pb-2">🏢 Espace Entreprise</h3>
-                
-                <!-- Logo Upload Uploader -->
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-400 mb-1.5">Logo d'entreprise</label>
-                    <div class="border border-dashed border-slate-700 hover:border-emerald-500/50 rounded-xl p-4 text-center cursor-pointer transition-all bg-slate-900/30 relative">
-                        <input type="file" id="logoInput" accept="image/*" onchange="chargerLogo(event)" class="absolute inset-0 opacity-0 cursor-pointer">
-                        <div id="logoPreview" class="text-xs text-slate-400">
-                            <span class="text-lg block mb-1">🖼️</span> Cliquez pour ajouter votre logo
-                        </div>
-                    </div>
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Nom de la boîte</label>
+                    <input id="cfgBoite" type="text" value="InnovCorp" oninput="synchroDonneesGlobales()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-emerald-500">
                 </div>
-
-                <!-- Pièces jointes (Charte, Livret...) -->
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-400 mb-1.5">Fichiers à joindre au mail (Règlement, Charte informatique...)</label>
-                    <div class="border border-dashed border-slate-700 hover:border-blue-500/50 rounded-xl p-4 text-center cursor-pointer transition-all bg-slate-900/30 relative">
-                        <input type="file" id="docInput" multiple onchange="chargerDocuments(event)" class="absolute inset-0 opacity-0 cursor-pointer">
-                        <div class="text-xs text-slate-400">
-                            <span class="text-lg block mb-1">📎</span> Ajouter des documents annexes
-                        </div>
-                    </div>
-                    <div id="docList" class="mt-2 space-y-1"></div>
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Code WiFi Bureau</label>
+                    <input id="cfgWifi" type="text" value="InnovCorp_Secure_2026" oninput="synchroDonneesGlobales()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-emerald-500">
                 </div>
             </section>
 
-            <!-- 2. DATA IMPORT (EXCEL / CSV) -->
-            <section class="bg-slate-950 border border-slate-800/80 rounded-2xl p-5 space-y-3">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">📊 Base employés existants</h3>
-                    <button onclick="telechargerModeleExcel()" class="text-[10px] text-emerald-400 hover:underline">Télécharger modèle CSV</button>
-                </div>
-                
-                <div class="border border-dashed border-emerald-500/20 hover:border-emerald-500/60 rounded-xl p-4 text-center cursor-pointer transition-all bg-emerald-500/5 relative">
-                    <input type="file" id="csvInput" accept=".csv" onchange="importerCSV(event)" class="absolute inset-0 opacity-0 cursor-pointer">
-                    <div class="text-xs text-slate-300">
-                        <span class="text-lg block mb-1">📥</span> Glissez votre fichier d'employés (CSV)
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. ACTION : FORMULAIRE DU NOUVEL ARRIVÉ -->
-            <section class="bg-slate-950 border border-emerald-500/20 rounded-2xl p-5 space-y-4 shadow-xl shadow-emerald-500/5">
+            <section class="bg-slate-950 border border-emerald-500/20 rounded-2xl p-5 space-y-4">
                 <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider border-b border-slate-800 pb-2">✨ Ajouter une nouvelle recrue</h3>
-                
                 <div class="space-y-3 text-xs">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-slate-400 mb-1">Prénom</label>
-                            <input id="empPrenom" type="text" value="Thomas" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <input id="empPrenom" type="text" value="Thomas" oninput="synchroDonneesGlobales()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
                             <label class="block text-slate-400 mb-1">Nom</label>
-                            <input id="empNom" type="text" value="Dubois" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <input id="empNom" type="text" value="Dubois" oninput="synchroDonneesGlobales()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
                         </div>
                     </div>
                     <div>
                         <label class="block text-slate-400 mb-1">Intitulé du poste</label>
-                        <input id="empPoste" type="text" value="Développeur Fullstack" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                        <input id="empPoste" type="text" value="Développeur Fullstack" oninput="synchroDonneesGlobales()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-slate-400 mb-1">Manager Direct (Qui est son N+1 ?)</label>
-                            <select id="empManager" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
-                                <option value="Sarah Martin (CEO)">Sarah Martin (CEO)</option>
-                                <option value="Pierre Leroy (CTO)">Pierre Leroy (CTO)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 mb-1">Email Personnel du salarié</label>
-                            <input id="empEmail" type="email" value="thomas.dubois@email.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500" placeholder="salarie@gmail.com">
-                        </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Email Personnel</label>
+                        <input id="empEmail" type="email" value="thomas.dubois@email.com" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
                     </div>
 
-                    <button onclick="injecterEtEnvoyer()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2 cursor-pointer text-sm mt-2">
-                        🚀 Valider l'Onboarding & Envoyer le Mail
+                    <button onclick="validerOnboardingRH()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer text-sm font-semibold mt-2">
+                        🚀 Générer le Portail & Notifier le salarié
                     </button>
                 </div>
             </section>
         </div>
 
-        <!-- VISUELS EN DIRECT (DROITE - 7 Colonnes) -->
+        <!-- APERÇU MAIL ET ORGANIGRAMME RH -->
         <div class="lg:col-span-7 space-y-6">
-            
-            <!-- COUCHE 1 : L'ORGANIGRAMME INTERACTIF DE LA BOITE -->
             <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🌳 Organigramme d'entreprise (Mis à jour en direct)</h3>
-                
-                <!-- Conteneur de l'arbre graphique -->
-                <div class="bg-slate-900/50 rounded-xl p-6 border border-slate-800/60 min-h-[220px] flex flex-col items-center justify-center space-y-6">
-                    
-                    <!-- Niveau 1 : Le Boss -->
-                    <div class="bg-slate-950 border-2 border-purple-500/40 px-4 py-2 rounded-xl text-center shadow-md">
-                        <div class="font-bold text-xs text-white">👑 Sarah Martin</div>
-                        <div class="text-[10px] text-purple-400 font-medium">Présidente (CEO)</div>
-                    </div>
-
-                    <div class="w-0.5 h-6 bg-slate-800"></div>
-
-                    <!-- Niveau 2 : Les Managers -->
-                    <div class="flex gap-8 justify-center w-full">
-                        <div class="bg-slate-950 border border-blue-500/40 px-4 py-2 rounded-xl text-center shadow-sm relative">
-                            <div class="font-bold text-xs text-white">👔 Pierre Leroy</div>
-                            <div class="text-[10px] text-blue-400 font-medium">CTO</div>
-                            
-                            <!-- Niveau 3 : Les Équipes (S'injectent ici) -->
-                            <div class="w-0.5 h-6 bg-slate-800 mx-auto mt-2"></div>
-                            <div id="orgaTeamDev" class="space-y-2 pt-2">
-                                <div class="bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 text-[10px] text-slate-400">
-                                    Lucas Bernard (Dev Front)
-                                </div>
-                                <!-- Le nouveau se mettra ici tout seul -->
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-950 border border-amber-500/40 px-4 py-2 rounded-xl text-center shadow-sm h-fit">
-                            <div class="font-bold text-xs text-white">💼 Amandine Roy</div>
-                            <div class="text-[10px] text-amber-400 font-medium">Directrice Commerciale</div>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            <!-- COUCHE 2 : LES CARTES DE BIENVENUE PRÊTES À PARTIR -->
-            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">✉️ Aperçu du mail de bienvenue généré</h3>
-                
-                <div class="bg-slate-900 rounded-xl p-5 border border-slate-800 text-xs text-slate-300 space-y-3">
-                    <div><span class="text-slate-500">De :</span> rh@innovcorp.fr</div>
-                    <div><span class="text-slate-500">À :</span> <span id="mailCible" class="text-emerald-400 font-mono font-medium">thomas.dubois@email.com</span></div>
-                    <div class="border-b border-slate-800 pb-2"><span class="text-slate-500">Objet :</span> Bienvenue dans l'équipe ! Vos accès et livret d'accueil d'arrivée 🚀</div>
-                    
-                    <div class="space-y-2 text-slate-400 py-2 leading-relaxed">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">✉️ Mail automatique généré</h3>
+                <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 text-xs text-slate-300 space-y-2">
+                    <div><span class="text-slate-500">À :</span> <span id="mailCible" class="text-emerald-400 font-mono">thomas.dubois@email.com</span></div>
+                    <div class="border-b border-slate-800 pb-2"><span class="text-slate-500">Objet :</span> Bienvenue chez InnovCorp ! Votre espace personnel d'intégration</div>
+                    <div class="space-y-2 text-slate-400 pt-2">
                         <p>Hello <span id="mailPrenom" class="text-white font-bold">Thomas</span>,</p>
-                        <p>Toute la boîte est ravie de t'accueillir en tant que <span id="mailPoste" class="text-white font-medium">[Développeur Fullstack]</span> ! Ton poste est rattaché à l'équipe de ton manager <span id="mailManager" class="text-white font-medium">Pierre Leroy (CTO)</span>. Ton profil a bien été rattaché à l'organigramme de l'entreprise.</p>
-                        <p>Tu trouveras en pièce jointe ton livret d'accueil généré à l'instant ainsi que l'ensemble des chartes d'entreprise signées.</p>
-                    </div>
-
-                    <!-- Fichiers joints simulés -->
-                    <div class="pt-2 border-t border-slate-800 flex flex-wrap gap-2">
-                        <div class="bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800 text-[10px] text-slate-400 flex items-center gap-1">
-                            📄 Livret_Accueil.pdf <span class="text-emerald-400">✓</span>
+                        <p>Toute l'équipe a hâte de t'accueillir ! Pour préparer ton arrivée en toute sérénité, nous t'avons créé un portail d'intégration unique et sécurisé.</p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 inline-block my-2 text-center w-full">
+                            <p class="text-slate-400 text-[11px] mb-1">Votre lien secret d'accès :</p>
+                            <button onclick="basculerVue('Employee')" class="text-xs bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-1.5 rounded-lg hover:bg-emerald-500 hover:text-slate-950 transition-all cursor-pointer font-bold font-mono">
+                                dayone.os/space/thomas-dubois-7264
+                            </button>
                         </div>
-                        <div id="attachedDocsWrapper" class="flex gap-2"></div>
+                        <p class="text-[11px] italic">Ce portail contient ton livret d'accueil interactif, ton planning d'intégration et l'organigramme en temps réel.</p>
                     </div>
                 </div>
             </section>
-
         </div>
-    </main>
-
-    <!-- ASSISTANCE CHAT -->
-    <div class="fixed bottom-4 right-4 z-50">
-        <button onclick="alert('DayOne OS — Version de démonstration ultra-complète')" class="bg-slate-950 border border-slate-800 text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 hover:bg-slate-800 transition-all text-xs font-medium cursor-pointer">
-            💬 Démo Commerciale Active
-        </button>
     </div>
 
-    <!-- CODE LOGIQUE DU LOGICIEL -->
-    <script>
-        // ACTIONS DE CHARGEMENT DE LOGO
-        function chargerLogo(event) {
-            const preview = document.getElementById('logoPreview');
-            const file = event.target.files[0];
-            if (file) {
-                preview.innerHTML = `✅ Logo chargé : <span class="text-emerald-400 font-bold">${file.name}</span>`;
-            }
-        }
 
-        // ACTIONS DE CHARGEMENT DES DOCUMENTS SECONDAIRES
-        function chargerDocuments(event) {
-            const wrapper = document.getElementById('docList');
-            const mailWrapper = document.getElementById('attachedDocsWrapper');
-            wrapper.innerHTML = "";
-            mailWrapper.innerHTML = "";
+    <!-- CONTAINER 2 : L'ESPACE PERSO DU SALARIÉ (Masqué par défaut) -->
+    <div id="containerEmployee" class="max-w-7xl mx-auto w-full p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start hidden">
+        
+        <!-- COLONNE GAUCHE ESPACE EMPLOYÉ : INFOS ACCUEIL ET ORGANIGRAMME -->
+        <div class="lg:col-span-7 space-y-6">
             
-            const files = event.target.files;
-            for (let i = 0; i < files.length; i++) {
-                // Ajouter dans la config gauche
-                const item = document.createElement('div');
-                item.className = "text-[11px] text-slate-400 flex items-center gap-1";
-                item.innerHTML = `📁 ${files[i].name}`;
-                wrapper.appendChild(item);
+            <!-- PORTAIL BIENVENUE CARD -->
+            <div class="bg-gradient-to-r from-slate-950 to-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-xl">
+                <div class="absolute right-6 top-6 text-4xl opacity-10 font-bold select-none">WELCOME</div>
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/5 border border-emerald-500/20 px-2.5 py-1 rounded-md">Mon Espace d'Intégration</span>
+                <h2 class="text-2xl font-bold text-white mt-3">Ravi de t'accueillir, <span id="empWelcomeName" class="text-emerald-400">Thomas</span> !</h2>
+                <p class="text-xs text-slate-400 mt-1">Tu es officiellement attendu le <span id="empWelcomeDate" class="text-white font-medium">01/09/2026</span> au poste de <span id="empWelcomePoste" class="text-white italic">[Développeur Fullstack]</span> chez <span id="empWelcomeBoite" class="text-white font-bold">InnovCorp</span>.</p>
+                
+                <div class="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-slate-800 text-xs">
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-0.5">🛜 WiFi des bureaux</span>
+                        <span id="empWelcomeWifi" class="font-mono text-white font-semibold">InnovCorp_Secure_2026</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block mb-0.5">📂 Téléchargement</span>
+                        <button onclick="alert('Téléchargement du livret d\'accueil officiel au format PDF')" class="text-emerald-400 hover:underline font-bold text-left block">Obtenir mon Livret PDF 📥</button>
+                    </div>
+                </div>
+            </div>
 
-                // Ajouter en pièce jointe du mail à droite
-                const mailItem = document.createElement('div');
-                mailItem.className = "bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800 text-[10px] text-slate-400 flex items-center gap-1";
-                mailItem.innerHTML = `📎 ${files[i].name} <span class="text-blue-400">✓</span>`;
-                mailWrapper.appendChild(mailItem);
-            }
-        }
+            <!-- ORGANIGRAMME INTEGRÉ DYNAMIQUE -->
+            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🌳 Votre place dans l'organigramme (Mis à jour automatiquement)</h3>
+                <div class="bg-slate-900/30 rounded-xl p-4 border border-slate-800/60 flex flex-col items-center justify-center space-y-4 min-h-[200px]">
+                    
+                    <!-- CEO -->
+                    <div class="bg-slate-950 border border-purple-500/30 px-4 py-1.5 rounded-xl text-center text-xs">
+                        <div class="font-bold text-white">👑 Sarah Martin</div>
+                        <div class="text-[9px] text-purple-400">CEO</div>
+                    </div>
+                    <div class="w-0.5 h-4 bg-slate-800"></div>
+                    
+                    <!-- CTO / Manager -->
+                    <div class="bg-slate-950 border border-blue-500/40 px-5 py-2 rounded-xl text-center text-xs relative">
+                        <div class="font-bold text-white">👔 Pierre Leroy</div>
+                        <div class="text-[9px] text-blue-400">CTO (Votre N+1)</div>
+                        
+                        <div class="w-0.5 h-4 bg-slate-800 mx-auto mt-2"></div>
+                        <!-- Mon équipe -->
+                        <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl mt-1 space-y-1.5 min-w-[150px]">
+                            <div class="text-[9px] text-slate-500 font-semibold border-b border-slate-800 pb-1 uppercase">Votre équipe :</div>
+                            <div class="text-[10px] text-slate-400">Lucas Bernard (Front)</div>
+                            <!-- Le salarié s'auto-injecte ici dans son propre espace perso -->
+                            <div id="empSelfOrgaNode" class="bg-emerald-500/10 border border-emerald-500/40 px-2 py-1 rounded text-[10px] text-emerald-400 font-bold">
+                                THOMAS DUBOIS (Moi)
+                            </div>
+                        </div>
+                    </div>
 
-        // SIMULATION D'IMPORT EXCEL / CSV DE BASE EMPLOYE
-        function telechargerModeleExcel() {
-            // Crée un faux fichier CSV modèle téléchargeable
-            const csvContent = "data:text/csv;charset=utf-8,Prenom,Nom,Poste,Manager\nLucas,Bernard,Dev Front,Pierre Leroy\nJean,Dupont,Sales Executive,Amandine Roy";
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Modele_Employees_DayOne.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+                </div>
+            </section>
+        </div>
 
-        function importerCSV(event) {
-            const file = event.target.files[0];
-            if (file) {
-                alert(`📊 Base de données analysée !\nFichier "${file.name}" importé avec succès. Les employés existants ont été chargés en arrière-plan.`);
-            }
-        }
+        <!-- COLONNE DROITE ESPACE EMPLOYÉ : LA TIMELINE STRATÉGIQUE -->
+        <div class="lg:col-span-5">
+            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🗺️ Feuille de route d'intégration</h3>
+                
+                <!-- La Timeline demandée -->
+                <div class="relative border-l border-slate-800 pl-5 ml-2.5 space-y-6 py-2 text-xs">
+                    
+                    <!-- JOUR 1 (Actif / Validé par défaut) -->
+                    <div class="relative">
+                        <div class="absolute -left-7.5 bg-emerald-500/10 border border-emerald-500 text-emerald-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] shadow-sm shadow-emerald-500/20">✓</div>
+                        <h4 class="font-bold text-white text-sm">Jour 1 : Accueil & Configuration</h4>
+                        <p class="text-slate-400 mt-1 text-[11px] leading-relaxed">Petit-déjeuner avec l'équipe, configuration de ton ordinateur et attribution de ton badge d'accès aux locaux.</p>
+                    </div>
 
-        // SYNCHRONISATION DU MAIL ET DU SYSTÈME
-        function injecterEtEnvoyer() {
+                    <!-- SEMAINE 1 -->
+                    <div class="relative">
+                        <div class="absolute -left-7.5 bg-slate-900 border border-slate-700 text-slate-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">2</div>
+                        <h4 class="font-semibold text-slate-200 text-sm">Semaine 1 : Immersion Métier</h4>
+                        <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Premiers rendez-vous de synchronisation avec ton manager Pierre Leroy pour appréhender la base technique et nos process de déploiement.</p>
+                    </div>
+
+                    <!-- MOIS 1 -->
+                    <div class="relative">
+                        <div class="absolute -left-7.5 bg-slate-900 border border-slate-700 text-slate-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">3</div>
+                        <h4 class="font-semibold text-slate-200 text-sm">Mois 1 : Premier Point d'Étape</h4>
+                        <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Bilan de tes 30 premiers jours au sein de l'entreprise. C'est le moment de nous partager ton rapport d'étonnement pour améliorer l'équipe.</p>
+                    </div>
+
+                    <!-- FIN PÉRIODE D'ESSAI -->
+                    <div class="relative">
+                        <div class="absolute -left-7.5 bg-slate-900 border border-slate-700 text-slate-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">4</div>
+                        <h4 class="font-semibold text-slate-200 text-sm">Fin de la période d'essai : Validation</h4>
+                        <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Entretien final de validation mutuelle de ton intégration définitive au sein de la structure InnovCorp.</p>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- FOOTER SOUVERAIN -->
+    <footer class="border-t border-slate-800 bg-slate-950/80 py-4 text-center text-[11px] text-slate-500 w-full mt-10">
+        <p>© 2026 DayOne — Plateforme Premium d'Expérience Collaborateur B2B 🇫🇷</p>
+    </footer>
+
+    <!-- SCRIPT DE SYNCHRONISATION -->
+    <script>
+        // Synchronise toutes les variables textuelles à la volée
+        function synchroDonneesGlobales() {
+            const boite = document.getElementById('cfgBoite').value;
+            const wifi = document.getElementById('cfgWifi').value;
             const prenom = document.getElementById('empPrenom').value;
             const nom = document.getElementById('empNom').value;
             const poste = document.getElementById('empPoste').value;
-            const manager = document.getElementById('empManager').value;
             const email = document.getElementById('empEmail').value;
+            const date = document.getElementById('empDate').value;
 
-            if(!prenom || !nom || !email) {
-                alert("Veuillez remplir au moins le prénom, le nom et l'adresse e-mail.");
-                return;
+            // Update Email Preview
+            document.getElementById('mailCible').innerText = email || 'salarie@email.com';
+            document.getElementById('mailPrenom').innerText = prenom || 'Thomas';
+            document.getElementById('mailPoste').innerText = poste ? `[${poste}]` : '[Poste non défini]';
+
+            // Update Espace Employé en arrière-plan
+            document.getElementById('empWelcomeName').innerText = prenom;
+            document.getElementById('empWelcomeBoite').innerText = boite;
+            document.getElementById('empWelcomePoste').innerText = `[${poste}]`;
+            document.getElementById('empWelcomeWifi').innerText = wifi;
+            document.getElementById('empSelfOrgaNode').innerText = `${prenom.toUpperCase()} ${nom.toUpperCase()} (Moi)`;
+
+            if (date) {
+                const parts = date.split('-');
+                document.getElementById('empWelcomeDate').innerText = `${parts[2]}/${parts[1]}/${parts[0]}`;
             }
-
-            // 1. Mettre à jour l'aperçu du mail
-            document.getElementById('mailCible').innerText = email;
-            document.getElementById('mailPrenom').innerText = prenom;
-            document.getElementById('mailPoste').innerText = `[${poste}]`;
-            document.getElementById('mailManager').innerText = manager;
-
-            // 2. INJECTER LE NOUVEL ARRIVÉ DIRECTEMENT DANS L'ORGANIGRAMME
-            const teamDev = document.getElementById('orgaTeamDev');
-            
-            // On vérifie s'il n'est pas déjà dans l'orga pour éviter les doublons à chaque clic
-            const ID_Unique = `node-${prenom}-${nom}`;
-            if (!document.getElementById(ID_Unique)) {
-                const nouveauNoeud = document.createElement('div');
-                nouveauNoeud.id = ID_Unique;
-                nouveauNoeud.className = "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 px-3 py-1.5 rounded-lg border border-emerald-500 text-[10px] text-white font-bold shadow-md animate-bounce";
-                nouveauNoeud.innerHTML = `✨ ${prenom} ${nom} (${poste.split(' ')[0]})`;
-                teamDev.appendChild(nouveauNoeud);
-            }
-
-            alert(`🚀 SUCCÈS DAYONE OS :\n\n1. Le profil de ${prenom} ${nom} a été sauvegardé.\n2. Il a été rattaché automatiquement sous la direction de ${manager.split(' ')[0]} dans l'organigramme.\n3. L'e-mail d'intégration contenant le Livret d'Accueil et les documents annexes a été envoyé à ${email} !`);
         }
+
+        // Basculer l'affichage pour montrer soit la vue RH, soit la vue Salarié dans la démo
+        function basculerVue(type) {
+            const blockRh = document.getElementById('containerRH');
+            const blockEmp = document.getElementById('containerEmployee');
+            const btnRh = document.getElementById('viewRhBtn');
+            const btnEmp = document.getElementById('viewEmpBtn');
+
+            if (type === 'RH') {
+                blockRh.classList.remove('hidden');
+                blockEmp.classList.add('hidden');
+                btnRh.className = "px-4 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition-all cursor-pointer shadow-md";
+                btnEmp.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer";
+            } else {
+                blockRh.classList.add('hidden');
+                blockEmp.classList.remove('hidden');
+                btnEmp.className = "px-4 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition-all cursor-pointer shadow-md";
+                btnRh.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer";
+            }
+        }
+
+        function validerOnboardingRH() {
+            const prenom = document.getElementById('empPrenom').value;
+            alert(`⚡ SUCCÈS : Le portail de ${prenom} est généré et activé.\nUn e-mail d'invitation contenant son lien secret d'accès vient de lui être envoyé.`);
+            // Bascule automatique sur la vue employé pour montrer l'effet waouh au client
+            basculerVue('Employee');
+        }
+
+        window.onload = function() {
+            synchroDonneesGlobales();
+        };
     </script>
 </body>
 </html>
