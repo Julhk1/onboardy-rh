@@ -3,91 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onboardy Studio - RH</title>
-    <!-- Tailwind CSS pour un design magnifique -->
+    <title>Livret'Easy - Créer un Livret d'Accueil</title>
+    <!-- Tailwind CSS pour un design incroyable -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Confettis -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Librairie de génération PDF en direct à partir du HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
 
-    <!-- TOP BAR -->
-    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur px-6 py-4 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <div class="bg-emerald-500 p-2 rounded-xl text-slate-950 font-bold text-xl">⚡</div>
-            <h1 class="font-bold text-xl tracking-tight text-white">
-                Onboardy <span class="text-xs font-medium text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full bg-emerald-500/5">Studio TPE</span>
-            </h1>
+    <!-- 1. BARRE DE NAVIGATION -->
+    <header class="bg-[#1e293b] text-white px-6 py-3 flex justify-between items-center shadow-md">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">📖</span>
+            <span class="font-bold text-lg tracking-wide">LIVRET'<span class="text-emerald-400">EASY</span></span>
         </div>
-        <button onclick="lancerConfetti()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-4 py-2 rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-95">
-            Tester le succès 🎉
-        </button>
+        <nav class="hidden md:flex items-center gap-6 text-sm text-slate-300">
+            <a href="#" class="text-white font-medium border-b-2 border-emerald-400 pb-1 flex items-center gap-1">📝 Créer un Livret</a>
+            <a href="#" class="hover:text-white flex items-center gap-1">📁 Mes Modèles</a>
+            <a href="#" class="hover:text-white flex items-center gap-1">⚙️ Paramètres</a>
+        </nav>
+        <div class="flex items-center gap-2 text-sm">
+            <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-slate-900 font-bold">E</div>
+            <span class="font-medium text-slate-200">Emma - RH ▾</span>
+        </div>
     </header>
 
-    <!-- CONTENT -->
-    <main class="max-w-6xl mx-auto p-6 w-full grid grid-cols-1 md:grid-cols-3 gap-6 my-auto">
+    <!-- 2. TITRE PRINCIPAL -->
+    <div class="max-w-7xl mx-auto w-full px-6 pt-6">
+        <h2 class="text-2xl font-bold text-slate-900">Bienvenue sur Livret'Easy : Créez votre Livret d'Accueil en quelques clics.</h2>
+        <p class="text-sm text-slate-500 mt-1">Suivez les étapes pour générer votre document personnalisé.</p>
+    </div>
+
+    <!-- 3. ZONE PRINCIPALE (FORMULAIRE À ÉTAPES) -->
+    <main class="max-w-7xl mx-auto w-full px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
         
-        <!-- CARTE 1 : ONBOARDING -->
-        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/40 transition-all group">
-            <div class="text-3xl mb-4">🚀</div>
-            <h3 class="text-lg font-bold text-white mb-2">Timeline d'Onboarding</h3>
-            <p class="text-xs text-slate-400 mb-4">Générez un livret d'accueil interactif et suivez l'arrivée du salarié pas à pas (façon Story).</p>
-            <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 space-y-2 mb-4 text-xs">
-                <div class="flex items-center gap-2 text-emerald-400">✓ Livret PDF généré</div>
-                <div class="flex items-center gap-2 text-emerald-400">✓ Signature sécurité OK</div>
-                <div class="flex items-center gap-2 text-amber-400 animate-pulse">⏳ Café d'équipe (10h30)</div>
+        <!-- PANNEAU DE GAUCHE : LE FORMULAIRE À ÉTAPES DYNAMIQUE -->
+        <section class="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+            
+            <!-- Indicateur d'Étape dynamique -->
+            <div class="mb-6">
+                <div id="stepIndicator" class="text-sm font-semibold text-slate-700">Étape 1 / 3 : Informations de Base</div>
+                <div class="w-full bg-slate-100 h-2 rounded-full mt-2 overflow-hidden flex">
+                    <div id="progressBar" class="bg-emerald-500 h-full w-1/3 transition-all duration-300"></div>
+                </div>
             </div>
-            <button onclick="ouvrirOutil('Onboarding')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 rounded-xl text-xs transition-all">Lancer le parcours</button>
-        </div>
 
-        <!-- CARTE 2 : ENTRETIEN CHAT -->
-        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/40 transition-all group">
-            <div class="text-3xl mb-4">💬</div>
-            <h3 class="text-lg font-bold text-white mb-2">Entretien Annuel "Chat"</h3>
-            <p class="text-xs text-slate-400 mb-4">Fini les longs formulaires Word. Le salarié prépare son bilan sur son téléphone via un chat ludique en 4 min.</p>
-            <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 text-xs h-[76px] flex flex-col justify-between">
-                <div class="text-slate-400 italic">"Bonjour ! Quel est ton moral dans l'équipe sur une échelle de 1 à 5 ?"</div>
-                <div class="text-right text-emerald-400 font-medium">Réponse par SMS →</div>
+            <!-- BLOC ÉTAPE 1 : INFOS DE BASE -->
+            <div id="step1" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nom du nouveau salarié ❓</label>
+                        <input id="inputNom" type="text" value="Thomas Dubois" oninput="synchroDonnees()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Intitulé du poste ❓</label>
+                        <input id="inputPoste" type="text" value="Développeur Fullstack" oninput="synchroDonnees()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Date d'arrivée ❓</label>
+                    <input id="inputDate" type="date" value="2026-08-01" oninput="synchroDonnees()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+                </div>
             </div>
-            <button onclick="ouvrirOutil('Entretien SMS')" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 rounded-xl text-xs transition-all mt-4">Simuler le Chat</button>
-        </div>
 
-        <!-- CARTE 3 : BOUTON ROUGE -->
-        <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 hover:border-rose-500/40 transition-all group">
-            <div class="text-3xl mb-4">🚨</div>
-            <h3 class="text-lg font-bold text-white mb-2">Le Bouton Rouge</h3>
-            <p class="text-xs text-slate-400 mb-4">Un employé s'en va ? Planifiez proprement la coupure des accès (Slack, mail) et générez la check-list de départ.</p>
-            <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 text-xs flex items-center justify-center h-[76px]">
-                <span class="text-rose-500 font-semibold tracking-wider animate-pulse">PROCÉDURE SÉCURISÉE</span>
+            <!-- BLOC ÉTAPE 2 : CULTURE & ENTREPRISE -->
+            <div id="step2" class="space-y-4 hidden">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-slate-600">QUI SOMMES-NOUS ? (Présentation)</label>
+                    </div>
+                    <textarea id="inputCulture" rows="4" oninput="synchroDonnees()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">Notre mission chez InnovCorp est de digitaliser le quotidien des RH avec passion. Nos valeurs sont l'entraide, l'autonomie et l'efficacité au travail.</textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Code WiFi des bureaux 🛜</label>
+                    <input id="inputWifi" type="text" value="InnovCorp_Guest_2026!" oninput="synchroDonnees()" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+                </div>
             </div>
-            <button onclick="declencherBoutonRouge()" class="w-full bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white font-medium py-2 rounded-xl text-xs transition-all border border-rose-600/30 mt-4">Activer l'Offboarding</button>
-        </div>
 
+            <!-- BLOC ÉTAPE 3 : CHECKLIST SÉCURITÉ -->
+            <div id="step3" class="space-y-4 hidden">
+                <h4 class="text-sm font-semibold text-slate-700">Consignes de sécurité obligatoires :</h4>
+                <p class="text-xs text-slate-500">Cochez les règles de sécurité à ajouter à la fin du document :</p>
+                <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <label class="flex items-center gap-3 text-xs text-slate-700 font-medium">
+                        <input type="checkbox" checked id="checkIncendie" onchange="synchroDonnees()" class="accent-emerald-500 w-4 h-4"> En cas d'incendie : évacuation vers le point de rassemblement extérieur.
+                    </label>
+                    <label class="flex items-center gap-3 text-xs text-slate-700 font-medium">
+                        <input type="checkbox" checked id="checkSecu" onchange="synchroDonnees()" class="accent-emerald-500 w-4 h-4"> Port du badge d'accès obligatoire dans les locaux de la boîte.
+                    </label>
+                </div>
+                <!-- BOUTON TÉLÉCHARGER LE PDF -->
+                <button onclick="telechargerVraiPDF()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold py-3 rounded-xl text-sm hover:from-emerald-400 hover:to-teal-400 shadow-md transition-all flex items-center justify-center gap-2">
+                    📥 Télécharger le livret d'accueil en PDF
+                </button>
+            </div>
+
+            <!-- Boutons de Navigation (Précédent / Continuer) -->
+            <div class="flex gap-4 mt-6 pt-4 border-t border-slate-100">
+                <button id="btnPrev" onclick="changerEtape(-1)" class="w-1/2 border border-slate-300 text-slate-500 font-semibold py-2.5 rounded-lg text-sm hover:bg-slate-50 transition-all opacity-50 cursor-not-allowed" disabled>Précédent</button>
+                <button id="btnNext" onclick="changerEtape(1)" class="w-1/2 bg-emerald-500 text-white font-semibold py-2.5 rounded-lg text-sm hover:bg-emerald-400 shadow-sm transition-all uppercase">Continuer</button>
+            </div>
+        </section>
+
+        <!-- PANNEAU DE DROITE : LE COMPOSANT PDF IMMÉDIAT ET INTERACTIF -->
+        <section class="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+            <h3 class="text-sm font-semibold text-slate-700 mb-3">Prévisualisation en temps réel</h3>
+            
+            <!-- Le conteneur qui va être transformé en VRAI PDF par html2pdf -->
+            <div id="pdfSource" class="bg-white border border-slate-300 rounded-lg p-8 shadow-inner flex flex-col justify-between min-h-[500px] text-slate-800">
+                
+                <!-- ENTÊTE DU DOCUMENT -->
+                <div class="text-center border-b-2 border-emerald-500 pb-4">
+                    <h4 class="text-2xl font-bold tracking-wide uppercase text-slate-900">
+                        Livret d'Accueil Salarié
+                    </h4>
+                    <p class="text-sm text-slate-500 mt-1">Bienvenue dans l'entreprise</p>
+                </div>
+
+                <!-- CORPS DU DOCUMENT (Se met à jour tout seul) -->
+                <div class="my-6 space-y-4 flex-1">
+                    <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-500/20 text-center">
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Nouveau Membre</p>
+                        <h5 id="pdfNom" class="text-xl font-bold text-emerald-600 mt-1">THOMAS DUBOIS</h5>
+                        <p id="pdfPoste" class="text-sm font-medium text-slate-700 mt-0.5">[Développeur Fullstack]</p>
+                        <p id="pdfDate" class="text-xs text-slate-500 mt-1 italic">Date d'entrée prévue : 01/08/2026</p>
+                    </div>
+
+                    <div class="space-y-1">
+                        <h6 class="text-xs font-bold text-slate-900 uppercase tracking-wide">🏢 Qui sommes-nous ?</h6>
+                        <p id="pdfCulture" class="text-xs text-slate-600 leading-relaxed text-justify">Notre mission chez InnovCorp est de digitaliser le quotidien des RH avec passion. Nos valeurs sont l'entraide, l'autonomie et l'efficacité au travail.</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
+                        <span class="font-bold">🛜 Accès WiFi :</span> <span id="pdfWifi" class="font-mono text-slate-700">InnovCorp_Guest_2026!</span>
+                    </div>
+
+                    <!-- Sécurité (Affichée conditionnellement) -->
+                    <div id="pdfSecuBlock" class="space-y-1 pt-2">
+                        <h6 class="text-xs font-bold text-rose-600 uppercase tracking-wide">⚠️ Consignes Obligatoires</h6>
+                        <ul id="pdfSecuList" class="text-[11px] text-slate-600 list-disc pl-4 space-y-1">
+                            <li id="pdfIncendie">En cas d'incendie : évacuation vers le point de rassemblement extérieur.</li>
+                            <li id="pdfSecu">Port du badge d'accès obligatoire dans les locaux de la boîte.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- PIED DE PAGE DU LIVRET -->
+                <div class="border-t pt-4 flex justify-between items-center text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                    <span>Document Officiel RH</span>
+                    <span>Page 1 / 1</span>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="border-t border-slate-800/60 bg-slate-950/50 py-4 text-center text-xs text-slate-500 w-full">
-        <p>© 2026 Onboardy Studio - Conçu pour simplifier les PME françaises 🇫🇷</p>
-    </footer>
+    <!-- FOOTER CHAT D'ASSISTANCE -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <button onclick="alert('Besoin d\'aide ? Envoyez-moi un message sur LinkedIn !')" class="bg-[#1e293b] text-white px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 hover:bg-slate-800 transition-all text-sm font-medium">
+            💬 Assistance Chat
+        </button>
+    </div>
 
-    <!-- LOGIQUE INTERACTIVE JAVASCRIPT -->
+    <!-- 4. TOUTE LA LOGIQUE JAVASCRIPT DU LOGICIEL -->
     <script>
-        function lancerConfetti() {
-            confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // SYNCHRONISATION EN DIRECT DES CHAMPS
+        function synchroDonnees() {
+            // Inputs gauche
+            const nom = document.getElementById('inputNom').value;
+            const poste = document.getElementById('inputPoste').value;
+            const date = document.getElementById('inputDate').value;
+            const culture = document.getElementById('inputCulture').value;
+            const wifi = document.getElementById('inputWifi').value;
+            
+            // Checkboxes sécurité
+            const checkIncendie = document.getElementById('checkIncendie').checked;
+            const checkSecu = document.getElementById('checkSecu').checked;
+
+            // Remplacement dans le PDF à droite
+            document.getElementById('pdfNom').innerText = nom ? nom.toUpperCase() : "NOUVEAU SALARIÉ";
+            document.getElementById('pdfPoste').innerText = poste ? "[" + poste + "]" : "[Poste non défini]";
+            
+            // Formater la date proprement au format FR
+            if (date) {
+                const parts = date.split('-');
+                document.getElementById('pdfDate').innerText = `Date d'entrée prévue : ${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            document.getElementById('pdfCulture').innerText = culture;
+            document.getElementById('pdfWifi').innerText = wifi;
+
+            // Afficher ou masquer les règles de sécurité du PDF
+            document.getElementById('pdfIncendie').style.display = checkIncendie ? 'list-item' : 'none';
+            document.getElementById('pdfSecu').style.display = checkSecu ? 'list-item' : 'none';
+            document.getElementById('pdfSecuBlock').style.display = (checkIncendie || checkSecu) ? 'block' : 'none';
         }
-        function ouvrirOutil(nom) {
-            alert("💻 Outil [" + nom + "] initialisé avec succès pour la démo RH !");
-            lancerConfetti();
+
+        // NAVIGATION ENTRE LES ÉTAPES DU FORMULAIRE
+        function changerEtape(direction) {
+            // Masquer l'étape actuelle
+            document.getElementById(`step${currentStep}`).classList.add('hidden');
+
+            // Calculer la nouvelle étape
+            currentStep += direction;
+            if (currentStep < 1) currentStep = 1;
+            if (currentStep > totalSteps) currentStep = totalSteps;
+
+            // Afficher la nouvelle étape
+            document.getElementById(`step${currentStep}`).classList.remove('hidden');
+
+            // Mettre à jour la barre de progression et l'indicateur textuel
+            document.getElementById('stepIndicator').innerText = `Étape ${currentStep} / ${totalSteps} : ` + 
+                (currentStep === 1 ? "Informations de Base" : currentStep === 2 ? "Culture et Équipe" : "Consignes & Validation");
+            
+            const progressPercent = (currentStep / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+            // Activer/Désactiver les boutons de navigation proprement
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+
+            if (currentStep === 1) {
+                btnPrev.disabled = true;
+                btnPrev.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                btnPrev.disabled = false;
+                btnPrev.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            if (currentStep === totalSteps) {
+                btnNext.innerText = "Terminé ✨";
+                btnNext.disabled = true;
+                btnNext.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                btnNext.innerText = "Continuer";
+                btnNext.disabled = false;
+                btnNext.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
         }
-        function declencherBoutonRouge() {
-            alert("🚨 Alerte Offboarding : Coupure des accès Slack/Mail planifiée et e-mail de départ bienveillant rédigé !");
-            lancerConfetti();
+
+        // L'ACTION DU LOGICIEL : GÉNÉRATION ET TÉLÉCHARGEMENT DU VRAI PDF
+        function telechargerVraiPDF() {
+            const element = document.getElementById('pdfSource');
+            const nomSalarie = document.getElementById('inputNom').value || 'Salarie';
+            
+            // Configuration haut de gamme pour l'impression PDF
+            const options = {
+                margin:       10,
+                filename:     `Livret_Accueil_${nomSalarie.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Lancement du téléchargement natif
+            html2pdf().set(options).from(element).save();
         }
+
+        // Initialiser les données au premier chargement
+        synchroDonnees();
     </script>
 </body>
 </html>
