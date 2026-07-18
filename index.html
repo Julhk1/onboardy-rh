@@ -37,7 +37,7 @@
         <!-- COLONNE GAUCHE CONFIGURATION RH -->
         <div class="lg:col-span-5 space-y-6">
             
-            <!-- CONFIG ENTREPRISE (LOGO & DOCS) RE-INJECTÉ ! -->
+            <!-- CONFIG ENTREPRISE (LOGO & DOCS) -->
             <section class="card-premium p-5 space-y-4">
                 <h3 class="text-xs font-bold uppercase tracking-wider border-b border-slate-200 pb-2">🏢 1. Configuration Entreprise</h3>
                 
@@ -61,7 +61,7 @@
                     </div>
                 </div>
 
-                <!-- Pièces jointes (RETOUR !) -->
+                <!-- Pièces jointes -->
                 <div>
                     <label class="block text-[11px] font-semibold mb-1">Documents annexes à joindre (Règlement, Charte...)</label>
                     <div class="upload-box p-3 text-center cursor-pointer relative">
@@ -72,7 +72,7 @@
                 </div>
             </section>
 
-            <!-- IMPORT EXCEL / CSV (RETOUR !) -->
+            <!-- IMPORT EXCEL / CSV -->
             <section class="card-premium p-5 space-y-3">
                 <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                     <h3 class="text-xs font-bold uppercase tracking-wider">📊 2. Base Employés Existants</h3>
@@ -117,7 +117,7 @@
                     </div>
                     <div>
                         <label class="block mb-1 font-medium">Date d'arrivée</label>
-                        <input id="empDate" type="date" value="2026-09-01" oninput="synchroTotale()" class="input-premium w-full focus:outline-none">
+                        <input id="empDate" type="date" value="2026-09-01" class="input-premium w-full focus:outline-none">
                     </div>
 
                     <button onclick="declencherOnboardingGeneral()" class="btn-action w-full py-3 flex items-center justify-center gap-2 cursor-pointer text-sm font-semibold mt-2">
@@ -133,17 +133,17 @@
             <section class="card-premium p-5">
                 <h3 class="text-xs font-bold uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">🌳 Organigramme d'entreprise</h3>
                 <div class="bg-slate-50 rounded-xl p-6 border border-slate-200 min-h-[200px] flex flex-col items-center justify-center space-y-4">
-                    <div class="bg-white border border-purple-200 px-4 py-1.5 rounded-xl text-center text-xs">
-                        <div class="font-bold">👑 Sarah Martin</div>
-                        <div class="text-[9px] text-purple-600 font-medium">CEO</div>
+                    <div class="bg-white border border-purple-200 px-4 py-1.5 rounded-xl text-center text-xs shadow-sm">
+                        <div class="font-bold text-slate-800">👑 Sarah Martin</div>
+                        <div class="text-[9px] text-purple-600 font-semibold">CEO</div>
                     </div>
                     <div class="w-0.5 h-4 bg-slate-300"></div>
-                    <div class="bg-white border border-blue-200 px-5 py-2 rounded-xl text-center text-xs relative">
-                        <div class="font-bold">👔 Pierre Leroy</div>
-                        <div class="text-[9px] text-blue-600 font-medium">CTO</div>
+                    <div class="bg-white border border-blue-200 px-5 py-2 rounded-xl text-center text-xs relative shadow-sm">
+                        <div class="font-bold text-slate-800">👔 Pierre Leroy</div>
+                        <div class="text-[9px] text-blue-600 font-semibold">CTO</div>
                         <div class="w-0.5 h-4 bg-slate-300 mx-auto mt-2"></div>
-                        <div class="bg-slate-100 border border-slate-200 p-2 rounded-xl mt-1 space-y-1.5 min-w-[160px]">
-                            <div class="text-[9px] text-slate-500 font-semibold border-b border-slate-200 pb-1 uppercase">Équipe :</div>
+                        <div id="orgaTeamBox" class="bg-slate-50 border border-slate-200 p-2 rounded-xl mt-1 space-y-1.5 min-w-[160px]">
+                            <div class="text-[9px] text-slate-500 font-bold border-b border-slate-200 pb-1 uppercase">Équipe :</div>
                             <div class="text-[10px] text-slate-600">Lucas Bernard (Front)</div>
                             <div id="rhOrgaDynamicNode" class="bg-emerald-50 border border-emerald-200 px-2 py-1 rounded text-[10px] text-emerald-700 font-bold hidden">
                                 <!-- Injecté -->
@@ -157,7 +157,7 @@
             <section class="card-premium p-5">
                 <h3 class="text-xs font-bold uppercase tracking-wider mb-3 border-b border-slate-200 pb-2">✉️ Aperçu du mail prêt à partir</h3>
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 text-xs space-y-2">
-                    <div><span class="text-slate-400">À :</span> <span id="mailCible" class="text-emerald-600 font-mono font-medium">thomas.dubois@email.com</span></div>
+                    <div><span class="text-slate-400">À :</span> <span id="mailCible" class="text-emerald-600 font-mono font-medium">thomas.dubois@gmail.com</span></div>
                     <div class="border-b border-slate-200 pb-2"><span class="text-slate-400">Objet :</span> Bienvenue ! Vos accès et votre espace d'intégration unique</div>
                     <div class="space-y-2 text-slate-600 pt-2">
                         <p>Hello <span id="mailPrenom" class="font-bold text-slate-900">Thomas</span>,</p>
@@ -182,14 +182,14 @@
         <!-- GAUCHE EMPLOYÉ -->
         <div class="lg:col-span-7 space-y-6">
             <div class="employee-welcome-card rounded-2xl p-6 relative shadow-sm">
-                <span id="empLogoSpace" class="text-xs text-slate-400 block mb-2 font-mono uppercase tracking-wider">[Logo Entreprise]</span>
-                <h2 class="text-2xl font-bold">Ravi de t'accueillir, <span id="empWelcomeName" class="text-emerald-600">Thomas</span> !</h2>
-                <p class="text-xs text-slate-500 mt-1">Tu es attendu le <span id="empWelcomeDate" class="font-medium">01/09/2026</span> chez <span id="empWelcomeBoite" class="font-bold">InnovCorp</span> en tant que <span id="empWelcomePoste" class="italic">[Développeur Fullstack]</span>.</p>
+                <div id="empLogoSpace" class="text-xs text-slate-400 block mb-2 font-mono uppercase tracking-wider">[Logo Entreprise]</div>
+                <h2 class="text-2xl font-bold text-slate-900">Ravi de t'accueillir, <span id="empWelcomeName" class="text-emerald-600">Thomas</span> !</h2>
+                <p class="text-xs text-slate-500 mt-1">Tu es attendu le <span id="empWelcomeDate" class="font-medium text-slate-900">01/09/2026</span> chez <span id="empWelcomeBoite" class="font-bold text-slate-900">InnovCorp</span> en tant que <span id="empWelcomePoste" class="italic text-slate-900">[Développeur Fullstack]</span>.</p>
                 
                 <div class="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-slate-200 text-xs">
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                         <span class="text-slate-400 block mb-0.5">🛜 WiFi des bureaux</span>
-                        <span id="empWelcomeWifi" class="font-mono font-semibold">InnovCorp_Secure_2026</span>
+                        <span id="empWelcomeWifi" class="font-mono font-semibold text-slate-900">InnovCorp_Secure_2026</span>
                     </div>
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex flex-col justify-center">
                         <span class="text-slate-400 block mb-0.5">📂 Documents RH joints</span>
@@ -202,16 +202,16 @@
             <section class="card-premium p-5">
                 <h3 class="text-xs font-bold uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">🌳 Ta place dans l'organigramme</h3>
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col items-center justify-center space-y-4">
-                    <div class="bg-white border border-purple-200 px-4 py-1.5 rounded-xl text-center text-xs">
-                        <div class="font-bold">👑 Sarah Martin</div>
+                    <div class="bg-white border border-purple-200 px-4 py-1.5 rounded-xl text-center text-xs shadow-sm">
+                        <div class="font-bold text-slate-800">👑 Sarah Martin</div>
                         <div class="text-[9px] text-purple-600 font-medium">CEO</div>
                     </div>
                     <div class="w-0.5 h-4 bg-slate-300"></div>
-                    <div class="bg-white border border-blue-200 px-5 py-2 rounded-xl text-center text-xs relative">
-                        <div class="font-bold">👔 Pierre Leroy</div>
+                    <div class="bg-white border border-blue-200 px-5 py-2 rounded-xl text-center text-xs relative shadow-sm">
+                        <div class="font-bold text-slate-800">👔 Pierre Leroy</div>
                         <div class="text-[9px] text-blue-600 font-medium">CTO (Ton Manager)</div>
                         <div class="w-0.5 h-4 bg-slate-300 mx-auto mt-2"></div>
-                        <div class="bg-slate-100 border border-slate-200 p-2 rounded-xl mt-1 space-y-1.5 min-w-[150px]">
+                        <div class="bg-slate-50 border border-slate-200 p-2 rounded-xl mt-1 space-y-1.5 min-w-[150px]">
                             <div class="text-[9px] text-slate-500 font-semibold border-b border-slate-200 pb-1 uppercase">Ton équipe :</div>
                             <div class="text-[10px] text-slate-600">Lucas Bernard (Front)</div>
                             <div id="empSelfOrgaNode" class="bg-emerald-50 border border-emerald-200 px-2 py-1 rounded text-[10px] text-emerald-700 font-bold">
@@ -230,12 +230,12 @@
                 <div class="relative border-l border-slate-200 pl-5 ml-2.5 space-y-6 py-2 text-xs">
                     <div>
                         <div class="timeline-dot absolute -left-7.5 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">✓</div>
-                        <h4 class="font-bold text-sm">Musique d'accueil & Matériel</h4>
+                        <h4 class="font-bold text-sm text-slate-800">Jour 1 : Accueil & Matériel</h4>
                         <p class="text-slate-500 mt-0.5 text-[11px]">Café de bienvenue, attribution du PC, remise des badges et déjeuner d'équipe.</p>
                     </div>
                     <div>
                         <div class="timeline-dot absolute -left-7.5 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">2</div>
-                        <h4 class="font-semibold text-sm">Semaine 1 : Immersion Technique</h4>
+                        <h4 class="font-semibold text-sm text-slate-800">Semaine 1 : Immersion Technique</h4>
                         <p class="text-slate-500 mt-0.5 text-[11px]">Prise en main des projets de la boîte et réunions d'immersion.</p>
                     </div>
                 </div>
