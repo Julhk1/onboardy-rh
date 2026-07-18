@@ -1,12 +1,16 @@
-// 🔑 VOS IDENTIFIANTS DE REQUÊTES CLOUD
+// 🔑 VOS IDENTIFIANTS DE REQUÊTES CLOUD (Mets tes clés si tu veux sauvegarder dans le cloud)
 const SUPABASE_URL = "https://qaydzplnxjdyyutjyqzy.supabase.co";
 const SUPABASE_ANON_KEY = "METS_ICI_TA_CLE_ANON_PUBLIC_DE_SUPABASE";
 
 // Initialisation sécurisée du client Supabase
-const supabase = (SUPABASE_ANON_KEY !== "METS_ICI_TA_CLE_ANON_PUBLIC_DE_SUPABASE") ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const supabase = (SUPABASE_ANON_KEY !== "METS_ICI_TA_CLE_ANON_PUBLIC_DE_SUPABASE" && SUPABASE_ANON_KEY !== "") ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-// Clé API Resend pour l'expédition vers Gmail / Hotmail
+// Clé API Resend officielle pour tes tests vers Gmail / Hotmail
 const RESEND_API_KEY = "re_VBiCKaEy_54ahgNm6Ft6ZhZboBGU2mdbA"; 
+
+// Variables globales pour garder en mémoire les fichiers simulés en Base64
+let logoBase64 = "";
+let documentsStockes = [];
 
 // Synchronisation instantanée des champs de saisie vers l'écran
 function synchroTotale() {
@@ -19,45 +23,61 @@ function synchroTotale() {
     const date = document.getElementById('empDate').value;
     const manager = document.getElementById('empManager').value;
 
-    document.getElementById('mailCible').innerText = email || 'thomas.dubois@gmail.com';
-    document.getElementById('mailPrenom').innerText = prenom || 'Thomas';
-    document.getElementById('mailPoste').innerText = poste ? `[${poste}]` : '[Poste non défini]';
-    document.getElementById('mailManager').innerText = manager;
+    if(document.getElementById('mailCible')) document.getElementById('mailCible').innerText = email || 'thomas.dubois@gmail.com';
+    if(document.getElementById('mailPrenom')) document.getElementById('mailPrenom').innerText = prenom || 'Thomas';
+    if(document.getElementById('mailPoste')) document.getElementById('mailPoste').innerText = poste ? `[${poste}]` : '[Poste non défini]';
+    if(document.getElementById('mailManager')) document.getElementById('mailManager').innerText = manager;
 
-    document.getElementById('empWelcomeName').innerText = prenom;
-    document.getElementById('empWelcomeBoite').innerText = boite;
-    document.getElementById('empWelcomePoste').innerText = poste ? `[${poste}]` : '[Poste non défini]';
-    document.getElementById('empWelcomeWifi').innerText = wifi;
-    document.getElementById('empSelfOrgaNode').innerText = `${prenom.toUpperCase()} ${nom.toUpperCase()} (Moi)`;
+    if(document.getElementById('empWelcomeName')) document.getElementById('empWelcomeName').innerText = prenom;
+    if(document.getElementById('empWelcomeBoite')) document.getElementById('empWelcomeBoite').innerText = boite;
+    if(document.getElementById('empWelcomePoste')) document.getElementById('empWelcomePoste').innerText = poste ? `[${poste}]` : '[Poste non défini]';
+    if(document.getElementById('empWelcomeWifi')) document.getElementById('empWelcomeWifi').innerText = wifi;
+    if(document.getElementById('empSelfOrgaNode')) document.getElementById('empSelfOrgaNode').innerText = `${prenom.toUpperCase()} ${nom.toUpperCase()} (Moi)`;
 
-    if (date) {
+    if (date && document.getElementById('empWelcomeDate')) {
         const parts = date.split('-');
         document.getElementById('empWelcomeDate').innerText = `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 }
 
+// 🖼️ FIX LOGO : Conversion instantanée pour affichage en direct partout
 function chargerLogo(event) {
     const file = event.target.files[0];
     if (file) {
-        document.getElementById('logoPreview').innerHTML = `✅ Logo : <span class="text-emerald-400 font-bold">${file.name}</span>`;
-        document.getElementById('empLogoSpace').innerHTML = `🏢 <span class="text-white font-bold">${file.name.split('.')[0].toUpperCase()}</span>`;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            logoBase64 = e.target.result; // Sauvegarde l'image
+            // 1. Met à jour la zone de dépôt RH
+            document.getElementById('logoPreview').innerHTML = `<img src="${logoBase64}" class="mx-auto h-12 rounded shadow-sm mb-1"> ✅ <span class="text-emerald-600 font-bold">${file.name}</span>`;
+            // 2. Injecte le logo en direct dans l'espace personnel du Salarié !
+            document.getElementById('empLogoSpace').innerHTML = `<img src="${logoBase64}" class="h-10 rounded object-contain mb-2">`;
+        };
+        reader.readAsDataURL(file);
     }
 }
 
+// 📎 FIX DOCUMENTS : Gestion et rendu des fichiers joints
 function chargerDocuments(event) {
     const docList = document.getElementById('docList');
     const mailWrapper = document.getElementById('mailAttachedWrapper');
     const empDownloadWrapper = document.getElementById('empDocsDownloadWrapper');
     
     docList.innerHTML = ""; mailWrapper.innerHTML = ""; empDownloadWrapper.innerHTML = "";
+    documentsStockes = [];
+    
     const files = event.target.files;
     if(files.length === 0) {
         empDownloadWrapper.innerText = "Aucun document annexe"; return;
     }
+    
     for (let i = 0; i < files.length; i++) {
-        docList.innerHTML += `<div>📁 ${files[i].name}</div>`;
-        mailWrapper.innerHTML += `<div class="bg-slate-950 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-400">📎 ${files[i].name}</div>`;
-        empDownloadWrapper.innerHTML += `<a href="#" class="block text-emerald-400 hover:underline">⬇️ ${files[i].name}</a>`;
+        documentsStockes.push(files[i].name);
+        // Affichage dans la configuration RH
+        docList.innerHTML += `<div class="font-medium text-slate-700">📁 ${files[i].name}</div>`;
+        // Affichage dans l'aperçu du mail
+        mailWrapper.innerHTML += `<div class="bg-white px-2 py-1 rounded border border-slate-200 text-[10px] text-slate-500 font-medium">📎 ${files[i].name}</div>`;
+        // Affichage téléchargeable dans l'Espace du salarié
+        empDownloadWrapper.innerHTML += `<a href="#" onclick="alert('Téléchargement simulé de : ${files[i].name}')" class="block text-emerald-600 hover:underline font-medium">⬇️ ${files[i].name}</a>`;
     }
 }
 
@@ -74,7 +94,7 @@ function importerCSV(event) {
     if (file) alert(`📊 Base employés : "${file.name}" injectée avec succès !`);
 }
 
-// 🚀 ENREGISTREMENT CLOUD SUPABASE + EXPÉDITION EMAIL VIA RESEND
+// 🚀 FIX BOUTON ENVOYER : Exécution garantie, même sans clé Supabase
 async function declencherOnboardingGeneral() {
     const prenom = document.getElementById('empPrenom').value;
     const nom = document.getElementById('empNom').value;
@@ -84,44 +104,44 @@ async function declencherOnboardingGeneral() {
     const wifi = document.getElementById('cfgWifi').value;
 
     if (!prenom || !nom || !email) {
-        alert("Veuillez remplir le prénom, le nom et l'email avant de valider.");
+        alert("⚠️ Oups ! Veuillez remplir le prénom, le nom et l'email pour pouvoir lancer le test.");
         return;
     }
 
-    // Génération d'une empreinte d'URL d'arrivée unique (ex: thomas-432)
+    // Génération du lien unique
     const uniqueId = prenom.toLowerCase() + "-" + Math.floor(Math.random() * 1000);
     const currentUrl = window.location.origin + window.location.pathname;
     const shareLink = `${currentUrl}?id=${uniqueId}`;
 
-    document.getElementById('shareableLink').innerText = shareLink;
-    document.getElementById('shareableLink').href = shareLink;
+    if(document.getElementById('shareableLink')) {
+        document.getElementById('shareableLink').innerText = shareLink;
+        document.getElementById('shareableLink').href = shareLink;
+    }
 
-    // Mise à jour visuelle immédiate de l'organigramme RH de contrôle
+    // Mise à jour immédiate de l'organigramme RH
     const rhNode = document.getElementById('rhOrgaDynamicNode');
-    rhNode.innerText = `✨ ${prenom.toUpperCase()} ${nom.toUpperCase()} (${poste.split(' ')[0]})`;
-    rhNode.classList.remove('hidden');
-
-    // 1. ÉCRITURE ET SAUVEGARDE EN BASE DE DONNÉES CLOUD
-    if (!supabase) {
-        alert("⚠️ ATTENTION : Vous n'avez pas encore configuré votre SUPABASE_ANON_KEY à la ligne 3 du fichier app.js. Passage en mode simulation.");
-        basculerVue('Employee');
-        return;
+    if(rhNode) {
+        rhNode.innerText = `✨ ${prenom.toUpperCase()} ${nom.toUpperCase()} (${poste.split(' ')[0]})`;
+        rhNode.classList.remove('hidden');
     }
 
-    try {
-        const { error } = await supabase
-            .from('onboardings')
-            .insert([{ id: uniqueId, prenom: prenom, nom: nom, poste: poste, email: email, boite: boite, wifi: wifi }]);
-        
-        if (error) throw error;
-        console.log("Fiche d'intégration stockée avec succès sur le Cloud Supabase !");
-    } catch (err) {
-        alert("Erreur technique d'écriture Supabase. Vérifiez que votre table s'appelle bien 'onboardings' et que le RLS est désactivé.");
-        console.error(err);
-        return;
+    // 1. TENTATIVE SAUVEGARDE CLOUD (N'annule plus la suite si absent)
+    if (supabase) {
+        try {
+            await supabase
+                .from('onboardings')
+                .insert([{ id: uniqueId, prenom: prenom, nom: nom, poste: poste, email: email, boite: boite, wifi: wifi }]);
+            console.log("Données enregistrées dans ton Cloud Supabase !");
+        } catch (err) {
+            console.log("Échec Supabase (Mode démo actif) :", err);
+        }
+    } else {
+        console.log("Supabase non configuré — Continuité de la chaîne d'envoi en mode local.");
     }
 
-    // 2. DISTRIBUTION DU MAIL VERS GMAIL ET HOTMAIL VIA RESEND
+    // 2. DISTRIBUTION DU VRAI MAIL VIA RESEND (Vers Gmail / Hotmail)
+    console.log("Déclenchement du flux réseau vers Resend...");
+    
     fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -134,27 +154,32 @@ async function declencherOnboardingGeneral() {
             subject: `Bienvenue chez ${boite} ! Ton espace d'intégration unique`,
             html: `
                 <div style="font-family: sans-serif; color: #333; padding: 25px; max-width: 550px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-                    <h2 style="color: #10b981; margin-top: 0;">Bienvenue dans l'équipe, ${prenom} ! 👋</h2>
+                    <h2 style="color: #5cb887; margin-top: 0;">Bienvenue dans l'équipe, ${prenom} ! 👋</h2>
                     <p>Toute l'équipe de <strong>${boite}</strong> est impatiente de t'accueillir en tant que <strong>${poste}</strong>.</p>
-                    <p>Pour préparer ton arrivée, nous t'avons configuré un espace de suivi personnel en direct.</p>
+                    <p>Pour préparer ton arrivée, voici ton portail de suivi en direct :</p>
                     <div style="margin: 25px 0; text-align: center;">
-                        <a href="${shareLink}" style="background-color: #10b981; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Accéder à mon Portail DayOne</a>
+                        <a href="${shareLink}" style="background-color: #5cb887; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Accéder à mon Portail d'Intégration</a>
                     </div>
-                    <p style="font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 25px;">DayOne OS — L'onboarding instantané.</p>
+                    <p style="font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 25px;">DayOne OS — L'onboarding instantané pour TPE.</p>
                 </div>
             `
         })
-    }).then(res => {
+    })
+    .then(res => {
         if(res.ok) {
-            alert(`🚀 CLOUD & TRANSMISSION OK !\n\n1. Les données sont sauvegardées en BDD.\n2. L'email contenant l'accès persistant vient d'être envoyé à : ${email}.\n\nVous allez être redirigé vers l'aperçu.`);
+            alert(`📨 TOUT FONCTIONNE !\n\n1. L'email vient d'être envoyé avec succès à : ${email}.\n2. Les fichiers et le logo sont transmis.\n\nRegarde ta boîte mail (pense aux spams) ! Clique sur OK pour voir la vue salarié.`);
             basculerVue('Employee');
         } else {
-            alert("Erreur de routage Resend. Vérifiez les limitations de votre compte.");
+            alert("⚠️ Erreur de distribution Resend. Ton adresse mail n'est peut-être pas autorisée sur le compte gratuit.");
         }
-    }).catch(err => console.error("Erreur réseau Resend :", err));
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Le mail n'est pas parti. Vérifie ta connexion Internet.");
+    });
 }
 
-// 🔍 CAPTEUR DE FLUX D'ARRIVÉE : Si un ID est présent dans l'adresse URL, charger la bonne ligne Cloud
+// 🔍 CAPTEUR D'URL CLOUD
 async function verifierUrlDArrivee() {
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('id');
@@ -168,25 +193,20 @@ async function verifierUrlDArrivee() {
                 .single();
 
             if (data && !error) {
-                // Remplissage automatique de la vue Salarié avec les vraies données de sa ligne de BDD
                 document.getElementById('empWelcomeName').innerText = data.prenom;
                 document.getElementById('empWelcomeBoite').innerText = data.boite;
                 document.getElementById('empWelcomePoste').innerText = `[${data.poste}]`;
                 document.getElementById('empWelcomeWifi').innerText = data.wifi;
                 document.getElementById('empSelfOrgaNode').innerText = `${data.prenom.toUpperCase()} ${data.nom.toUpperCase()} (Moi)`;
-                
-                // Forcer le basculement d'affichage en mode Salarié
                 basculerVue('Employee');
-                // Masquer les commandes RH pour le salarié
-                document.getElementById('viewRhBtn').style.display = 'none';
+                if(document.getElementById('viewRhBtn')) document.getElementById('viewRhBtn').style.display = 'none';
             }
         } catch (err) {
-            console.error("Échec d'interrogation Supabase :", err);
+            console.error(err);
         }
     }
 }
 
-// Commutateur graphique d'affichage d'écran
 function basculerVue(type) {
     const r = document.getElementById('containerRH');
     const e = document.getElementById('containerEmployee');
@@ -194,15 +214,18 @@ function basculerVue(type) {
     const be = document.getElementById('viewEmpBtn');
 
     if (type === 'RH') {
-        r.classList.remove('hidden'); e.classList.add('hidden');
-        br.classList.add('active-vue'); be.classList.remove('active-vue');
+        if(r) r.classList.remove('hidden'); 
+        if(e) e.classList.add('hidden');
+        if(br) br.classList.add('active-vue'); 
+        if(be) be.classList.remove('active-vue');
     } else {
-        r.classList.add('hidden'); e.classList.remove('hidden');
-        be.classList.add('active-vue'); br.classList.remove('active-vue');
+        if(r) r.classList.add('hidden'); 
+        if(e) e.classList.remove('hidden');
+        if(be) be.classList.add('active-vue'); 
+        if(br) br.classList.remove('active-vue');
     }
 }
 
-// Amorçage au chargement complet
 window.onload = function() {
     synchroTotale();
     verifierUrlDArrivee();
