@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue — Ton espace d'intégration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="page onboarding-page">
+        <div id="loadingState" class="onboarding-loading">Chargement de ton espace…</div>
+
+        <div id="errorState" class="onboarding-error hidden">
+            <h2>Lien invalide ou expiré</h2>
+            <p>Ce lien d'intégration n'existe pas ou a été révoqué. Contacte ton service RH pour en recevoir un nouveau.</p>
+        </div>
+
+        <div id="contentState" class="hidden">
+            <section class="card welcome-card">
+                <div id="empLogoSpace" class="welcome-logo-slot hidden"></div>
+                <h2 class="welcome-title">Bienvenue, <span id="empWelcomeName" class="accent"></span> 👋</h2>
+                <p class="welcome-sub">
+                    Tu es attendu le <strong id="empWelcomeDate">—</strong> chez
+                    <strong id="empWelcomeBoite"></strong>, en tant que
+                    <em id="empWelcomePoste"></em>.
+                </p>
+                <div class="welcome-grid">
+                    <div class="welcome-tile">
+                        <span class="welcome-tile-label">Wi-Fi des bureaux</span>
+                        <span id="empWelcomeWifi" class="welcome-tile-value mono">—</span>
+                    </div>
+                    <div class="welcome-tile">
+                        <span class="welcome-tile-label">Documents à consulter</span>
+                        <div id="empDocsDownloadWrapper" class="welcome-docs">Aucun document annexe</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h3 class="card-title">Ton équipe</h3>
+                <div id="teamContainer" class="team-list"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>© 2026 DayOne — Onboarding Cloud</p>
+    </footer>
+
+    <script src="onboarding.js"></script>
+</body>
+</html>
