@@ -1,11 +1,11 @@
-/* 🌟 LIVRET'EASY STYLE — VERSION FINALE NETTE 🌟 */
+/* 🌟 LIVRET'EASY STYLE — ÉPURE ET LISIBILITÉ PARFAITE 🌟 */
 
 body {
-    background-color: #f1f5f9; /* Fond gris-bleu clair uniforme */
+    background-color: #f1f5f9;
     color: #1e293b;
 }
 
-/* Header Premium Bleu Marine */
+/* Header Premium Bleu Marine Profond */
 .main-header {
     background-color: #1a2e4c;
     border-bottom: 2px solid #14243c;
@@ -59,6 +59,12 @@ body {
     border: 2px dashed #cbd5e1;
     border-radius: 0.5rem;
     color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.upload-box:hover {
+    background-color: #f1f5f9;
+    border-color: #5cb887;
 }
 
 /* 🟢 Bouton d'action "CONTINUER" Vert */
@@ -90,26 +96,14 @@ body {
 
 .active-vue {
     background-color: #ffffff !important;
-    color: #1a2e4c !important; /* Devient bleu marine comme le fond Livret'Easy */
+    color: #1a2e4c !important; 
     border-radius: 0.5rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* 🛠️ Surcharges strictes pour nettoyer l'organigramme et les zones sombres restantes */
-.bg-slate-950, .bg-slate-900, .bg-slate-900\/30, .bg-slate-900\/50, .bg-slate-900\/80 {
-    background-color: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-}
-
-/* Nettoyage du bloc équipe sombre sous Pierre Leroy */
-#containerRH div[class*="bg-slate-900"], #containerEmployee div[class*="bg-slate-900"] {
-    background-color: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
-}
-
-/* Forcer la lisibilité des textes */
-.text-white, h1, h2, h3, h4, label {
-    color: #1e293b !important;
+/* Forcer la lisibilité globale */
+h1, h2, h3, h4, label {
+    color: #1e293b;
 }
 
 /* Garder les textes du header en blanc */
@@ -117,12 +111,9 @@ body {
     color: #ffffff !important;
 }
 
-.text-slate-400, .text-slate-500 {
-    color: #64748b !important;
-}
-
+/* Points de la timeline */
 .timeline-dot {
-    background-color: #f1f5f9 !important;
-    border-color: #cbd5e1 !important;
+    background-color: #e2e8f0 !important;
+    border: 2px solid #cbd5e1 !important;
     color: #475569 !important;
 }
