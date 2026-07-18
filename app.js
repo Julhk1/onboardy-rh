@@ -1,75 +1,153 @@
-// 🔑 VOS IDENTIFIANTS DE REQUÊTES CLOUD (Optionnels pour simuler)
-const SUPABASE_URL = "https://qaydzplnxjdyyutjyqzy.supabase.co";
-const SUPABASE_ANON_KEY = "METS_ICI_TA_CLE_ANON_PUBLIC_DE_SUPABASE";
+// ============================================
+// DAYONE — CONFIGURATION
+// ============================================
+// La clé Resend N'EST PLUS ICI : elle vit côté serveur dans
+// la fonction /api/send-email.js (variable d'environnement).
+// Ne jamais remettre de clé API secrète dans un fichier .js
+// servi au navigateur — c'est visible par n'importe qui.
+const CONFIG = {
+    SUPABASE_URL: "https://qaydzplnxjdyyutjyqzy.supabase.co",
+    SUPABASE_ANON_KEY: "METS_ICI_TA_CLE_ANON_PUBLIC_DE_SUPABASE", // La clé "anon" Supabase est publique par design (protégée par les règles RLS)
+    SEND_EMAIL_ENDPOINT: "/api/send-email"
+};
 
-// Initialisation sécurisée du client Supabase
-const supabase = (SUPABASE_ANON_KEY !== "METS_ICI_TA_CLE_ANON_PUBLIC_DE_SUPABASE" && SUPABASE_ANON_KEY !== "") ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const supabase = (CONFIG.SUPABASE_ANON_KEY && !CONFIG.SUPABASE_ANON_KEY.startsWith("METS_ICI"))
+    ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY)
+    : null;
 
-// Clé API Resend officielle injectée pour tes tests vers Gmail / Hotmail
-const RESEND_API_KEY = "re_VBiCKaEy_54ahgNm6Ft6ZhZboBGU2mdbA"; 
-
-// Mémoire locale pour les fichiers chargés
 let logoBase64 = "";
+let attachedDocs = [];
 
-function synchroTotale() {
-    const boite = document.getElementById('cfgBoite').value;
-    const wifi = document.getElementById('cfgWifi').value;
-    const prenom = document.getElementById('empPrenom').value;
-    const nom = document.getElementById('empNom').value;
-    const poste = document.getElementById('empPoste').value;
-    const email = document.getElementById('empEmail').value;
-    const date = document.getElementById('empDate').value;
-    const manager = document.getElementById('empManager').value;
-
-    if(document.getElementById('mailCible')) document.getElementById('mailCible').innerText = email || 'thomas.dubois@gmail.com';
-    if(document.getElementById('mailPrenom')) document.getElementById('mailPrenom').innerText = prenom || 'Thomas';
-    if(document.getElementById('mailPoste')) document.getElementById('mailPoste').innerText = poste ? `[${poste}]` : '[Poste non défini]';
-    if(document.getElementById('mailManager')) document.getElementById('mailManager').innerText = manager;
-
-    if(document.getElementById('empWelcomeName')) document.getElementById('empWelcomeName').innerText = prenom;
-    if(document.getElementById('empWelcomeBoite')) document.getElementById('empWelcomeBoite').innerText = boite;
-    if(document.getElementById('empWelcomePoste')) document.getElementById('empWelcomePoste').innerText = poste ? `[${poste}]` : '[Poste non défini]';
-    if(document.getElementById('empWelcomeWifi')) document.getElementById('empWelcomeWifi').innerText = wifi;
-    if(document.getElementById('empSelfOrgaNode')) document.getElementById('empSelfOrgaNode').innerText = `${prenom.toUpperCase()} ${nom.toUpperCase()} (Moi)`;
-
-    if (date && document.getElementById('empWelcomeDate')) {
-        const parts = date.split('-');
-        document.getElementById('empWelcomeDate').innerText = `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
+// ============================================
+// TOASTS
+// ============================================
+function toast(message, type = "success") {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.textContent = message;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
 }
 
-// 🖼️ CHARGEMENT DU LOGO EN DIRECT SANS BUG
+// ============================================
+// SYNCHRONISATION DES CHAMPS + CHECKLIST
+// ============================================
+function synchroTotale() {
+    const boite = val('cfgBoite');
+    const wifi = val('cfgWifi');
+    const prenom = val('empPrenom');
+    const nom = val('empNom');
+    const poste = val('empPoste');
+    const email = val('empEmail');
+    const date = val('empDate');
+    const manager = val('empManager');
+
+    setText('mailCible', email || 'exemple@email.com');
+    setText('mailPrenom', prenom || '—');
+    setText('mailPoste', poste ? `[${poste}]` : '[Poste non défini]');
+    setText('mailManager', manager);
+
+    setText('empWelcomeName', prenom);
+    setText('empWelcomeBoite', boite);
+    setText('empWelcomePoste', poste ? `[${poste}]` : '[Poste non défini]');
+    setText('empWelcomeWifi', wifi);
+    setText('empSelfOrgaNode', `${prenom.toUpperCase()} ${nom.toUpperCase()} (Moi)`);
+
+    if (date) {
+        const [y, m, d] = date.split('-');
+        setText('empWelcomeDate', `${d}/${m}/${y}`);
+    }
+
+    mettreAJourChecklist();
+}
+
+function val(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : "";
+}
+
+function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+}
+
+function emailEstValide(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function mettreAJourChecklist() {
+    const ficheComplete = val('empPrenom') && val('empNom') && val('empPoste') && val('empDate');
+    const emailValide = emailEstValide(val('empEmail'));
+    const logoCharge = !!logoBase64;
+    const docsJoints = attachedDocs.length > 0;
+
+    setChecklistItem('chkFiche', ficheComplete);
+    setChecklistItem('chkEmail', emailValide);
+    setChecklistItem('chkLogo', logoCharge);
+    setChecklistItem('chkDocs', docsJoints);
+
+    const total = [ficheComplete, emailValide, logoCharge, docsJoints].filter(Boolean).length;
+    const pct = Math.round((total / 4) * 100);
+
+    const bar = document.getElementById('progressBar');
+    const pctLabel = document.getElementById('progressPct');
+    if (bar) bar.style.width = pct + '%';
+    if (pctLabel) pctLabel.innerText = pct + '%';
+}
+
+function setChecklistItem(id, done) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('is-complete', !!done);
+}
+
+// ============================================
+// LOGO & DOCUMENTS
+// ============================================
 function chargerLogo(event) {
     const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            logoBase64 = e.target.result;
-            document.getElementById('logoPreview').innerHTML = `<img src="${logoBase64}" class="mx-auto h-12 rounded shadow-sm mb-1"> ✅ <span class="text-emerald-600 font-bold">${file.name}</span>`;
-            document.getElementById('empLogoSpace').innerHTML = `<img src="${logoBase64}" class="h-10 rounded object-contain mb-2">`;
-        };
-        reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        logoBase64 = e.target.result;
+        const preview = document.getElementById('logoPreview');
+        if (preview) {
+            preview.innerHTML = `<img src="${logoBase64}" style="height:36px;border-radius:6px;margin-bottom:4px;"><br><span style="color:var(--success);font-weight:600;">${file.name}</span>`;
+        }
+        const empSlot = document.getElementById('empLogoSpace');
+        if (empSlot) empSlot.innerHTML = `<img src="${logoBase64}" style="height:32px;border-radius:6px;">`;
+        mettreAJourChecklist();
+    };
+    reader.readAsDataURL(file);
 }
 
-// 📎 CHARGEMENT DES DOCUMENTS ANNEXES EN DIRECT SANS BUG
 function chargerDocuments(event) {
     const docList = document.getElementById('docList');
     const mailWrapper = document.getElementById('mailAttachedWrapper');
-    const empDownloadWrapper = document.getElementById('empDocsDownloadWrapper');
-    
-    docList.innerHTML = ""; mailWrapper.innerHTML = ""; empDownloadWrapper.innerHTML = "";
+    const empWrapper = document.getElementById('empDocsDownloadWrapper');
+
+    docList.innerHTML = "";
+    mailWrapper.innerHTML = "";
+    empWrapper.innerHTML = "";
+
     const files = event.target.files;
-    
-    if(files.length === 0) {
-        empDownloadWrapper.innerText = "Aucun document annexe"; return;
+    attachedDocs = Array.from(files).map(f => f.name);
+
+    if (files.length === 0) {
+        empWrapper.innerText = "Aucun document annexe";
+        mettreAJourChecklist();
+        return;
     }
-    
-    for (let i = 0; i < files.length; i++) {
-        docList.innerHTML += `<div class="font-medium text-slate-700">📁 ${files[i].name}</div>`;
-        mailWrapper.innerHTML += `<div class="bg-white px-2 py-1 rounded border border-slate-200 text-[10px] text-slate-500 font-medium">📎 ${files[i].name}</div>`;
-        empDownloadWrapper.innerHTML += `<a href="#" onclick="alert('Téléchargement de : ${files[i].name}')" class="block text-emerald-600 hover:underline font-medium">⬇️ ${files[i].name}</a>`;
+
+    for (const file of files) {
+        docList.innerHTML += `<div>📁 ${file.name}</div>`;
+        mailWrapper.innerHTML += `<span class="attachment-chip">${file.name}</span>`;
+        empWrapper.innerHTML += `<a href="#" onclick="event.preventDefault(); toast('Téléchargement : ${file.name}')">⬇ ${file.name}</a><br>`;
     }
+
+    mettreAJourChecklist();
 }
 
 function telechargerModeleExcel() {
@@ -77,126 +155,146 @@ function telechargerModeleExcel() {
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));
     link.setAttribute("download", "Modele_DayOne.csv");
-    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function importerCSV(event) {
     const file = event.target.files[0];
-    if (file) alert(`📊 Base employés : "${file.name}" injectée avec succès !`);
+    if (file) toast(`Base employés "${file.name}" importée`, "success");
 }
 
-// 🚀 EXECUTION COMPLÈTE ANTI-BUG ET EXPÉDITION EMAIL GARANTIE
+// ============================================
+// LANCEMENT DE L'ONBOARDING (sauvegarde + email)
+// ============================================
 async function declencherOnboardingGeneral() {
-    const prenom = document.getElementById('empPrenom').value;
-    const nom = document.getElementById('empNom').value;
-    const poste = document.getElementById('empPoste').value;
-    const email = document.getElementById('empEmail').value;
-    const boite = document.getElementById('cfgBoite').value;
-    const wifi = document.getElementById('cfgWifi').value;
+    const prenom = val('empPrenom');
+    const nom = val('empNom');
+    const poste = val('empPoste');
+    const email = val('empEmail');
+    const boite = val('cfgBoite');
+    const wifi = val('cfgWifi');
+    const manager = val('empManager');
 
     if (!prenom || !nom || !email) {
-        alert("⚠️ Veuillez remplir le prénom, le nom et l'email pour tester.");
+        toast("Merci de renseigner au minimum le prénom, le nom et l'email.", "error");
+        return;
+    }
+    if (!emailEstValide(email)) {
+        toast("L'adresse email ne semble pas valide.", "error");
         return;
     }
 
-    const uniqueId = prenom.toLowerCase() + "-" + Math.floor(Math.random() * 1000);
-    const currentUrl = window.location.origin + window.location.pathname;
-    const shareLink = `${currentUrl}?id=${uniqueId}`;
+    const btn = document.querySelector('.btn-primary');
+    if (btn) { btn.disabled = true; btn.innerText = "Envoi en cours…"; }
 
-    if(document.getElementById('shareableLink')) {
-        document.getElementById('shareableLink').innerText = shareLink;
-        document.getElementById('shareableLink').href = shareLink;
-    }
+    const uniqueId = `${prenom.toLowerCase()}-${Math.floor(Math.random() * 10000)}`;
+    const shareLink = `${window.location.origin}${window.location.pathname}?id=${uniqueId}`;
+
+    const linkEl = document.getElementById('shareableLink');
+    if (linkEl) { linkEl.innerText = shareLink; linkEl.href = shareLink; }
 
     const rhNode = document.getElementById('rhOrgaDynamicNode');
-    if(rhNode) {
-        rhNode.innerText = `✨ ${prenom.toUpperCase()} ${nom.toUpperCase()} (${poste.split(' ')[0]})`;
+    if (rhNode) {
+        rhNode.innerText = `${prenom.toUpperCase()} ${nom.toUpperCase()} — ${poste.split(' ')[0]}`;
         rhNode.classList.remove('hidden');
     }
 
-    // 1. Sauvegarde Supabase si dispo
+    // 1. Sauvegarde Supabase (si configuré)
     if (supabase) {
         try {
-            await supabase
-                .from('onboardings')
-                .insert([{ id: uniqueId, prenom: prenom, nom: nom, poste: poste, email: email, boite: boite, wifi: wifi }]);
-        } catch (err) { console.log("Supabase ignoré pour la démo local."); }
+            await supabase.from('onboardings').insert([{
+                id: uniqueId, prenom, nom, poste, email, boite, wifi, manager
+            }]);
+        } catch (err) {
+            console.warn("Supabase non configuré, sauvegarde ignorée:", err);
+        }
     }
 
-    // 2. Envoi forcé Resend
-    fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${RESEND_API_KEY}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            from: 'onboarding@resend.dev', 
-            to: email,
-            subject: `Bienvenue chez ${boite} ! Ton espace d'intégration unique`,
-            html: `
-                <div style="font-family: sans-serif; color: #333; padding: 25px; max-width: 550px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-                    <h2 style="color: #5cb887; margin-top: 0;">Bienvenue dans l'équipe, ${prenom} ! 👋</h2>
-                    <p>Toute l'équipe de <strong>${boite}</strong> est impatiente de t'accueillir en tant que <strong>${poste}</strong>.</p>
-                    <p>Voici ton portail de suivi en direct :</p>
-                    <div style="margin: 25px 0; text-align: center;">
-                        <a href="${shareLink}" style="background-color: #5cb887; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Accéder à mon Portail d'Intégration</a>
+    // 2. Envoi de l'email — passe par notre fonction serverless,
+    // jamais d'appel direct à l'API Resend depuis le navigateur.
+    try {
+        const res = await fetch(CONFIG.SEND_EMAIL_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                to: email,
+                subject: `Bienvenue chez ${boite} !`,
+                html: `
+                    <div style="font-family: Arial, sans-serif; color:#1e2430; padding:24px; max-width:520px; border:1px solid #E4E1D8; border-radius:12px;">
+                        <h2 style="color:#B8863B; margin-top:0;">Bienvenue, ${prenom} !</h2>
+                        <p>Toute l'équipe de <strong>${boite}</strong> est ravie de t'accueillir en tant que <strong>${poste}</strong>.</p>
+                        <p>Ton portail d'intégration personnel :</p>
+                        <div style="text-align:center; margin:24px 0;">
+                            <a href="${shareLink}" style="background:#101828; color:#fff; padding:12px 24px; text-decoration:none; border-radius:8px; font-weight:bold; display:inline-block;">
+                                Accéder à mon espace
+                            </a>
+                        </div>
                     </div>
-                </div>
-            `
-        })
-    })
-    .then(res => {
-        if(res.ok) {
-            alert(`📨 TOUT FONCTIONNE !\n\nL'email vient d'être envoyé à : ${email}.\nLe logo et les fichiers sont liés en direct.\n\nClique sur OK pour basculer de vue.`);
+                `
+            })
+        });
+
+        if (res.ok) {
+            toast(`Invitation envoyée à ${email}`, "success");
             basculerVue('Employee');
         } else {
-            alert("⚠️ Erreur d'envoi. Resend refuse l'adresse ou la clé.");
+            const data = await res.json().catch(() => ({}));
+            console.error(data);
+            toast("La fonction /api/send-email n'est pas encore déployée — voir le README.", "error");
         }
-    })
-    .catch(err => alert("Erreur réseau lors de l'envoi du mail."));
+    } catch (err) {
+        console.error(err);
+        toast("Impossible de contacter le serveur d'envoi. As-tu déployé la fonction /api/send-email ?", "error");
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerText = "Enregistrer et envoyer l'invitation"; }
+    }
 }
 
+// ============================================
+// ARRIVÉE VIA LIEN PARTAGÉ
+// ============================================
 async function verifierUrlDArrivee() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const userId = urlParams.get('id');
+    const userId = new URLSearchParams(window.location.search).get('id');
+    if (!userId || !supabase) return;
 
-    if (userId && supabase) {
-        try {
-            const { data, error } = await supabase.from('onboardings').select('*').eq('id', userId).single();
-            if (data && !error) {
-                document.getElementById('empWelcomeName').innerText = data.prenom;
-                document.getElementById('empWelcomeBoite').innerText = data.boite;
-                document.getElementById('empWelcomePoste').innerText = `[${data.poste}]`;
-                document.getElementById('empWelcomeWifi').innerText = data.wifi;
-                document.getElementById('empSelfOrgaNode').innerText = `${data.prenom.toUpperCase()} ${data.nom.toUpperCase()} (Moi)`;
-                basculerVue('Employee');
-                if(document.getElementById('viewRhBtn')) document.getElementById('viewRhBtn').style.display = 'none';
-            }
-        } catch (err) { console.error(err); }
+    try {
+        const { data, error } = await supabase.from('onboardings').select('*').eq('id', userId).single();
+        if (data && !error) {
+            setText('empWelcomeName', data.prenom);
+            setText('empWelcomeBoite', data.boite);
+            setText('empWelcomePoste', `[${data.poste}]`);
+            setText('empWelcomeWifi', data.wifi);
+            setText('empSelfOrgaNode', `${data.prenom.toUpperCase()} ${data.nom.toUpperCase()} (Moi)`);
+            basculerVue('Employee');
+            const rhBtn = document.getElementById('viewRhBtn');
+            if (rhBtn) rhBtn.style.display = 'none';
+        }
+    } catch (err) {
+        console.error(err);
     }
 }
 
+// ============================================
+// BASCULE DE VUE
+// ============================================
 function basculerVue(type) {
-    const r = document.getElementById('containerRH');
-    const e = document.getElementById('containerEmployee');
-    const br = document.getElementById('viewRhBtn');
-    const be = document.getElementById('viewEmpBtn');
+    const rh = document.getElementById('containerRH');
+    const emp = document.getElementById('containerEmployee');
+    const btnRh = document.getElementById('viewRhBtn');
+    const btnEmp = document.getElementById('viewEmpBtn');
 
-    if (type === 'RH') {
-        if(r) r.classList.remove('hidden'); 
-        if(e) e.classList.add('hidden');
-        if(br) br.classList.add('active-vue'); 
-        if(be) be.classList.remove('active-vue');
-    } else {
-        if(r) r.classList.add('hidden'); 
-        if(e) e.classList.remove('hidden');
-        if(be) be.classList.add('active-vue'); 
-        if(br) br.classList.remove('active-vue');
-    }
+    const isRh = type === 'RH';
+    rh?.classList.toggle('hidden', !isRh);
+    emp?.classList.toggle('hidden', isRh);
+    btnRh?.classList.toggle('is-active', isRh);
+    btnEmp?.classList.toggle('is-active', !isRh);
+    btnRh?.setAttribute('aria-selected', isRh);
+    btnEmp?.setAttribute('aria-selected', !isRh);
 }
 
-window.onload = function() {
+window.onload = function () {
     synchroTotale();
     verifierUrlDArrivee();
 };
