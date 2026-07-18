@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DayOne — Onboarding Cloud pour PME</title>
+    <title>DayOne — Espace Ressources Humaines</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -13,269 +13,195 @@
 
     <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-    <header class="app-header">
-        <div class="brand">
-            <span class="brand-mark">D1</span>
-            <div class="brand-text">
-                <span class="brand-name">DayOne</span>
-                <span class="brand-tag">Onboarding Cloud</span>
+    <!-- ============ ÉCRAN DE CONNEXION RH ============ -->
+    <div id="loginView" class="login-screen">
+        <div class="login-card">
+            <div class="brand brand-center">
+                <span class="brand-mark">D1</span>
+                <div class="brand-text">
+                    <span class="brand-name">DayOne</span>
+                    <span class="brand-tag">Espace Ressources Humaines</span>
+                </div>
             </div>
+
+            <h2 id="loginModeLabel" class="login-title">Connexion</h2>
+            <p class="login-sub">Réservé à l'équipe RH. Chaque entreprise dispose de son propre espace privé.</p>
+
+            <div id="loginError" class="login-error hidden"></div>
+
+            <div class="field">
+                <label for="loginEmail">Email professionnel</label>
+                <input id="loginEmail" type="email" placeholder="rh@monentreprise.com" autocomplete="email">
+            </div>
+            <div class="field">
+                <label for="loginPassword">Mot de passe</label>
+                <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <button id="loginSubmitBtn" class="btn-primary" onclick="soumettreLogin()">Se connecter</button>
+
+            <button id="loginToggleBtn" class="link-btn login-toggle" onclick="basculerModeLogin()">
+                Pas encore de compte ? Créer un espace RH
+            </button>
         </div>
-        <nav class="view-switch" role="tablist" aria-label="Changer de vue">
-            <button id="viewRhBtn" class="view-btn is-active" onclick="basculerVue('RH')" role="tab" aria-selected="true">
-                Tableau de bord RH
-            </button>
-            <button id="viewEmpBtn" class="view-btn" onclick="basculerVue('Employee')" role="tab" aria-selected="false">
-                Espace collaborateur
-            </button>
-        </nav>
-    </header>
+    </div>
 
-    <!-- ============ VUE RH ============ -->
-    <main id="containerRH" class="page">
-        <div class="grid">
+    <!-- ============ DASHBOARD RH ============ -->
+    <div id="dashboardView" class="hidden">
+        <header class="app-header">
+            <div class="brand">
+                <span class="brand-mark">D1</span>
+                <div class="brand-text">
+                    <span class="brand-name">DayOne</span>
+                    <span class="brand-tag">Espace Ressources Humaines</span>
+                </div>
+            </div>
+            <button class="view-btn logout-btn" onclick="deconnexion()">Déconnexion</button>
+        </header>
 
-            <!-- COLONNE GAUCHE -->
-            <div class="col col-left">
+        <main class="page">
+            <div class="grid">
 
-                <!-- Checklist de préparation -->
-                <section class="card progress-card">
-                    <div class="progress-head">
-                        <h3>Préparation du Jour J</h3>
-                        <span id="progressPct" class="progress-pct">0%</span>
-                    </div>
-                    <div class="progress-track">
-                        <div id="progressBar" class="progress-fill"></div>
-                    </div>
-                    <ul class="checklist">
-                        <li id="chkFiche" class="checklist-item"><span class="chk-dot"></span>Fiche collaborateur complète</li>
-                        <li id="chkEmail" class="checklist-item"><span class="chk-dot"></span>Email valide</li>
-                        <li id="chkLogo" class="checklist-item"><span class="chk-dot"></span>Logo entreprise chargé</li>
-                        <li id="chkDocs" class="checklist-item"><span class="chk-dot"></span>Documents annexes joints</li>
-                    </ul>
-                </section>
+                <!-- COLONNE GAUCHE -->
+                <div class="col col-left">
 
-                <!-- Configuration entreprise -->
-                <section class="card">
-                    <h3 class="card-title">
-                        <span class="step-badge">1</span>Configuration entreprise
-                    </h3>
-                    <div class="field-row">
-                        <div class="field">
-                            <label for="cfgBoite">Nom de l'entreprise</label>
-                            <input id="cfgBoite" type="text" value="InnovCorp" oninput="synchroTotale()">
-                        </div>
-                        <div class="field">
-                            <label for="cfgWifi">Code Wi-Fi bureaux</label>
-                            <input id="cfgWifi" type="text" value="InnovCorp_Secure_2026" oninput="synchroTotale()">
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>Logo officiel</label>
-                        <div class="upload-box">
-                            <input type="file" id="logoInput" accept="image/*" onchange="chargerLogo(event)">
-                            <div id="logoPreview" class="upload-hint">
-                                <span class="upload-icon">↑</span>
-                                Cliquer pour importer un logo
+                    <!-- Configuration entreprise -->
+                    <section class="card">
+                        <h3 class="card-title"><span class="step-badge">1</span>Configuration entreprise</h3>
+                        <div class="field-row">
+                            <div class="field">
+                                <label for="cfgBoite">Nom de l'entreprise</label>
+                                <input id="cfgBoite" type="text" placeholder="InnovCorp">
+                            </div>
+                            <div class="field">
+                                <label for="cfgWifi">Code Wi-Fi bureaux</label>
+                                <input id="cfgWifi" type="text" placeholder="InnovCorp_Secure_2026">
                             </div>
                         </div>
-                    </div>
 
-                    <div class="field">
-                        <label>Documents à joindre (règlement, charte…)</label>
-                        <div class="upload-box">
-                            <input type="file" id="docInput" multiple onchange="chargerDocuments(event)">
+                        <div class="field">
+                            <label>Logo officiel</label>
+                            <div class="upload-box">
+                                <input type="file" id="logoInput" accept="image/*" onchange="chargerLogo(event)">
+                                <div id="logoPreview" class="upload-hint">
+                                    <span class="upload-icon">↑</span>
+                                    Cliquer pour importer un logo
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label>Documents communs (règlement, charte…)</label>
+                            <div class="upload-box">
+                                <input type="file" id="docInput" multiple onchange="chargerDocuments(event)">
+                                <div class="upload-hint">
+                                    <span class="upload-icon">↑</span>
+                                    Ajouter des documents
+                                </div>
+                            </div>
+                            <div id="docList" class="doc-list"></div>
+                        </div>
+
+                        <button class="btn-primary" onclick="enregistrerOrganisation()">Enregistrer les infos entreprise</button>
+                    </section>
+
+                    <!-- Import Excel / CSV -->
+                    <section class="card">
+                        <div class="card-title-row">
+                            <h3 class="card-title"><span class="step-badge">2</span>Import en masse</h3>
+                            <button class="link-btn" onclick="telechargerModeleExcel()">Modèle CSV</button>
+                        </div>
+                        <p class="hint-text">Colonnes attendues : Prenom, Nom, Poste, Service, Manager, Email, Date (AAAA-MM-JJ)</p>
+                        <div class="upload-box upload-box-muted">
+                            <input type="file" id="csvInput" accept=".csv" onchange="importerCSV(event)">
                             <div class="upload-hint">
                                 <span class="upload-icon">↑</span>
-                                Ajouter des documents
+                                Importer une liste d'employés
                             </div>
                         </div>
-                        <div id="docList" class="doc-list"></div>
-                    </div>
-                </section>
+                    </section>
 
-                <!-- Import base employés -->
-                <section class="card">
-                    <div class="card-title-row">
-                        <h3 class="card-title"><span class="step-badge">2</span>Base employés existants</h3>
-                        <button class="link-btn" onclick="telechargerModeleExcel()">Modèle CSV</button>
-                    </div>
-                    <div class="upload-box upload-box-muted">
-                        <input type="file" id="csvInput" accept=".csv" onchange="importerCSV(event)">
-                        <div class="upload-hint">
-                            <span class="upload-icon">↑</span>
-                            Importer la liste des employés
+                    <!-- Nouveau collaborateur -->
+                    <section class="card">
+                        <h3 class="card-title"><span class="step-badge">3</span>Lancer un onboarding</h3>
+                        <div id="duplicateBanner" class="duplicate-banner hidden">
+                            Pré-rempli à partir d'un profil existant — modifie ce qui change puis envoie.
+                            <button class="link-btn" onclick="viderFormulaireEmploye()">Repartir de zéro</button>
                         </div>
-                    </div>
-                </section>
 
-                <!-- Nouveau collaborateur -->
-                <section class="card">
-                    <h3 class="card-title"><span class="step-badge">3</span>Lancer un onboarding</h3>
+                        <div class="field-row">
+                            <div class="field">
+                                <label for="empPrenom">Prénom</label>
+                                <input id="empPrenom" type="text" oninput="mettreAJourChecklist()">
+                            </div>
+                            <div class="field">
+                                <label for="empNom">Nom</label>
+                                <input id="empNom" type="text" oninput="mettreAJourChecklist()">
+                            </div>
+                        </div>
 
-                    <div class="field-row">
+                        <div class="field-row">
+                            <div class="field">
+                                <label for="empPoste">Intitulé du poste</label>
+                                <input id="empPoste" type="text" oninput="mettreAJourChecklist()">
+                            </div>
+                            <div class="field">
+                                <label for="empService">Service</label>
+                                <input id="empService" type="text" list="serviceSuggestions" placeholder="Finance, Tech, Ventes…" oninput="mettreAJourChecklist()">
+                                <datalist id="serviceSuggestions"></datalist>
+                            </div>
+                        </div>
+
+                        <div class="field-row">
+                            <div class="field">
+                                <label for="empManager">Manager direct</label>
+                                <input id="empManager" type="text" placeholder="Prénom Nom (Poste)">
+                            </div>
+                            <div class="field">
+                                <label for="empEmail">Email personnel</label>
+                                <input id="empEmail" type="email" oninput="mettreAJourChecklist()">
+                            </div>
+                        </div>
+
                         <div class="field">
-                            <label for="empPrenom">Prénom</label>
-                            <input id="empPrenom" type="text" value="Thomas" oninput="synchroTotale()">
+                            <label for="empDate">Date d'arrivée</label>
+                            <input id="empDate" type="date">
                         </div>
-                        <div class="field">
-                            <label for="empNom">Nom</label>
-                            <input id="empNom" type="text" value="Dubois" oninput="synchroTotale()">
+
+                        <ul class="checklist">
+                            <li id="chkFiche" class="checklist-item"><span class="chk-dot"></span>Fiche complète</li>
+                            <li id="chkEmail" class="checklist-item"><span class="chk-dot"></span>Email valide</li>
+                        </ul>
+
+                        <button id="empSubmitBtn" onclick="declencherOnboardingGeneral()" class="btn-primary">
+                            Enregistrer et envoyer l'invitation
+                        </button>
+                    </section>
+                </div>
+
+                <!-- COLONNE DROITE -->
+                <div class="col col-right">
+                    <section class="card">
+                        <h3 class="card-title">Organigramme (généré automatiquement)</h3>
+                        <div id="orgChartContainer" class="org-chart-dynamic">
+                            <p class="empty-hint">Ajoute des employés pour voir apparaître l'organigramme.</p>
                         </div>
-                    </div>
+                    </section>
 
-                    <div class="field">
-                        <label for="empPoste">Intitulé du poste</label>
-                        <input id="empPoste" type="text" value="Développeur Fullstack" oninput="synchroTotale()">
-                    </div>
-
-                    <div class="field-row">
-                        <div class="field">
-                            <label for="empManager">Manager direct (N+1)</label>
-                            <select id="empManager" onchange="synchroTotale()">
-                                <option value="Pierre Leroy (CTO)">Pierre Leroy (CTO)</option>
-                                <option value="Sarah Martin (CEO)">Sarah Martin (CEO)</option>
-                            </select>
+                    <section class="card">
+                        <h3 class="card-title">Employés enregistrés</h3>
+                        <div id="employeeListContainer" class="employee-list">
+                            <p class="empty-hint">Aucun employé pour le moment.</p>
                         </div>
-                        <div class="field">
-                            <label for="empEmail">Email personnel</label>
-                            <input id="empEmail" type="email" value="thomas.dubois@gmail.com" oninput="synchroTotale()">
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label for="empDate">Date d'arrivée</label>
-                        <input id="empDate" type="date" value="2026-09-01" oninput="synchroTotale()">
-                    </div>
-
-                    <button onclick="declencherOnboardingGeneral()" class="btn-primary">
-                        Enregistrer et envoyer l'invitation
-                    </button>
-                </section>
+                    </section>
+                </div>
             </div>
+        </main>
 
-            <!-- COLONNE DROITE -->
-            <div class="col col-right">
-
-                <section class="card">
-                    <h3 class="card-title">Organigramme</h3>
-                    <div class="org-chart">
-                        <div class="org-node org-node-lead">
-                            <div class="org-name">Sarah Martin</div>
-                            <div class="org-role">CEO</div>
-                        </div>
-                        <div class="org-branch"></div>
-                        <div class="org-node org-node-manager">
-                            <div class="org-name">Pierre Leroy</div>
-                            <div class="org-role">CTO</div>
-                            <div class="org-branch org-branch-sm"></div>
-                            <div id="orgaTeamBox" class="org-team">
-                                <div class="org-team-label">Équipe</div>
-                                <div class="org-team-member">Lucas Bernard — Front-end</div>
-                                <div id="rhOrgaDynamicNode" class="org-team-new hidden"></div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="card">
-                    <h3 class="card-title">Aperçu de l'email d'invitation</h3>
-                    <div class="mail-preview">
-                        <div class="mail-line"><span class="mail-label">À</span><span id="mailCible" class="mail-value mono">thomas.dubois@gmail.com</span></div>
-                        <div class="mail-line mail-line-border"><span class="mail-label">Objet</span><span class="mail-value">Bienvenue ! Ton accès à l'espace d'intégration</span></div>
-                        <div class="mail-body">
-                            <p>Bonjour <strong id="mailPrenom">Thomas</strong>,</p>
-                            <p>Nous sommes ravis de t'accueillir en tant que <strong id="mailPoste">[Développeur Fullstack]</strong>, sous la responsabilité de <strong id="mailManager">Pierre Leroy (CTO)</strong>.</p>
-                            <p>Ton espace personnel d'intégration est prêt :</p>
-                            <div class="mail-cta">
-                                <a id="shareableLink" href="#">Générer une invitation pour voir le lien</a>
-                            </div>
-                        </div>
-                        <div class="mail-attachments">
-                            <span class="attachment-chip">Livret_Accueil.pdf</span>
-                            <span id="mailAttachedWrapper" class="attachment-chip-wrapper"></span>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </main>
-
-    <!-- ============ VUE EMPLOYÉ ============ -->
-    <main id="containerEmployee" class="page hidden">
-        <div class="grid">
-
-            <div class="col col-right-wide">
-                <section class="card welcome-card">
-                    <div id="empLogoSpace" class="welcome-logo-slot">Logo entreprise</div>
-                    <h2 class="welcome-title">Bienvenue, <span id="empWelcomeName" class="accent">Thomas</span> 👋</h2>
-                    <p class="welcome-sub">
-                        Tu es attendu le <strong id="empWelcomeDate">01/09/2026</strong> chez
-                        <strong id="empWelcomeBoite">InnovCorp</strong>, en tant que
-                        <em id="empWelcomePoste">[Développeur Fullstack]</em>.
-                    </p>
-                    <div class="welcome-grid">
-                        <div class="welcome-tile">
-                            <span class="welcome-tile-label">Wi-Fi des bureaux</span>
-                            <span id="empWelcomeWifi" class="welcome-tile-value mono">InnovCorp_Secure_2026</span>
-                        </div>
-                        <div class="welcome-tile">
-                            <span class="welcome-tile-label">Documents joints</span>
-                            <div id="empDocsDownloadWrapper" class="welcome-docs">Aucun document annexe</div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="card">
-                    <h3 class="card-title">Ta place dans l'organigramme</h3>
-                    <div class="org-chart">
-                        <div class="org-node org-node-lead">
-                            <div class="org-name">Sarah Martin</div>
-                            <div class="org-role">CEO</div>
-                        </div>
-                        <div class="org-branch"></div>
-                        <div class="org-node org-node-manager">
-                            <div class="org-name">Pierre Leroy</div>
-                            <div class="org-role">CTO — ton manager</div>
-                            <div class="org-branch org-branch-sm"></div>
-                            <div class="org-team">
-                                <div class="org-team-label">Ton équipe</div>
-                                <div class="org-team-member">Lucas Bernard — Front-end</div>
-                                <div id="empSelfOrgaNode" class="org-team-new">THOMAS DUBOIS (moi)</div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <div class="col col-left-narrow">
-                <section class="card">
-                    <h3 class="card-title">Feuille de route</h3>
-                    <ol class="timeline">
-                        <li class="timeline-item is-done">
-                            <span class="timeline-dot">✓</span>
-                            <div>
-                                <h4>Jour 1 — Accueil & matériel</h4>
-                                <p>Café de bienvenue, attribution du PC, badges, déjeuner d'équipe.</p>
-                            </div>
-                        </li>
-                        <li class="timeline-item">
-                            <span class="timeline-dot">2</span>
-                            <div>
-                                <h4>Semaine 1 — Immersion technique</h4>
-                                <p>Prise en main des projets et réunions d'intégration.</p>
-                            </div>
-                        </li>
-                    </ol>
-                </section>
-            </div>
-        </div>
-    </main>
-
-    <footer class="app-footer">
-        <p>© 2026 DayOne — Onboarding Cloud</p>
-    </footer>
+        <footer class="app-footer">
+            <p>© 2026 DayOne — Onboarding Cloud</p>
+        </footer>
+    </div>
 
     <script src="app.js"></script>
 </body>
