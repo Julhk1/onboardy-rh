@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- 🔌 LE SCRIPT SUPABASE -->
+    <!-- 🔌 LE SCRIPT SUPABASE POUR LA BASE DE DONNÉES -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500/20">
@@ -18,7 +18,7 @@
     <header class="main-header px-8 py-4 flex flex-col sm:flex-row gap-4 justify-between items-center sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <div class="brand-badge text-slate-950 font-bold p-2 rounded-xl text-sm">D1</div>
-            <h1 class="font-bold text-lg text-white">DayOne <span class="version-tag text-xs font-medium px-2 py-0.5 rounded-full">OS Engine</span></h1>
+            <h1 class="font-bold text-lg text-white">DayOne <span class="version-tag text-xs font-medium px-2 py-0.5 rounded-full">OS Cloud v4</span></h1>
         </div>
         
         <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
@@ -35,43 +35,54 @@
     <div id="containerRH" class="max-w-7xl mx-auto w-full p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
         <div class="lg:col-span-5 space-y-6">
             <section class="card-premium p-5 space-y-4">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800 pb-2">🏢 Espace Entreprise (<span id="rhBoiteTitle" class="text-blue-500">...</span>)</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800 pb-2">🏢 1. Entreprise</h3>
                 <div class="grid grid-cols-2 gap-3 text-xs">
                     <div>
+                        <label class="text-slate-400 block mb-1">Nom de la boîte</label>
+                        <input id="cfgBoite" type="text" value="InnovCorp" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-1.5 focus:outline-none">
+                    </div>
+                    <div>
                         <label class="text-slate-400 block mb-1">Code WiFi Bureau</label>
-                        <input id="cfgWifi" type="text" value="Wifi_Secure_2026" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-1.5 focus:outline-none">
+                        <input id="cfgWifi" type="text" value="InnovCorp_Secure_2026" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-1.5 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-semibold text-slate-400 block mb-1">Logo officiel</label>
+                    <div class="upload-box border border-dashed border-slate-700 rounded-xl p-3 text-center cursor-pointer relative">
+                        <input type="file" id="logoInput" accept="image/*" onchange="chargerLogo(event)" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <div id="logoPreview" class="text-xs text-slate-400">🖼️ Lier un logo d'entreprise</div>
                     </div>
                 </div>
             </section>
 
             <section class="card-premium border-emerald-500/10 p-5 space-y-4">
-                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider border-b border-slate-800 pb-2">✨ Ajouter un collaborateur</h3>
+                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider border-b border-slate-800 pb-2">✨ 2. Nouvel Onboarding Cloud</h3>
                 <div class="space-y-3 text-xs">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="text-slate-400 block mb-1">Prénom</label>
-                            <input id="empPrenom" type="text" placeholder="Prénom" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
+                            <input id="empPrenom" type="text" value="Thomas" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
                         </div>
                         <div>
                             <label class="text-slate-400 block mb-1">Nom</label>
-                            <input id="empNom" type="text" placeholder="Nom" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
+                            <input id="empNom" type="text" value="Dubois" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
                         </div>
                     </div>
                     <div>
                         <label class="text-slate-400 block mb-1">Poste</label>
-                        <input id="empPoste" type="text" placeholder="Ex: Développeur" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
+                        <input id="empPoste" type="text" value="Développeur Fullstack" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="text-slate-400 block mb-1">Manager Direct</label>
                             <select id="empManager" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
-                                <option value="Sarah Martin (CEO)">Sarah Martin (CEO)</option>
                                 <option value="Pierre Leroy (CTO)">Pierre Leroy (CTO)</option>
+                                <option value="Sarah Martin (CEO)">Sarah Martin (CEO)</option>
                             </select>
                         </div>
                         <div>
                             <label class="text-slate-400 block mb-1">Email Personnel</label>
-                            <input id="empEmail" type="email" placeholder="salarie@gmail.com" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
+                            <input id="empEmail" type="email" value="thomas.dubois@gmail.com" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
                         </div>
                     </div>
                     <div>
@@ -89,19 +100,37 @@
         <!-- DROITE RH -->
         <div class="lg:col-span-7 space-y-6">
             <section class="card-premium p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🌳 Employés de cette boîte stockés dans le Cloud</h3>
-                <div id="listeEmployesBoite" class="space-y-2 max-h-[200px] overflow-y-auto text-xs">
-                    <!-- Les employés existants de cette boîte spécifique s'afficheront ici -->
-                    <p class="text-slate-500 italic">Aucun employé enregistré pour le moment.</p>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🌳 Organigramme d'entreprise</h3>
+                <div class="bg-slate-900/30 rounded-xl p-6 border border-slate-800/40 flex flex-col items-center justify-center space-y-4">
+                    <div class="bg-slate-950 border border-purple-500/30 px-4 py-1.5 rounded-xl text-center text-xs">
+                        <div class="font-bold text-white">👑 Sarah Martin</div>
+                        <div class="text-[9px] text-purple-400">CEO</div>
+                    </div>
+                    <div class="w-0.5 h-4 bg-slate-800"></div>
+                    <div class="bg-slate-950 border border-blue-500/40 px-5 py-2 rounded-xl text-center text-xs relative">
+                        <div class="font-bold text-white">👔 Pierre Leroy</div>
+                        <div class="text-[9px] text-blue-400">CTO</div>
+                        <div class="w-0.5 h-4 bg-slate-800 mx-auto mt-2"></div>
+                        <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl mt-1 space-y-1.5 min-w-[160px]">
+                            <div class="text-[9px] text-slate-500 font-semibold border-b border-slate-800 pb-1 uppercase">Équipe :</div>
+                            <div class="text-[10px] text-slate-400">Lucas Bernard (Front)</div>
+                            <div id="rhOrgaDynamicNode" class="bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 rounded text-[10px] text-emerald-400 font-bold hidden"></div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <section class="card-premium p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">✉️ Lien unique généré</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">✉️ Mail automatique généré</h3>
                 <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 text-xs text-slate-300 space-y-2">
-                    <p class="text-slate-400">Une fois validé, le salarié recevra ce lien sécurisé d'accès à son espace :</p>
-                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-center w-full">
-                        <a id="shareableLink" href="#" class="text-blue-500 font-mono font-bold hover:underline">En attente de validation...</a>
+                    <div><span class="text-slate-500">À :</span> <span id="mailCible" class="text-emerald-400 font-mono">thomas.dubois@gmail.com</span></div>
+                    <div class="border-b border-slate-800 pb-2"><span class="text-slate-500">Objet :</span> Bienvenue ! Votre espace d'intégration unique</div>
+                    <div class="space-y-2 text-slate-400 pt-2">
+                        <p>Hello <span id="mailPrenom" class="text-white font-bold">Thomas</span>,</p>
+                        <p>Clique ci-dessous pour tester ton lien unique persistant :</p>
+                        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-center w-full">
+                            <a id="shareableLink" href="#" class="text-emerald-400 font-mono font-bold hover:underline">Générez un profil pour voir le lien</a>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -112,8 +141,9 @@
     <div id="containerEmployee" class="max-w-7xl mx-auto w-full p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start hidden">
         <div class="lg:col-span-7 space-y-6">
             <div class="employee-welcome-card border border-slate-800 rounded-2xl p-6 relative shadow-xl">
-                <h2 class="text-2xl font-bold text-white">Ravi de t'accueillir, <span id="empWelcomeName" class="text-blue-500">...</span> !</h2>
-                <p class="text-xs text-slate-400 mt-1">Tu es attendu le <span id="empWelcomeDate" class="text-white font-medium">--/--/----</span> chez <span id="empWelcomeBoite" class="text-white font-bold">...</span>.</p>
+                <span id="empLogoSpace" class="text-xs text-slate-500 block mb-2 font-mono uppercase tracking-wider">[Logo Entreprise]</span>
+                <h2 class="text-2xl font-bold text-white">Ravi de t'accueillir, <span id="empWelcomeName" class="text-emerald-400">Collaborateur</span> !</h2>
+                <p class="text-xs text-slate-400 mt-1">Tu es attendu le <span id="empWelcomeDate" class="text-white font-medium">--/--/----</span> chez <span id="empWelcomeBoite" class="text-white font-bold">l'entreprise</span>.</p>
                 
                 <div class="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-slate-800 text-xs">
                     <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
@@ -122,16 +152,37 @@
                     </div>
                 </div>
             </div>
+
+            <section class="card-premium p-5">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🌳 Ta place dans l'organigramme</h3>
+                <div class="bg-slate-900/30 rounded-xl p-4 border border-slate-800/60 flex flex-col items-center justify-center space-y-4">
+                    <div class="bg-slate-950 border border-purple-500/30 px-4 py-1.5 rounded-xl text-center text-xs">
+                        <div class="font-bold text-white">👑 Sarah Martin</div>
+                        <div class="text-[9px] text-purple-400">CEO</div>
+                    </div>
+                    <div class="w-0.5 h-4 bg-slate-800"></div>
+                    <div class="bg-slate-950 border border-blue-500/40 px-5 py-2 rounded-xl text-center text-xs relative">
+                        <div class="font-bold text-white">👔 Pierre Leroy</div>
+                        <div class="text-[9px] text-blue-400">CTO (Ton Manager)</div>
+                        <div class="w-0.5 h-4 bg-slate-800 mx-auto mt-2"></div>
+                        <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl mt-1 space-y-1.5 min-w-[150px]">
+                            <div class="text-[9px] text-slate-500 font-semibold border-b border-slate-800 pb-1 uppercase">Ton équipe :</div>
+                            <div class="text-[10px] text-slate-400">Lucas Bernard (Front)</div>
+                            <div id="empSelfOrgaNode" class="bg-emerald-500/10 border border-emerald-500/40 px-2 py-1 rounded text-[10px] text-emerald-400 font-bold">Moi</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <div class="lg:col-span-5">
             <section class="card-premium p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🗺️ Feuille de route</h3>
-                <div class="timeline relative border-l border-slate-800 pl-5 ml-2.5 space-y-4 py-2 text-xs">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🗺️ Feuille de route d'intégration</h3>
+                <div class="timeline relative border-l border-slate-800 pl-5 ml-2.5 space-y-6 py-2 text-xs">
                     <div>
                         <div class="timeline-dot absolute -left-7.5 bg-emerald-500/10 border border-emerald-500 text-emerald-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">✓</div>
-                        <h4 class="font-bold text-white text-sm">Jour 1</h4>
-                        <p class="text-slate-400 mt-0.5 text-[11px]">Intégration et découverte de l'équipe.</p>
+                        <h4 class="font-bold text-white text-sm">Le Jour J</h4>
+                        <p class="text-slate-400 mt-0.5 text-[11px]">Accueil par le manager, café d'équipe et remise du matériel informatique.</p>
                     </div>
                 </div>
             </section>
@@ -139,7 +190,7 @@
     </div>
 
     <footer class="border-t border-slate-800 bg-slate-950 py-4 text-center text-[11px] text-slate-500">
-        <p>© 2026 DayOne OS — Moteur SaaS Cloisonné B2B 🇫🇷</p>
+        <p>© 2026 DayOne OS — Version Cloud Multi-utilisateurs 🇫🇷</p>
     </footer>
 
     <script src="app.js"></script>
