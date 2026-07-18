@@ -1,25 +1,23 @@
-/* 🌟 LIVRET'EASY STYLE — CHARTE CLAIRE PREMIUM 🌟 */
+/* 🌟 LIVRET'EASY STYLE — VERSION FINALE NETTE 🌟 */
 
 body {
-    background-color: #f1f5f9; /* Fond général gris-bleu très doux */
-    color: #1e293b; /* Texte principal en ardoise sombre */
+    background-color: #f1f5f9; /* Fond gris-bleu clair uniforme */
+    color: #1e293b;
 }
 
-/* Header Premium Bleu Marine Profond */
+/* Header Premium Bleu Marine */
 .main-header {
-    background-color: #1a2e4c; /* Bleu marine signature de l'image */
+    background-color: #1a2e4c;
     border-bottom: 2px solid #14243c;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
-/* Badge D1 en haut à gauche */
 .brand-badge {
     background-color: #ffffff;
     color: #1a2e4c;
     border-radius: 8px;
 }
 
-/* Tag de version */
 .version-tag {
     background-color: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.25);
@@ -31,17 +29,16 @@ body {
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
 }
 
-/* Carte Salarié façon "Aperçu de document" */
 .employee-welcome-card {
     background-color: #ffffff;
     border: 1px solid #cbd5e1;
-    border-top: 4px solid #1a2e4c; /* Accent haut bleu marine */
+    border-top: 4px solid #1a2e4c;
 }
 
-/* Inputs & Formulaires impeccables */
+/* Inputs & Formulaires */
 .input-premium {
     background-color: #ffffff;
     border: 1px solid #cbd5e1;
@@ -56,7 +53,7 @@ body {
     box-shadow: 0 0 0 3px rgba(26, 46, 76, 0.1);
 }
 
-/* Zone d'import / Dropzone de l'image */
+/* Zone d'import */
 .upload-box {
     background-color: #f8fafc;
     border: 2px dashed #cbd5e1;
@@ -64,15 +61,9 @@ body {
     color: #64748b;
 }
 
-.upload-box:hover {
-    background-color: #f1f5f9;
-    border-color: #5cb887;
-    color: #1e293b;
-}
-
-/* 🟢 Bouton d'action "CONTINUER" Vert Fluo Épuré */
+/* 🟢 Bouton d'action "CONTINUER" Vert */
 .btn-action {
-    background-color: #5cb887; /* Le vert exact de ton image */
+    background-color: #5cb887;
     color: #ffffff;
     font-weight: 600;
     border-radius: 0.5rem;
@@ -82,47 +73,54 @@ body {
 .btn-action:hover {
     background-color: #4da676;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(92, 184, 135, 0.2);
 }
 
-/* Boutons de navigation (Précédent / Switch) */
+/* Boutons du commutateur de vue (Header) */
 .vue-btn {
-    color: #94a3b8;
-    font-weight: 500;
+    color: #94a3b8 !important;
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
 }
 
 .vue-btn:hover {
-    color: #ffffff;
-}
-
-/* Onglet actif du header */
-.active-vue {
-    background-color: rgba(255, 255, 255, 0.15) !important;
     color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Surcharge pour l'affichage de l'Organigramme et des blocs gris */
-.bg-slate-950 {
+.active-vue {
+    background-color: #ffffff !important;
+    color: #1a2e4c !important; /* Devient bleu marine comme le fond Livret'Easy */
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 🛠️ Surcharges strictes pour nettoyer l'organigramme et les zones sombres restantes */
+.bg-slate-950, .bg-slate-900, .bg-slate-900\/30, .bg-slate-900\/50, .bg-slate-900\/80 {
     background-color: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
 }
 
-.bg-slate-900\/30, .bg-slate-900\/50, .bg-slate-900\/80 {
+/* Nettoyage du bloc équipe sombre sous Pierre Leroy */
+#containerRH div[class*="bg-slate-900"], #containerEmployee div[class*="bg-slate-900"] {
     background-color: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
 }
 
-.text-white {
+/* Forcer la lisibilité des textes */
+.text-white, h1, h2, h3, h4, label {
     color: #1e293b !important;
 }
 
-/* Petits textes descriptifs */
-.text-slate-400 {
+/* Garder les textes du header en blanc */
+.main-header h1, .main-header span, .main-header button:not(.active-vue) {
+    color: #ffffff !important;
+}
+
+.text-slate-400, .text-slate-500 {
     color: #64748b !important;
 }
 
-/* Points de la timeline */
 .timeline-dot {
     background-color: #f1f5f9 !important;
     border-color: #cbd5e1 !important;
