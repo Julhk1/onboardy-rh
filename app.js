@@ -11,7 +11,7 @@ const CONFIG = {
     SEND_EMAIL_ENDPOINT: "/api/send-email"
 };
 
-const supabase = (CONFIG.SUPABASE_ANON_KEY && !CONFIG.SUPABASE_ANON_KEY.startsWith("METS_ICI"))
+const supabaseClient = (CONFIG.SUPABASE_ANON_KEY && !CONFIG.SUPABASE_ANON_KEY.startsWith("METS_ICI"))
     ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY)
     : null;
 
@@ -202,9 +202,9 @@ async function declencherOnboardingGeneral() {
     }
 
     // 1. Sauvegarde Supabase (si configuré)
-    if (supabase) {
+    if (supabaseClient) {
         try {
-            await supabase.from('onboardings').insert([{
+            await supabaseClient.from('onboardings').insert([{
                 id: uniqueId, prenom, nom, poste, email, boite, wifi, manager
             }]);
         } catch (err) {
@@ -257,10 +257,10 @@ async function declencherOnboardingGeneral() {
 // ============================================
 async function verifierUrlDArrivee() {
     const userId = new URLSearchParams(window.location.search).get('id');
-    if (!userId || !supabase) return;
+    if (!userId || !supabaseClient) return;
 
     try {
-        const { data, error } = await supabase.from('onboardings').select('*').eq('id', userId).single();
+        const { data, error } = await supabaseClient.from('onboardings').select('*').eq('id', userId).single();
         if (data && !error) {
             setText('empWelcomeName', data.prenom);
             setText('empWelcomeBoite', data.boite);
