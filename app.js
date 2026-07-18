@@ -1,4 +1,4 @@
-// Synchronisation des textes en direct entre les deux vues
+// Synchronisation des textes en direct entre les deux vues (RH et Employé)
 function synchroTotale() {
     const boite = document.getElementById('cfgBoite').value;
     const wifi = document.getElementById('cfgWifi').value;
@@ -64,7 +64,7 @@ function importerCSV(event) {
     if (file) alert(`📊 Base employés : "${file.name}" injectée avec succès !`);
 }
 
-// 🚀 ENVOI ROBUSTE VERS GMAIL / HOTMAIL VIA L'API RESEND
+// 🚀 ENVOI MAILS VERS GMAIL / HOTMAIL VIA L'API RESEND
 function declencherOnboardingGeneral() {
     const prenom = document.getElementById('empPrenom').value;
     const nom = document.getElementById('empNom').value;
@@ -72,21 +72,15 @@ function declencherOnboardingGeneral() {
     const email = document.getElementById('empEmail').value;
     const boite = document.getElementById('cfgBoite').value;
 
-    // Mise à jour de l'organigramme RH
+    // Mise à jour visuelle immédiate de l'organigramme RH
     const rhNode = document.getElementById('rhOrgaDynamicNode');
     rhNode.innerText = `✨ ${prenom.toUpperCase()} ${nom.toUpperCase()} (${poste.split(' ')[0]})`;
     rhNode.classList.remove('hidden');
 
-    // CONFIGURATION DE TA CLÉ RESEND POUR LES VRAIS MAILS (Gratuit sur resend.com)
-    const RESEND_API_KEY = "VOTRE_API_KEY_RESEND"; 
+    // Clé Resend configurée de ton compte
+    const RESEND_API_KEY = "re_VBiCKaEy_54ahgNm6Ft6ZhZboBGU2mdbA"; 
 
-    if (RESEND_API_KEY === "VOTRE_API_KEY_RESEND") {
-        alert(`⚡ MODE DÉMO GRAPHIQUE :\nL'organigramme s'est mis à jour et le mail est prêt ! Pour recevoir le VRAI mail sur ton Gmail ou ton Hotmail, crée un compte gratuit sur resend.com et colle ta clé API à la ligne 64 du fichier app.js.`);
-        basculerVue('Employee');
-        return;
-    }
-
-    // Appel API direct vers les serveurs de routage de Resend (Délivrabilité Gmail/Hotmail à 99.9%)
+    // Envoi de la requête réseau sécurisée à Resend
     fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -94,19 +88,32 @@ function declencherOnboardingGeneral() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            from: 'onboarding@resend.dev', // Remplaçable par ton domaine plus tard
+            from: 'onboarding@resend.dev', 
             to: email,
             subject: `Bienvenue chez ${boite} ! Votre espace d'intégration unique`,
-            html: `<p>Hello <strong>${prenom}</strong>,</p><p>Toute l'équipe de ${boite} a hâte de t'accueillir en tant que ${poste} !</p><p>Découvre ton espace d'intégration en direct sur DayOne OS.</p>`
+            html: `
+                <div style="font-family: sans-serif; color: #333; padding: 20px; max-width: 600px; border: 1px solid #eee; border-radius: 10px;">
+                    <h2 style="color: #10b981;">Bienvenue dans l'équipe, ${prenom} ! 🚀</h2>
+                    <p>Nous sommes ravis de t'accueillir chez <strong>${boite}</strong> au poste de <strong>${poste}</strong>.</p>
+                    <p>Ton espace personnel d'intégration à l'organigramme est prêt à être exploré.</p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+                    <p style="font-size: 11px; color: #666;">Généré automatiquement par DayOne OS.</p>
+                </div>
+            `
         })
-    }).then(res => {
+    })
+    .then(res => {
         if(res.ok) {
-            alert(`📨 VRAI MAIL ENVOYÉ ! Le flux réseau a distribué le mail avec succès vers l'adresse : ${email}. (Vérifie ta boîte de réception ou tes spams)`);
+            alert(`📨 SUCCÈS NET ! Le flux Resend a bien distribué l'email d'onboarding à : ${email}\n\nL'organigramme a été mis à jour.`);
             basculerVue('Employee');
         } else {
-            alert("Erreur lors de la distribution du mail via Resend.");
+            alert("Erreur lors de la distribution du mail via Resend. Vérifie les quotas de ton compte gratuit.");
         }
-    }).catch(err => console.error(err));
+    })
+    .catch(err => {
+        alert("Erreur réseau lors de l'appel à Resend.");
+        console.error(err);
+    });
 }
 
 function basculerVue(type) {
@@ -124,7 +131,7 @@ function basculerVue(type) {
     }
 }
 
-// Lancement automatique
+// Initialisation globale
 window.onload = function() {
     synchroTotale();
 };
