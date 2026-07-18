@@ -3,136 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DayOne OS — Le Système d'Onboarding Intégral</title>
-    <!-- Tailwind CSS -->
+    <title>DayOne OS — Système d'Onboarding Intégral</title>
+    <!-- Tailwind CSS pour les bases -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Fichier CSS personnalisé pour les couleurs reposantes -->
+    <link rel="stylesheet" href="style.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500/20">
 
-    <!-- HEADER GLOBAL AVEC SÉLECTEUR DE VUE -->
-    <header class="border-b border-slate-800 bg-slate-950 px-8 py-4 flex flex-col sm:flex-row gap-4 justify-between items-center sticky top-0 z-50">
+    <!-- HEADER GLOBAL -->
+    <header class="main-header px-8 py-4 flex flex-col sm:flex-row gap-4 justify-between items-center sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <div class="bg-emerald-500 text-slate-950 font-bold p-2 rounded-xl text-sm">⚡</div>
-            <h1 class="font-bold text-lg text-white">DayOne <span class="text-xs text-emerald-400 font-medium px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20">OS Intégral</span></h1>
+            <div class="brand-badge text-slate-950 font-bold p-2 rounded-xl text-sm">D1</div>
+            <h1 class="font-bold text-lg text-white">DayOne <span class="version-tag text-xs font-medium px-2 py-0.5 rounded-full">OS Pro v3</span></h1>
         </div>
         
-        <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
-            <button id="viewRhBtn" onclick="basculerVue('RH')" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition-all cursor-pointer shadow-md">
+        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <button id="viewRhBtn" onclick="basculerVue('RH')" class="vue-btn active-vue px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">
                 🖥️ Vue Tableau de Bord RH
             </button>
-            <button id="viewEmpBtn" onclick="basculerVue('Employee')" class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer">
+            <button id="viewEmpBtn" onclick="basculerVue('Employee')" class="vue-btn px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer">
                 📱 Vue Espace Perso Employé
             </button>
         </div>
     </header>
 
-    <!-- CONTAINER 1 : TABLEAU DE BORD INTÉGRAL RH -->
+    <!-- CONTAINER 1 : TABLEAU DE BORD RH -->
     <div id="containerRH" class="max-w-7xl mx-auto w-full p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start">
         
-        <!-- COLONNE GAUCHE CONFIGURATION RH (5 Colonnes) -->
+        <!-- CONFIGURATION RH -->
         <div class="lg:col-span-5 space-y-6">
-            
-            <!-- CONFIG ENTREPRISE (LOGO & DOCS) -->
-            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800 pb-2">🏢 1. Configuration Entreprise</h3>
-                
+            <section class="card-premium p-5 space-y-4">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800 pb-2">🏢 1. Entreprise</h3>
                 <div class="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                        <label class="block text-slate-400 mb-1">Nom de la boîte</label>
-                        <input id="cfgBoite" type="text" value="InnovCorp" oninput="synchroTotale()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-500">
+                        <label class="text-slate-400 block mb-1">Nom de la boîte</label>
+                        <input id="cfgBoite" type="text" value="InnovCorp" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-1.5 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-slate-400 mb-1">Code WiFi Principal</label>
-                        <input id="cfgWifi" type="text" value="InnovCorp_Secure_2026" oninput="synchroTotale()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-500">
+                        <label class="text-slate-400 block mb-1">Code WiFi Bureau</label>
+                        <input id="cfgWifi" type="text" value="InnovCorp_Secure_2026" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-1.5 focus:outline-none">
                     </div>
                 </div>
 
-                <!-- Logo Upload -->
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Logo officiel</label>
-                    <div class="border border-dashed border-slate-700 hover:border-emerald-500/50 rounded-xl p-3 text-center cursor-pointer transition-all bg-slate-900/30 relative">
+                    <label class="text-[11px] font-semibold text-slate-400 block mb-1">Logo officiel</label>
+                    <div class="upload-box border border-dashed border-slate-700 rounded-xl p-3 text-center cursor-pointer relative">
                         <input type="file" id="logoInput" accept="image/*" onchange="chargerLogo(event)" class="absolute inset-0 opacity-0 cursor-pointer">
-                        <div id="logoPreview" class="text-xs text-slate-400">🖼️ Cliquez pour lier un logo</div>
+                        <div id="logoPreview" class="text-xs text-slate-400">🖼️ Lier un logo d'entreprise</div>
                     </div>
                 </div>
 
-                <!-- Pièces jointes -->
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Documents annexes à joindre (Règlement, Charte...)</label>
-                    <div class="border border-dashed border-slate-700 hover:border-blue-500/50 rounded-xl p-3 text-center cursor-pointer transition-all bg-slate-900/30 relative">
+                    <label class="text-[11px] font-semibold text-slate-400 block mb-1">Documents annexes (Charte, Livret...)</label>
+                    <div class="upload-box border border-dashed border-slate-700 rounded-xl p-3 text-center cursor-pointer relative">
                         <input type="file" id="docInput" multiple onchange="chargerDocuments(event)" class="absolute inset-0 opacity-0 cursor-pointer">
                         <div class="text-xs text-slate-400">📎 Ajouter des documents</div>
                     </div>
-                    <div id="docList" class="mt-2 space-y-1 text-xs"></div>
+                    <div id="docList" class="mt-2 space-y-1 text-xs text-slate-400"></div>
                 </div>
             </section>
 
-            <!-- IMPORT EXCEL / CSV -->
-            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-3">
+            <!-- EXCEL / CSV -->
+            <section class="card-premium p-5 space-y-3">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">📊 2. Base Employés Existants</h3>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">📊 2. Base Employés</h3>
                     <button onclick="telechargerModeleExcel()" class="text-[10px] text-emerald-400 hover:underline">Modèle Excel/CSV</button>
                 </div>
-                <div class="border border-dashed border-emerald-500/20 hover:border-emerald-500/60 rounded-xl p-4 text-center cursor-pointer transition-all bg-emerald-500/5 relative">
+                <div class="upload-box border border-dashed border-emerald-500/10 rounded-xl p-4 text-center cursor-pointer relative bg-emerald-500/5">
                     <input type="file" id="csvInput" accept=".csv" onchange="importerCSV(event)" class="absolute inset-0 opacity-0 cursor-pointer">
-                    <div class="text-xs text-slate-300">📥 Glissez la liste de vos anciens employés</div>
+                    <div class="text-xs text-slate-300">📥 Importer l'historique de vos employés</div>
                 </div>
             </section>
 
-            <!-- AJOUT DU NOUVEAU COLLABORATEUR -->
-            <section class="bg-slate-950 border border-emerald-500/20 rounded-2xl p-5 space-y-4 shadow-xl">
-                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider border-b border-slate-800 pb-2">✨ 3. Lancer un Onboarding</h3>
+            <!-- FORMULAIRE NOUVEAU SALARIÉ -->
+            <section class="card-premium border-emerald-500/10 p-5 space-y-4">
+                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider border-b border-slate-800 pb-2">✨ 3. Nouvel Onboarding</h3>
                 <div class="space-y-3 text-xs">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-slate-400 mb-1">Prénom</label>
-                            <input id="empPrenom" type="text" value="Thomas" oninput="synchroTotale()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <label class="text-slate-400 block mb-1">Prénom</label>
+                            <input id="empPrenom" type="text" value="Thomas" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
                         </div>
                         <div>
-                            <label class="block text-slate-400 mb-1">Nom</label>
-                            <input id="empNom" type="text" value="Dubois" oninput="synchroTotale()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <label class="text-slate-400 block mb-1">Nom</label>
+                            <input id="empNom" type="text" value="Dubois" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-slate-400 mb-1">Intitulé du poste</label>
-                        <input id="empPoste" type="text" value="Développeur Fullstack" oninput="synchroTotale()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                        <label class="text-slate-400 block mb-1">Poste</label>
+                        <input id="empPoste" type="text" value="Développeur Fullstack" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-slate-400 mb-1">Manager Direct (N+1)</label>
-                            <select id="empManager" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <label class="text-slate-400 block mb-1">Manager Direct</label>
+                            <select id="empManager" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
                                 <option value="Pierre Leroy (CTO)">Pierre Leroy (CTO)</option>
                                 <option value="Sarah Martin (CEO)">Sarah Martin (CEO)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-slate-400 mb-1">Email Personnel</label>
-                            <input id="empEmail" type="email" value="thomas.dubois@email.com" oninput="synchroTotale()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <label class="text-slate-400 block mb-1">Email Personnel (Gmail / Hotmail...)</label>
+                            <input id="empEmail" type="email" value="thomas.dubois@gmail.com" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none" placeholder="exemple@gmail.com">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-slate-400 mb-1">Date d'arrivée</label>
-                        <input id="empDate" type="date" value="2026-09-01" oninput="synchroTotale()" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                        <label class="text-slate-400 block mb-1">Date d'arrivée</label>
+                        <input id="empDate" type="date" value="2026-09-01" oninput="synchroTotale()" class="input-premium w-full rounded-lg px-3 py-2 text-white focus:outline-none">
                     </div>
 
-                    <button onclick="declencherOnboardingGeneral()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer text-sm font-semibold mt-2">
-                        🚀 Injecter, Envoyer & Activer le Portail
+                    <button onclick="declencherOnboardingGeneral()" class="btn-action w-full text-slate-950 font-bold py-3 rounded-xl flex items-center justify-center gap-2 cursor-pointer text-sm mt-2">
+                        🚀 Envoyer à Gmail / Hotmail & Activer
                     </button>
                 </div>
             </section>
         </div>
 
-        <!-- COLONNE DROITE APERÇUS RH (7 Colonnes) -->
+        <!-- DROITE RH (ORGANIGRAMME & MAIL) -->
         <div class="lg:col-span-7 space-y-6">
-            <!-- ORGANIGRAMME RH -->
-            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5">
+            <section class="card-premium p-5">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🌳 Organigramme d'entreprise</h3>
-                <div class="bg-slate-900/50 rounded-xl p-6 border border-slate-800/60 min-h-[200px] flex flex-col items-center justify-center space-y-4">
+                <div class="bg-slate-900/30 rounded-xl p-6 border border-slate-800/40 flex flex-col items-center justify-center space-y-4">
                     <div class="bg-slate-950 border border-purple-500/30 px-4 py-1.5 rounded-xl text-center text-xs">
                         <div class="font-bold text-white">👑 Sarah Martin</div>
                         <div class="text-[9px] text-purple-400">CEO</div>
@@ -145,26 +138,22 @@
                         <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl mt-1 space-y-1.5 min-w-[160px]">
                             <div class="text-[9px] text-slate-500 font-semibold border-b border-slate-800 pb-1 uppercase">Équipe :</div>
                             <div class="text-[10px] text-slate-400">Lucas Bernard (Front)</div>
-                            <div id="rhOrgaDynamicNode" class="bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 rounded text-[10px] text-emerald-400 font-bold hidden">
-                                <!-- Injecté dynamiquement -->
-                            </div>
+                            <div id="rhOrgaDynamicNode" class="bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 rounded text-[10px] text-emerald-400 font-bold hidden"></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- MAIL AUTOMATIQUE -->
-            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">✉️ Aperçu du mail prêt à partir</h3>
-                <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 text-xs text-slate-300 space-y-2">
-                    <div><span class="text-slate-500">À :</span> <span id="mailCible" class="text-emerald-400 font-mono">thomas.dubois@email.com</span></div>
-                    <div class="border-b border-slate-800 pb-2"><span class="text-slate-500">Objet :</span> Bienvenue ! Vos accès et votre espace d'intégration unique</div>
+            <section class="card-premium p-5">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">✉️ Mail automatique généré</h3>
+                <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 text-xs text-slate-300 space-y-2">
+                    <div><span class="text-slate-500">À :</span> <span id="mailCible" class="text-emerald-400 font-mono">thomas.dubois@gmail.com</span></div>
+                    <div class="border-b border-slate-800 pb-2"><span class="text-slate-500">Objet :</span> Bienvenue ! Votre espace d'intégration unique</div>
                     <div class="space-y-2 text-slate-400 pt-2">
                         <p>Hello <span id="mailPrenom" class="text-white font-bold">Thomas</span>,</p>
-                        <p>Nous sommes ravis de t'accueillir comme <span id="mailPoste" class="text-white font-medium">[Développeur Fullstack]</span> ! Ton profil a été intégré à notre organigramme sous la responsabilité de <span id="mailManager" class="text-white">Pierre Leroy (CTO)</span>.</p>
-                        <p>Clique ci-dessous pour ouvrir ton Espace Personnel d'intégration et retrouver tes fichiers joints :</p>
+                        <p>Nous sommes ravis de t'accueillir comme <span id="mailPoste" class="text-white font-medium">[Développeur Fullstack]</span> ! Ton profil a été rattaché à l'organigramme.</p>
                         <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-center w-full">
-                            <span class="text-emerald-400 font-mono font-bold cursor-pointer hover:underline" onclick="basculerVue('Employee')">dayone.os/space/thomas-dubois</span>
+                            <span class="text-emerald-400 font-mono font-bold">dayone.os/space/thomas-dubois</span>
                         </div>
                     </div>
                     <div class="pt-2 border-t border-slate-800 flex flex-wrap gap-2">
@@ -176,15 +165,13 @@
         </div>
     </div>
 
-    <!-- CONTAINER 2 : L'ESPACE PERSO DU SALARIÉ (MASQUÉ AU DÉPART) -->
+    <!-- CONTAINER 2 : L'ESPACE PERSO DU SALARIÉ (EMPLOYEE VIEW) -->
     <div id="containerEmployee" class="max-w-7xl mx-auto w-full p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 items-start hidden">
-        
-        <!-- GAUCHE EMPLOYÉ -->
         <div class="lg:col-span-7 space-y-6">
-            <div class="bg-gradient-to-r from-slate-950 to-slate-900 border border-slate-800 rounded-2xl p-6 relative shadow-xl">
+            <div class="employee-welcome-card border border-slate-800 rounded-2xl p-6 relative shadow-xl">
                 <span id="empLogoSpace" class="text-xs text-slate-500 block mb-2 font-mono uppercase tracking-wider">[Logo Entreprise]</span>
                 <h2 class="text-2xl font-bold text-white">Ravi de t'accueillir, <span id="empWelcomeName" class="text-emerald-400">Thomas</span> !</h2>
-                <p class="text-xs text-slate-400 mt-1">Tu es attendu le <span id="empWelcomeDate" class="text-white font-medium">01/09/2026</span> chez <span id="empWelcomeBoite" class="text-white font-bold">InnovCorp</span> en tant que <span id="empWelcomePoste" class="text-white italic">[Développeur Fullstack]</span>.</p>
+                <p class="text-xs text-slate-400 mt-1">Tu es attendu le <span id="empWelcomeDate" class="text-white font-medium">01/09/2026</span> chez <span id="empWelcomeBoite" class="text-white font-bold">InnovCorp</span>.</p>
                 
                 <div class="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-slate-800 text-xs">
                     <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
@@ -198,8 +185,7 @@
                 </div>
             </div>
 
-            <!-- ORGANIGRAMME ACCÈS EMPLOYÉ -->
-            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5">
+            <section class="card-premium p-5">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🌳 Ta place dans l'organigramme</h3>
                 <div class="bg-slate-900/30 rounded-xl p-4 border border-slate-800/60 flex flex-col items-center justify-center space-y-4">
                     <div class="bg-slate-950 border border-purple-500/30 px-4 py-1.5 rounded-xl text-center text-xs">
@@ -214,39 +200,31 @@
                         <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl mt-1 space-y-1.5 min-w-[150px]">
                             <div class="text-[9px] text-slate-500 font-semibold border-b border-slate-800 pb-1 uppercase">Ton équipe :</div>
                             <div class="text-[10px] text-slate-400">Lucas Bernard (Front)</div>
-                            <div id="empSelfOrgaNode" class="bg-emerald-500/10 border border-emerald-500/40 px-2 py-1 rounded text-[10px] text-emerald-400 font-bold">
-                                THOMAS DUBOIS (Moi)
-                            </div>
+                            <div id="empSelfOrgaNode" class="bg-emerald-500/10 border border-emerald-500/40 px-2 py-1 rounded text-[10px] text-emerald-400 font-bold">THOMAS DUBOIS (Moi)</div>
                         </div>
                     </div>
                 </div>
             </section>
         </div>
 
-        <!-- DROITE EMPLOYÉ : LA TIMELINE PROGRESSIVE -->
         <div class="lg:col-span-5">
-            <section class="bg-slate-950 border border-slate-800 rounded-2xl p-5">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🗺️ Feuille de route de ton intégration</h3>
-                <div class="relative border-l border-slate-800 pl-5 ml-2.5 space-y-6 py-2 text-xs">
+            <section class="card-premium p-5">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">🗺️ Feuille de route d'intégration</h3>
+                <div class="timeline relative border-l border-slate-800 pl-5 ml-2.5 space-y-6 py-2 text-xs">
                     <div>
-                        <div class="absolute -left-7.5 bg-emerald-500/10 border border-emerald-500 text-emerald-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">✓</div>
+                        <div class="timeline-dot absolute -left-7.5 bg-emerald-500/10 border border-emerald-500 text-emerald-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">✓</div>
                         <h4 class="font-bold text-white text-sm">Jour 1 : Accueil & Matériel</h4>
-                        <p class="text-slate-400 mt-0.5 text-[11px]">Café de bienvenue, attribution du PC, remise des badges et déjeuner avec l'équipe.</p>
+                        <p class="text-slate-400 mt-0.5 text-[11px]">Café de bienvenue, attribution du PC, remise des badges.</p>
                     </div>
                     <div>
-                        <div class="absolute -left-7.5 bg-slate-900 border border-slate-700 text-slate-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">2</div>
+                        <div class="timeline-dot absolute -left-7.5 bg-slate-900 border border-slate-700 text-slate-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">2</div>
                         <h4 class="font-semibold text-slate-200 text-sm">Semaine 1 : Immersion Technique</h4>
-                        <p class="text-slate-500 mt-0.5 text-[11px]">Prise en main des projets de la boîte et réunions individuelles avec les membres du pôle.</p>
+                        <p class="text-slate-500 mt-0.5 text-[11px]">Prise en main des projets et réunions individuelles.</p>
                     </div>
                     <div>
-                        <div class="absolute -left-7.5 bg-slate-900 border border-slate-700 text-slate-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">3</div>
-                        <h4 class="font-semibold text-slate-200 text-sm">Mois 1 : Rapport d'Étonnement</h4>
-                        <p class="text-slate-500 mt-0.5 text-[11px]">Premier point d'étape avec ton manager pour faire remonter tes remarques et ton ressenti.</p>
-                    </div>
-                    <div>
-                        <div class="absolute -left-7.5 bg-slate-900 border border-slate-700 text-slate-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">4</div>
-                        <h4 class="font-semibold text-slate-200 text-sm">Fin de période d'essai : Validation</h4>
-                        <p class="text-slate-500 mt-0.5 text-[11px]">Entretien de bilan pour valider définitivement ton intégration à long terme.</p>
+                        <div class="timeline-dot absolute -left-7.5 bg-slate-900 border border-slate-700 text-slate-400 w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]">3</div>
+                        <h4 class="font-semibold text-slate-200 text-sm">Mois 1 : Bilan</h4>
+                        <p class="text-slate-500 mt-0.5 text-[11px]">Premier point d'étape avec ton manager pour partager ton rapport d'étonnement.</p>
                     </div>
                 </div>
             </section>
@@ -255,128 +233,10 @@
 
     <!-- FOOTER SOUVERAIN -->
     <footer class="border-t border-slate-800 bg-slate-950 py-4 text-center text-[11px] text-slate-500">
-        <p>© 2026 DayOne OS — Conçu pour propulser l'onboarding des PME françaises 🇫🇷</p>
+        <p>© 2026 DayOne OS — Design Premium Reposant 🇫🇷</p>
     </footer>
 
-    <!-- SCRIPT LOGIQUE SANS COMPROMIS -->
-    <script>
-        // Synchronisation globale dynamique
-        function synchroTotale() {
-            const boite = document.getElementById('cfgBoite').value;
-            const wifi = document.getElementById('cfgWifi').value;
-            const prenom = document.getElementById('empPrenom').value;
-            const nom = document.getElementById('empNom').value;
-            const poste = document.getElementById('empPoste').value;
-            const email = document.getElementById('empEmail').value;
-            const date = document.getElementById('empDate').value;
-            const manager = document.getElementById('empManager').value;
-
-            // Panneau RH mail preview
-            document.getElementById('mailCible').innerText = email || 'thomas.dubois@email.com';
-            document.getElementById('mailPrenom').innerText = prenom || 'Thomas';
-            document.getElementById('mailPoste').innerText = poste ? `[${poste}]` : '[Poste non défini]';
-            document.getElementById('mailManager').innerText = manager;
-
-            // Panneau Salarié Espace Perso
-            document.getElementById('empWelcomeName').innerText = prenom;
-            document.getElementById('empWelcomeBoite').innerText = boite;
-            document.getElementById('empWelcomePoste').innerText = poste ? `[${poste}]` : '[Poste non défini]';
-            document.getElementById('empWelcomeWifi').innerText = wifi;
-            document.getElementById('empSelfOrgaNode').innerText = `${prenom.toUpperCase()} ${nom.toUpperCase()} (Moi)`;
-
-            if (date) {
-                const parts = date.split('-');
-                document.getElementById('empWelcomeDate').innerText = `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-        }
-
-        // Gestion du logo d'entreprise
-        function chargerLogo(event) {
-            const file = event.target.files[0];
-            if (file) {
-                document.getElementById('logoPreview').innerHTML = `✅ Logo : <span class="text-emerald-400 font-bold">${file.name}</span>`;
-                document.getElementById('empLogoSpace').innerHTML = `🏢 <span class="text-white font-bold tracking-normal">${file.name.split('.')[0].toUpperCase()}</span>`;
-            }
-        }
-
-        // Gestion et transmission des fichiers joints
-        function chargerDocuments(event) {
-            const docList = document.getElementById('docList');
-            const mailWrapper = document.getElementById('mailAttachedWrapper');
-            const empDownloadWrapper = document.getElementById('empDocsDownloadWrapper');
-            
-            docList.innerHTML = "";
-            mailWrapper.innerHTML = "";
-            empDownloadWrapper.innerHTML = "";
-
-            const files = event.target.files;
-            if(files.length === 0) {
-                empDownloadWrapper.innerText = "Aucun document annexe";
-                return;
-            }
-
-            for (let i = 0; i < files.length; i++) {
-                // List gauche RH
-                docList.innerHTML += `<div class="text-slate-400 text-[11px]">📁 ${files[i].name}</div>`;
-                // List mail RH
-                mailWrapper.innerHTML += `<div class="bg-slate-950 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-400">📎 ${files[i].name}</div>`;
-                // List download Espace Salarié
-                empDownloadWrapper.innerHTML += `<a href="#" onclick="alert('Téléchargement de : ${files[i].name}')" class="block text-emerald-400 hover:underline">⬇️ ${files[i].name}</a>`;
-            }
-        }
-
-        // Modèle de base Excel / CSV pour anciens salariés
-        function telechargerModeleExcel() {
-            const csvContent = "data:text/csv;charset=utf-8,Prenom,Nom,Poste\nLucas,Bernard,Dev Front\nJulie,Martin,Office Manager";
-            const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", "Modele_DayOne.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function importerCSV(event) {
-            const file = event.target.files[0];
-            if (file) alert(`📊 Base employés : "${file.name}" injectée ! Vos anciens effectifs sont chargés dans le système.`);
-        }
-
-        // Lancement de la moulinette d'onboarding
-        function declencherOnboardingGeneral() {
-            const prenom = document.getElementById('empPrenom').value;
-            const nom = document.getElementById('empNom').value;
-            const poste = document.getElementById('empPoste').value;
-
-            // Injection dynamique dans l'organigramme RH
-            const rhNode = document.getElementById('rhOrgaDynamicNode');
-            rhNode.innerText = `✨ ${prenom.toUpperCase()} ${nom.toUpperCase()} (${poste.split(' ')[0]})`;
-            rhNode.classList.remove('hidden');
-
-            alert(`🚀 Onboarding Validé !\n\n1. Le profil est poussé dans l'organigramme.\n2. L'accès sécurisé a été généré.\n3. Le mail d'invitation est parti.`);
-            basculerVue('Employee');
-        }
-
-        // Commutateur de vue démo
-        function basculerVue(type) {
-            const r = document.getElementById('containerRH');
-            const e = document.getElementById('containerEmployee');
-            const br = document.getElementById('viewRhBtn');
-            const be = document.getElementById('viewEmpBtn');
-
-            if (type === 'RH') {
-                r.classList.remove('hidden'); e.classList.add('hidden');
-                br.className = "px-4 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition-all cursor-pointer shadow-md";
-                be.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer";
-            } else {
-                r.classList.add('hidden'); e.classList.remove('hidden');
-                be.className = "px-4 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-slate-950 transition-all cursor-pointer shadow-md";
-                br.className = "px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all cursor-pointer";
-            }
-        }
-
-        window.onload = function() {
-            synchroTotale();
-        };
-    </script>
+    <!-- Fichier JS Externe -->
+    <script src="app.js"></script>
 </body>
 </html>
