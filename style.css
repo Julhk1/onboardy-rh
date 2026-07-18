@@ -1,0 +1,77 @@
+/* Couleurs douces de fond et structures */
+body {
+    background-color: #0b0f19; /* Bleu nuit très sombre, beaucoup plus reposant que le noir pur */
+}
+
+.main-header {
+    background-color: #0f1422;
+    border-bottom: 1px solid #1e2640;
+}
+
+.brand-badge {
+    background-color: #10b981;
+}
+
+.version-tag {
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+/* Style des Cartes "Glassmorphism" adoucies */
+.card-premium {
+    background-color: #0f1422;
+    border: 1px solid #1e2640;
+    border-radius: 1rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
+.employee-welcome-card {
+    background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+    border: 1px solid #1e293b;
+}
+
+/* Formulaires et Inputs élégants */
+.input-premium {
+    background-color: #151b2e;
+    border: 1px solid #242f50;
+    color: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+.input-premium:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.upload-box {
+    background-color: rgba(21, 27, 46, 0.5);
+    transition: all 0.2s ease;
+}
+
+.upload-box:hover {
+    background-color: #151b2e;
+    border-color: #10b981;
+}
+
+/* Bouton principal */
+.btn-action {
+    background-color: #10b981;
+    color: #020617;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    background-color: #34d399;
+    transform: translateY(-1px);
+}
+
+/* Onglets sélecteurs de vue */
+.vue-btn {
+    transition: all 0.2s ease;
+}
+
+.active-vue {
+    background-color: #10b981;
+    color: #020617 !important;
+}
