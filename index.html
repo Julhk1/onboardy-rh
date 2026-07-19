@@ -130,6 +130,16 @@
                             <div id="docList" class="doc-list"></div>
                         </div>
 
+                        <div class="field">
+                            <label for="cfgEmailSubject">Objet de l'email d'invitation</label>
+                            <input id="cfgEmailSubject" type="text" placeholder="Bienvenue chez [Entreprise] !">
+                        </div>
+                        <div class="field">
+                            <label for="cfgEmailMessage">Message d'accueil personnalisé</label>
+                            <textarea id="cfgEmailMessage" rows="3" placeholder="Toute l'équipe est ravie de t'accueillir en tant que [poste]. À très vite !"></textarea>
+                            <p class="hint-text hint-text-tight">Laisse vide pour garder le message par défaut.</p>
+                        </div>
+
                         <button class="btn-primary" onclick="enregistrerOrganisation()">Enregistrer les infos entreprise</button>
                     </section>
 
@@ -152,6 +162,11 @@
                     <!-- Nouveau collaborateur -->
                     <section class="card">
                         <h3 class="card-title"><span class="step-badge">3</span>Lancer un onboarding</h3>
+                        <div id="editionBanner" class="duplicate-banner edition-banner hidden">
+                            Modification de <strong id="editionNomLabel"></strong> — aucun email ne sera renvoyé.
+                            <button class="link-btn" onclick="viderFormulaireEmploye()">Annuler la modification</button>
+                        </div>
+
                         <div id="duplicateBanner" class="duplicate-banner hidden">
                             Pré-rempli à partir d'un profil existant — modifie ce qui change puis envoie.
                             <button class="link-btn" onclick="viderFormulaireEmploye()">Repartir de zéro</button>
@@ -162,6 +177,7 @@
                             <select id="templateSelect" onchange="appliquerModelePoste()">
                                 <option value="">— Aucun modèle —</option>
                             </select>
+                            <p class="hint-text hint-text-tight">Crée d'abord un modèle plus bas (section "Contenus optionnels") pour qu'il apparaisse ici.</p>
                         </div>
 
                         <div class="field-row">
@@ -189,9 +205,12 @@
 
                         <div class="field-row">
                             <div class="field">
-                                <label for="empManager">Manager direct</label>
-                                <input id="empManager" type="text" list="managerSuggestions" placeholder="Prénom Nom (laisser vide si direction)">
-                                <datalist id="managerSuggestions"></datalist>
+                                <label for="empManagerSelect">Manager direct</label>
+                                <select id="empManagerSelect" onchange="gererChangementManager()">
+                                    <option value="">— Aucun (sommet de l'organigramme) —</option>
+                                    <option value="__externe__">Autre / externe (préciser)…</option>
+                                </select>
+                                <input id="empManagerExterne" type="text" placeholder="Nom du manager externe" class="hidden manager-externe-input">
                             </div>
                             <div class="field">
                                 <label for="empEmail">Email personnel</label>
@@ -276,7 +295,10 @@
                     </div>
                 </div>
 
-                <button class="btn-primary" onclick="enregistrerContenusOptionnels()">Enregistrer ces contenus</button>
+                <div class="button-row">
+                    <button class="btn-primary" onclick="enregistrerContenusOptionnels()">Enregistrer ces contenus</button>
+                    <button class="btn-danger" onclick="viderContenusOptionnels()">Vider ces contenus</button>
+                </div>
             </section>
         </main>
 
