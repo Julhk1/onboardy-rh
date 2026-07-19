@@ -7,7 +7,7 @@
 // dans les variables d'environnement Vercel, lues par /api/*.js.
 const CONFIG = {
     SUPABASE_URL: "https://qaydzplnxjdyyutjyqzy.supabase.co",
-    SUPABASE_ANON_KEY: "sb_publishable_yP4LRCrxH9ke4cuVKWnZbg_LtEGC-qn",
+    SUPABASE_ANON_KEY: "METS_ICI_TA_CLE_ANON_PUBLIC_DE_SUPABASE",
     SEND_EMAIL_ENDPOINT: "/api/send-email"
 };
 
@@ -258,6 +258,8 @@ async function chargerOuCreerOrganisation() {
     currentOrg = org;
     document.getElementById('cfgBoite').value = org.nom || "";
     document.getElementById('cfgWifi').value = org.wifi || "";
+    document.getElementById('cfgEmailSubject').value = org.email_subject || "";
+    document.getElementById('cfgEmailMessage').value = org.email_message || "";
     pendingLogoDataUrl = org.logo_data_url || "";
     pendingDocuments = org.documents || [];
     pendingLinks = org.useful_links || [];
@@ -324,14 +326,16 @@ async function enregistrerOrganisation() {
     if (!currentOrg) return;
     const nom = val('cfgBoite') || "Mon entreprise";
     const wifi = val('cfgWifi');
+    const email_subject = val('cfgEmailSubject');
+    const email_message = val('cfgEmailMessage');
 
     const { error } = await supabaseClient
         .from('organizations')
-        .update({ nom, wifi, logo_data_url: pendingLogoDataUrl, documents: pendingDocuments })
+        .update({ nom, wifi, logo_data_url: pendingLogoDataUrl, documents: pendingDocuments, email_subject, email_message })
         .eq('id', currentOrg.id);
 
     if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
-    currentOrg = { ...currentOrg, nom, wifi, logo_data_url: pendingLogoDataUrl, documents: pendingDocuments };
+    currentOrg = { ...currentOrg, nom, wifi, logo_data_url: pendingLogoDataUrl, documents: pendingDocuments, email_subject, email_message };
     toast("Informations entreprise enregistrées.");
 }
 
@@ -466,7 +470,7 @@ function appliquerModelePoste() {
     if (!t) return;
     document.getElementById('empPoste').value = t.poste || "";
     document.getElementById('empService').value = t.service || "";
-    document.getElementById('empManager').value = t.manager || "";
+    setManagerFieldValue(t.manager || "");
     mettreAJourChecklist();
 }
 
@@ -493,6 +497,32 @@ async function enregistrerContenusOptionnels() {
     toast("Contenus enregistrés — visibles sur les prochaines pages employé.");
 }
 
+async function viderContenusOptionnels() {
+    if (!currentOrg) return;
+    const ok = confirm("Vider les liens, contacts, checklist et modèles de poste ? Cette action est immédiate.");
+    if (!ok) return;
+
+    pendingLinks = [];
+    pendingContacts = [];
+    pendingChecklist = [];
+    pendingTemplates = [];
+
+    const { error } = await supabaseClient
+        .from('organizations')
+        .update({ useful_links: [], key_contacts: [], checklist: [], job_templates: [] })
+        .eq('id', currentOrg.id);
+
+    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
+    currentOrg = { ...currentOrg, useful_links: [], key_contacts: [], checklist: [], job_templates: [] };
+
+    renderLinksListRH();
+    renderContactsListRH();
+    renderChecklistListRH();
+    renderTemplatesListRH();
+    populateTemplateSelect();
+    toast("Contenus optionnels vidés.");
+}
+
 // ============================================================
 // CHECKLIST FORMULAIRE EMPLOYÉ
 // ============================================================
@@ -503,40 +533,150 @@ function mettreAJourChecklist() {
     document.getElementById('chkEmail')?.classList.toggle('is-complete', emailValide);
 }
 
+let editingEmployeeId = null;
+
+// ============================================================
+// CHAMP MANAGER (menu déroulant fiable, plus de texte libre)
+// ============================================================
+function populateManagerSelect() {
+    const select = document.getElementById('empManagerSelect');
+    if (!select) return;
+    const valeurActuelle = select.value;
+
+    const options = employees
+        .filter(e => e.id !== editingEmployeeId)
+        .map(e => `<option value="${escapeHtml(e.prenom + ' ' + e.nom)}">${escapeHtml(e.prenom)} ${escapeHtml(e.nom)} — ${escapeHtml(e.poste) || '—'}</option>`)
+        .join('');
+
+    select.innerHTML = `
+        <option value="">— Aucun (sommet de l'organigramme) —</option>
+        ${options}
+        <option value="__externe__">Autre / externe (préciser)…</option>
+    `;
+
+    // Réappliquer la sélection précédente si elle existe encore dans la nouvelle liste
+    if ([...select.options].some(o => o.value === valeurActuelle)) {
+        select.value = valeurActuelle;
+    }
+}
+
+function gererChangementManager() {
+    const select = document.getElementById('empManagerSelect');
+    const externe = document.getElementById('empManagerExterne');
+    externe.classList.toggle('hidden', select.value !== '__externe__');
+}
+
+function lireManagerSaisi() {
+    const select = document.getElementById('empManagerSelect');
+    if (select.value === '__externe__') return val('empManagerExterne');
+    return select.value;
+}
+
+function setManagerFieldValue(managerText) {
+    const select = document.getElementById('empManagerSelect');
+    const externe = document.getElementById('empManagerExterne');
+    if (!managerText) {
+        select.value = "";
+        externe.classList.add('hidden');
+        externe.value = "";
+        return;
+    }
+    const correspond = [...select.options].some(o => o.value === managerText);
+    if (correspond) {
+        select.value = managerText;
+        externe.classList.add('hidden');
+        externe.value = "";
+    } else {
+        select.value = "__externe__";
+        externe.classList.remove('hidden');
+        externe.value = managerText;
+    }
+}
+
+// ============================================================
+// FORMULAIRE : RESET / DUPLICATION / ÉDITION
+// ============================================================
 function viderFormulaireEmploye() {
-    ['empPrenom', 'empNom', 'empPoste', 'empService', 'empManager', 'empEmail', 'empDate'].forEach(id => {
+    ['empPrenom', 'empNom', 'empPoste', 'empService', 'empEmail', 'empDate'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = "";
     });
+    setManagerFieldValue("");
     document.getElementById('duplicateBanner').classList.add('hidden');
+    document.getElementById('editionBanner').classList.add('hidden');
+    document.getElementById('templateSelect').value = "";
+    editingEmployeeId = null;
+    populateManagerSelect();
+    document.getElementById('empSubmitBtn').innerText = "Enregistrer et envoyer l'invitation";
     mettreAJourChecklist();
 }
 
 function dupliquerEmploye(id) {
     const emp = employees.find(e => e.id === id);
     if (!emp) return;
+    editingEmployeeId = null;
+    populateManagerSelect();
     document.getElementById('empPoste').value = emp.poste || "";
     document.getElementById('empService').value = emp.service || "";
-    document.getElementById('empManager').value = emp.manager || "";
+    setManagerFieldValue(emp.manager || "");
     document.getElementById('empPrenom').value = "";
     document.getElementById('empNom').value = "";
     document.getElementById('empEmail').value = "";
     document.getElementById('empDate').value = "";
     document.getElementById('duplicateBanner').classList.remove('hidden');
+    document.getElementById('editionBanner').classList.add('hidden');
+    document.getElementById('empSubmitBtn').innerText = "Enregistrer et envoyer l'invitation";
     document.getElementById('empPrenom').scrollIntoView({ behavior: 'smooth', block: 'center' });
     document.getElementById('empPrenom').focus();
     mettreAJourChecklist();
 }
 
+function modifierEmploye(id) {
+    const emp = employees.find(e => e.id === id);
+    if (!emp) return;
+    editingEmployeeId = id;
+    populateManagerSelect();
+
+    document.getElementById('empPrenom').value = emp.prenom || "";
+    document.getElementById('empNom').value = emp.nom || "";
+    document.getElementById('empPoste').value = emp.poste || "";
+    document.getElementById('empService').value = emp.service || "";
+    setManagerFieldValue(emp.manager || "");
+    document.getElementById('empEmail').value = emp.email || "";
+    document.getElementById('empDate').value = emp.date_arrivee || "";
+
+    document.getElementById('duplicateBanner').classList.add('hidden');
+    document.getElementById('editionNomLabel').innerText = `${emp.prenom} ${emp.nom}`;
+    document.getElementById('editionBanner').classList.remove('hidden');
+    document.getElementById('empSubmitBtn').innerText = "Enregistrer les modifications";
+
+    document.getElementById('empPrenom').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    mettreAJourChecklist();
+}
+
+async function supprimerEmploye(id) {
+    const emp = employees.find(e => e.id === id);
+    if (!emp) return;
+    const ok = confirm(`Supprimer définitivement ${emp.prenom} ${emp.nom} ? Le lien d'onboarding déjà envoyé cessera de fonctionner.`);
+    if (!ok) return;
+
+    const { error } = await supabaseClient.from('employees').delete().eq('id', id);
+    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
+
+    if (editingEmployeeId === id) viderFormulaireEmploye();
+    toast(`${emp.prenom} ${emp.nom} supprimé(e).`);
+    await chargerEmployes();
+}
+
 // ============================================================
-// CRÉATION D'UN ONBOARDING
+// CRÉATION / MODIFICATION D'UN ONBOARDING
 // ============================================================
 async function declencherOnboardingGeneral() {
     const prenom = val('empPrenom');
     const nom = val('empNom');
     const poste = val('empPoste');
     const service = val('empService') || "Général";
-    const manager = val('empManager');
+    const manager = lireManagerSaisi();
     const email = val('empEmail');
     const date = val('empDate');
 
@@ -546,6 +686,11 @@ async function declencherOnboardingGeneral() {
     }
     if (!emailEstValide(email)) {
         toast("L'adresse email ne semble pas valide.", "error");
+        return;
+    }
+
+    if (editingEmployeeId) {
+        await enregistrerModificationEmploye({ prenom, nom, poste, service, manager, email, date });
         return;
     }
 
@@ -578,19 +723,51 @@ async function declencherOnboardingGeneral() {
     }
 }
 
+async function enregistrerModificationEmploye({ prenom, nom, poste, service, manager, email, date }) {
+    const btn = document.getElementById('empSubmitBtn');
+    btn.disabled = true;
+    btn.innerText = "Enregistrement…";
+
+    try {
+        const { error } = await supabaseClient
+            .from('employees')
+            .update({ prenom, nom, poste, service, manager, email, date_arrivee: date || null })
+            .eq('id', editingEmployeeId);
+
+        if (error) throw error;
+
+        toast(`Fiche de ${prenom} ${nom} mise à jour.`);
+        viderFormulaireEmploye();
+        await chargerEmployes();
+    } catch (err) {
+        console.error(err);
+        toast("Erreur lors de la modification.", "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Enregistrer et envoyer l'invitation";
+    }
+}
+
 async function envoyerInvitation(emp) {
     const shareLink = `${window.location.origin}/onboarding.html?token=${emp.token}`;
+    const sujet = (currentOrg.email_subject && currentOrg.email_subject.trim())
+        ? currentOrg.email_subject.trim()
+        : `Bienvenue chez ${currentOrg.nom} !`;
+    const messageAccueil = (currentOrg.email_message && currentOrg.email_message.trim())
+        ? escapeHtml(currentOrg.email_message.trim()).replace(/\n/g, '<br>')
+        : `Toute l'équipe de <strong>${escapeHtml(currentOrg.nom)}</strong> est ravie de t'accueillir en tant que <strong>${escapeHtml(emp.poste)}</strong>.`;
+
     try {
         const res = await fetch(CONFIG.SEND_EMAIL_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 to: emp.email,
-                subject: `Bienvenue chez ${currentOrg.nom} !`,
+                subject: sujet,
                 html: `
                     <div style="font-family: Arial, sans-serif; color:#1e2430; padding:24px; max-width:520px; border:1px solid #E4E1D8; border-radius:12px;">
                         <h2 style="color:#B8863B; margin-top:0;">Bienvenue, ${escapeHtml(emp.prenom)} !</h2>
-                        <p>Toute l'équipe de <strong>${escapeHtml(currentOrg.nom)}</strong> est ravie de t'accueillir en tant que <strong>${escapeHtml(emp.poste)}</strong>.</p>
+                        <p>${messageAccueil}</p>
                         <p>Ton portail d'intégration personnel :</p>
                         <div style="text-align:center; margin:24px 0;">
                             <a href="${shareLink}" style="background:#101828; color:#fff; padding:12px 24px; text-decoration:none; border-radius:8px; font-weight:bold; display:inline-block;">
@@ -635,7 +812,7 @@ async function chargerEmployes() {
     renderEmployeeList();
     renderOrgChart();
     updateServiceSuggestions();
-    updateManagerSuggestions();
+    populateManagerSelect();
 }
 
 function renderEmployeeList() {
@@ -656,6 +833,8 @@ function renderEmployeeList() {
             <div class="employee-actions">
                 ${!emp.invite_sent ? `<button class="link-btn" onclick="renvoyerInvitation('${emp.id}')">Envoyer</button>` : ''}
                 <button class="link-btn" onclick="dupliquerEmploye('${emp.id}')">Dupliquer</button>
+                <button class="link-btn" onclick="modifierEmploye('${emp.id}')">Modifier</button>
+                <button class="link-btn link-btn-danger" onclick="supprimerEmploye('${emp.id}')">Supprimer</button>
             </div>
         </div>
     `).join('');
@@ -735,12 +914,6 @@ function renderOrgChart() {
 
     const visites = new Set();
     container.innerHTML = `<div class="tree-roots">${racines.map(r => renderNoeudArbre(r, enfantsDe, visites)).join('')}</div>`;
-}
-
-function updateManagerSuggestions() {
-    const datalist = document.getElementById('managerSuggestions');
-    if (!datalist) return;
-    datalist.innerHTML = employees.map(e => `<option value="${escapeHtml(e.prenom + ' ' + e.nom)}">`).join('');
 }
 
 function updateServiceSuggestions() {
