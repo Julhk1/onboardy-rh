@@ -378,6 +378,47 @@ body {
 .btn-primary:hover { background: var(--ink-soft); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
+.button-row { display: flex; gap: 10px; margin-top: 6px; }
+.button-row .btn-primary, .button-row .btn-danger { margin-top: 0; width: auto; flex: 1; }
+
+.btn-danger {
+    background: var(--surface);
+    color: var(--danger);
+    border: 1.5px solid var(--danger);
+    border-radius: var(--radius-sm);
+    padding: 13px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+.btn-danger:hover { background: #FDECEA; }
+
+.link-btn-danger { color: var(--danger); }
+
+.field textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text);
+    resize: vertical;
+}
+.field textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.hint-text-tight { margin: -4px 0 10px; }
+
+.edition-banner { background: #FDF2E3; }
+
+.manager-externe-input { margin-top: 8px; }
+
 /* ---------- EMPLOYEE LIST ---------- */
 .employee-list { display: flex; flex-direction: column; gap: 10px; }
 
