@@ -7,7 +7,7 @@
 // dans les variables d'environnement Vercel, lues par /api/*.js.
 const CONFIG = {
     SUPABASE_URL: "https://qaydzplnxjdyyutjyqzy.supabase.co",
-    SUPABASE_ANON_KEY: "sb_publishable_yP4LRCrxH9ke4cuVKWnZbg_LtEGC-qn",
+    SUPABASE_ANON_KEY: "METS_ICI_TA_CLE_ANON_PUBLIC_DE_SUPABASE",
     SEND_EMAIL_ENDPOINT: "/api/send-email"
 };
 
@@ -20,9 +20,12 @@ const supabaseClient = CONFIGURED
 let currentUser = null;
 let currentOrg = null;
 let employees = [];
-let isSignupMode = false;
 let pendingLogoDataUrl = "";
 let pendingDocuments = []; // [{name, dataUrl}]
+let pendingLinks = [];       // [{nom, url}]
+let pendingContacts = [];    // [{nom, role, contact}]
+let pendingChecklist = [];   // [{titre, description}]
+let pendingTemplates = [];   // [{nom, poste, service, manager}]
 
 const DEFAULT_SERVICES = ["Direction", "Finance", "Tech", "Ventes", "Marketing", "RH", "Opérations"];
 
@@ -61,14 +64,56 @@ function genererToken() {
 // ============================================================
 // AUTHENTIFICATION RH
 // ============================================================
-function basculerModeLogin() {
-    isSignupMode = !isSignupMode;
-    document.getElementById('loginModeLabel').innerText = isSignupMode ? "Créer un espace RH" : "Connexion";
-    document.getElementById('loginSubmitBtn').innerText = isSignupMode ? "Créer mon espace" : "Se connecter";
-    document.getElementById('loginToggleBtn').innerText = isSignupMode
-        ? "Déjà un compte ? Se connecter"
-        : "Pas encore de compte ? Créer un espace RH";
+// loginMode : 'login' | 'signup' | 'forgot'
+let loginMode = 'login';
+
+function setLoginMode(mode) {
+    loginMode = mode;
+    const passwordWrapper = document.getElementById('passwordFieldWrapper');
+    const forgotBtn = document.getElementById('forgotPasswordBtn');
+    const toggleBtn = document.getElementById('loginToggleBtn');
+    const backBtn = document.getElementById('backToLoginBtn');
+    const titleEl = document.getElementById('loginModeLabel');
+    const submitBtn = document.getElementById('loginSubmitBtn');
+
     document.getElementById('loginError').classList.add('hidden');
+
+    if (mode === 'login') {
+        titleEl.innerText = "Connexion";
+        submitBtn.innerText = "Se connecter";
+        passwordWrapper.classList.remove('hidden');
+        forgotBtn.classList.remove('hidden');
+        toggleBtn.classList.remove('hidden');
+        toggleBtn.innerText = "Pas encore de compte ? Créer un espace RH";
+        backBtn.classList.add('hidden');
+    } else if (mode === 'signup') {
+        titleEl.innerText = "Créer un espace RH";
+        submitBtn.innerText = "Créer mon espace";
+        passwordWrapper.classList.remove('hidden');
+        forgotBtn.classList.add('hidden');
+        toggleBtn.classList.remove('hidden');
+        toggleBtn.innerText = "Déjà un compte ? Se connecter";
+        backBtn.classList.add('hidden');
+    } else if (mode === 'forgot') {
+        titleEl.innerText = "Mot de passe oublié";
+        submitBtn.innerText = "Envoyer le lien de réinitialisation";
+        passwordWrapper.classList.add('hidden');
+        forgotBtn.classList.add('hidden');
+        toggleBtn.classList.add('hidden');
+        backBtn.classList.remove('hidden');
+    }
+}
+
+function basculerModeLogin() {
+    setLoginMode(loginMode === 'signup' ? 'login' : 'signup');
+}
+
+function basculerModeMotDePasseOublie() {
+    setLoginMode('forgot');
+}
+
+function revenirALaConnexion() {
+    setLoginMode('login');
 }
 
 async function soumettreLogin() {
@@ -77,6 +122,26 @@ async function soumettreLogin() {
         return;
     }
     const email = val('loginEmail');
+
+    if (loginMode === 'forgot') {
+        if (!email) { afficherErreurLogin("Renseigne ton email pour recevoir le lien."); return; }
+        const btn = document.getElementById('loginSubmitBtn');
+        btn.disabled = true;
+        try {
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + window.location.pathname
+            });
+            if (error) throw error;
+            toast("Email envoyé — vérifie ta boîte mail (et les spams).");
+            setLoginMode('login');
+        } catch (err) {
+            afficherErreurLogin(traduireErreurAuth(err.message));
+        } finally {
+            btn.disabled = false;
+        }
+        return;
+    }
+
     const password = val('loginPassword');
     if (!email || !password) {
         afficherErreurLogin("Merci de renseigner ton email et ton mot de passe.");
@@ -88,14 +153,26 @@ async function soumettreLogin() {
     btn.innerText = "Un instant…";
 
     try {
-        if (isSignupMode) {
+        if (loginMode === 'signup') {
             const { data, error } = await supabaseClient.auth.signUp({ email, password });
             if (error) throw error;
+
+            // Supabase renvoie "identities: []" quand l'email existe déjà
+            // (comportement volontaire pour ne pas révéler les emails existants
+            // à un tiers malveillant — mais ici c'est bien TOI qui viens de taper
+            // ton propre email, donc on peut te le dire clairement).
+            if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+                afficherErreurLogin("Un compte existe déjà avec cet email.");
+                setLoginMode('login');
+                document.getElementById('loginEmail').value = email;
+                return;
+            }
+
             if (data.session) {
                 await entrerDashboard(data.user);
             } else {
                 afficherErreurLogin("Compte créé. Vérifie ta boîte mail pour confirmer ton adresse, puis connecte-toi.");
-                basculerModeLogin();
+                setLoginMode('login');
             }
         } else {
             const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
@@ -106,7 +183,29 @@ async function soumettreLogin() {
         afficherErreurLogin(traduireErreurAuth(err.message));
     } finally {
         btn.disabled = false;
-        btn.innerText = isSignupMode ? "Créer mon espace" : "Se connecter";
+        btn.innerText = loginMode === 'signup' ? "Créer mon espace" : "Se connecter";
+    }
+}
+
+async function soumettreNouveauMotDePasse() {
+    const newPassword = val('newPassword');
+    if (!newPassword || newPassword.length < 6) {
+        const el = document.getElementById('resetError');
+        el.innerText = "Le mot de passe doit contenir au moins 6 caractères.";
+        el.classList.remove('hidden');
+        return;
+    }
+    try {
+        const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+        if (error) throw error;
+        toast("Mot de passe mis à jour. Te voilà connecté(e).");
+        document.getElementById('resetPasswordView').classList.add('hidden');
+        const { data } = await supabaseClient.auth.getSession();
+        if (data.session) await entrerDashboard(data.session.user);
+    } catch (err) {
+        const el = document.getElementById('resetError');
+        el.innerText = traduireErreurAuth(err.message);
+        el.classList.remove('hidden');
     }
 }
 
@@ -161,12 +260,21 @@ async function chargerOuCreerOrganisation() {
     document.getElementById('cfgWifi').value = org.wifi || "";
     pendingLogoDataUrl = org.logo_data_url || "";
     pendingDocuments = org.documents || [];
+    pendingLinks = org.useful_links || [];
+    pendingContacts = org.key_contacts || [];
+    pendingChecklist = org.checklist || [];
+    pendingTemplates = org.job_templates || [];
 
     if (pendingLogoDataUrl) {
         document.getElementById('logoPreview').innerHTML =
             `<img src="${pendingLogoDataUrl}" style="height:36px;border-radius:6px;">`;
     }
     renderDocList();
+    renderLinksListRH();
+    renderContactsListRH();
+    renderChecklistListRH();
+    renderTemplatesListRH();
+    populateTemplateSelect();
 }
 
 // ============================================================
@@ -225,6 +333,164 @@ async function enregistrerOrganisation() {
     if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
     currentOrg = { ...currentOrg, nom, wifi, logo_data_url: pendingLogoDataUrl, documents: pendingDocuments };
     toast("Informations entreprise enregistrées.");
+}
+
+// ============================================================
+// CONTENUS OPTIONNELS : LIENS UTILES
+// ============================================================
+function ajouterLien() {
+    const nom = val('linkNom');
+    const url = val('linkUrl');
+    if (!nom || !url) { toast("Renseigne un nom et une URL.", "error"); return; }
+    pendingLinks.push({ nom, url });
+    document.getElementById('linkNom').value = "";
+    document.getElementById('linkUrl').value = "";
+    renderLinksListRH();
+}
+
+function retirerLien(index) {
+    pendingLinks.splice(index, 1);
+    renderLinksListRH();
+}
+
+function renderLinksListRH() {
+    const el = document.getElementById('linksListRH');
+    el.innerHTML = pendingLinks.map((l, i) => `
+        <div class="mini-list-row">
+            <span>🔗 ${escapeHtml(l.nom)}</span>
+            <button class="link-btn" onclick="retirerLien(${i})">retirer</button>
+        </div>
+    `).join('');
+}
+
+// ============================================================
+// CONTENUS OPTIONNELS : CONTACTS CLÉS
+// ============================================================
+function ajouterContact() {
+    const nom = val('contactNom');
+    const role = val('contactRole');
+    const contact = val('contactInfo');
+    if (!nom || !role) { toast("Renseigne au moins un nom et un rôle.", "error"); return; }
+    pendingContacts.push({ nom, role, contact });
+    document.getElementById('contactNom').value = "";
+    document.getElementById('contactRole').value = "";
+    document.getElementById('contactInfo').value = "";
+    renderContactsListRH();
+}
+
+function retirerContact(index) {
+    pendingContacts.splice(index, 1);
+    renderContactsListRH();
+}
+
+function renderContactsListRH() {
+    const el = document.getElementById('contactsListRH');
+    el.innerHTML = pendingContacts.map((c, i) => `
+        <div class="mini-list-row">
+            <span>${escapeHtml(c.nom)} — ${escapeHtml(c.role)}</span>
+            <button class="link-btn" onclick="retirerContact(${i})">retirer</button>
+        </div>
+    `).join('');
+}
+
+// ============================================================
+// CONTENUS OPTIONNELS : CHECKLIST D'INTÉGRATION
+// ============================================================
+function ajouterEtapeChecklist() {
+    const titre = val('checklistTitre');
+    const description = val('checklistDesc');
+    if (!titre) { toast("Renseigne au moins un titre d'étape.", "error"); return; }
+    pendingChecklist.push({ titre, description });
+    document.getElementById('checklistTitre').value = "";
+    document.getElementById('checklistDesc').value = "";
+    renderChecklistListRH();
+}
+
+function retirerEtapeChecklist(index) {
+    pendingChecklist.splice(index, 1);
+    renderChecklistListRH();
+}
+
+function renderChecklistListRH() {
+    const el = document.getElementById('checklistListRH');
+    el.innerHTML = pendingChecklist.map((e, i) => `
+        <div class="mini-list-row">
+            <span>${i + 1}. ${escapeHtml(e.titre)}</span>
+            <button class="link-btn" onclick="retirerEtapeChecklist(${i})">retirer</button>
+        </div>
+    `).join('');
+}
+
+// ============================================================
+// CONTENUS OPTIONNELS : MODÈLES DE POSTE
+// ============================================================
+function ajouterModelePoste() {
+    const nom = val('templateNom');
+    const poste = val('templatePoste');
+    const service = val('templateService');
+    const manager = val('templateManager');
+    if (!nom || !poste) { toast("Renseigne au moins un nom de modèle et un poste.", "error"); return; }
+    pendingTemplates.push({ nom, poste, service, manager });
+    ['templateNom', 'templatePoste', 'templateService', 'templateManager'].forEach(id => document.getElementById(id).value = "");
+    renderTemplatesListRH();
+    populateTemplateSelect();
+}
+
+function retirerModelePoste(index) {
+    pendingTemplates.splice(index, 1);
+    renderTemplatesListRH();
+    populateTemplateSelect();
+}
+
+function renderTemplatesListRH() {
+    const el = document.getElementById('templatesListRH');
+    el.innerHTML = pendingTemplates.map((t, i) => `
+        <div class="mini-list-row">
+            <span>🧩 ${escapeHtml(t.nom)}</span>
+            <button class="link-btn" onclick="retirerModelePoste(${i})">retirer</button>
+        </div>
+    `).join('');
+}
+
+function populateTemplateSelect() {
+    const select = document.getElementById('templateSelect');
+    if (!select) return;
+    select.innerHTML = `<option value="">— Aucun modèle —</option>` +
+        pendingTemplates.map((t, i) => `<option value="${i}">${escapeHtml(t.nom)}</option>`).join('');
+}
+
+function appliquerModelePoste() {
+    const index = document.getElementById('templateSelect').value;
+    if (index === "") return;
+    const t = pendingTemplates[index];
+    if (!t) return;
+    document.getElementById('empPoste').value = t.poste || "";
+    document.getElementById('empService').value = t.service || "";
+    document.getElementById('empManager').value = t.manager || "";
+    mettreAJourChecklist();
+}
+
+async function enregistrerContenusOptionnels() {
+    if (!currentOrg) return;
+    const { error } = await supabaseClient
+        .from('organizations')
+        .update({
+            useful_links: pendingLinks,
+            key_contacts: pendingContacts,
+            checklist: pendingChecklist,
+            job_templates: pendingTemplates
+        })
+        .eq('id', currentOrg.id);
+
+    if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
+    currentOrg = {
+        ...currentOrg,
+        useful_links: pendingLinks,
+        key_contacts: pendingContacts,
+        checklist: pendingChecklist,
+        job_templates: pendingTemplates
+    };
+    toast("Contenus enregistrés — visibles sur les prochaines pages employé.");
 }
 
 // ============================================================
@@ -360,7 +626,7 @@ async function renvoyerInvitation(id) {
 async function chargerEmployes() {
     const { data, error } = await supabaseClient
         .from('employees')
-        .select('*')
+        .select('id, prenom, nom, poste, service, manager, email, date_arrivee, invite_sent, viewed_at, token, created_at')
         .eq('org_id', currentOrg.id)
         .order('created_at', { ascending: false });
 
@@ -369,6 +635,7 @@ async function chargerEmployes() {
     renderEmployeeList();
     renderOrgChart();
     updateServiceSuggestions();
+    updateManagerSuggestions();
 }
 
 function renderEmployeeList() {
@@ -383,8 +650,8 @@ function renderEmployeeList() {
                 <span class="employee-name">${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}</span>
                 <span class="employee-meta">${escapeHtml(emp.poste) || '—'} · <span class="service-chip">${escapeHtml(emp.service)}</span></span>
             </div>
-            <div class="employee-status ${emp.invite_sent ? 'status-sent' : 'status-pending'}">
-                ${emp.invite_sent ? 'Envoyé' : 'En attente'}
+            <div class="employee-status ${statutClasse(emp)}">
+                ${statutLabel(emp)}
             </div>
             <div class="employee-actions">
                 ${!emp.invite_sent ? `<button class="link-btn" onclick="renvoyerInvitation('${emp.id}')">Envoyer</button>` : ''}
@@ -394,6 +661,63 @@ function renderEmployeeList() {
     `).join('');
 }
 
+function statutClasse(emp) {
+    if (emp.viewed_at) return 'status-viewed';
+    if (emp.invite_sent) return 'status-neutral';
+    return 'status-pending';
+}
+
+function statutLabel(emp) {
+    if (emp.viewed_at) return 'Consulté';
+    if (emp.invite_sent) return 'Envoyé';
+    return 'En attente';
+}
+
+function normaliserNom(s) {
+    return (s || '').trim().toLowerCase();
+}
+
+// Construit l'arbre hiérarchique à partir du champ "manager" (texte "Prénom Nom").
+// Un employé dont le manager ne correspond à personne dans la liste devient une racine
+// (ex: le PDG, ou un manager externe pas encore enregistré comme employé).
+function construireArbre(liste) {
+    const parNom = {};
+    liste.forEach(e => { parNom[normaliserNom(`${e.prenom} ${e.nom}`)] = e; });
+
+    const enfantsDe = {};
+    liste.forEach(e => {
+        const cleManager = e.manager && parNom[normaliserNom(e.manager)]
+            ? normaliserNom(e.manager)
+            : '__racine__';
+        if (!enfantsDe[cleManager]) enfantsDe[cleManager] = [];
+        enfantsDe[cleManager].push(e);
+    });
+
+    return enfantsDe;
+}
+
+function renderNoeudArbre(emp, enfantsDe, visites) {
+    const cle = normaliserNom(`${emp.prenom} ${emp.nom}`);
+    if (visites.has(cle)) return ''; // sécurité anti-boucle (manager circulaire)
+    visites.add(cle);
+
+    const enfants = enfantsDe[cle] || [];
+    return `
+        <div class="tree-node">
+            <div class="tree-box">
+                <span class="tree-name">${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}</span>
+                <span class="tree-role">${escapeHtml(emp.poste) || '—'}</span>
+                <span class="service-chip tree-service">${escapeHtml(emp.service)}</span>
+            </div>
+            ${enfants.length ? `
+                <div class="tree-children">
+                    ${enfants.map(e => renderNoeudArbre(e, enfantsDe, visites)).join('')}
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
 function renderOrgChart() {
     const container = document.getElementById('orgChartContainer');
     if (employees.length === 0) {
@@ -401,26 +725,22 @@ function renderOrgChart() {
         return;
     }
 
-    const groupes = {};
-    employees.forEach(emp => {
-        const service = emp.service || "Général";
-        if (!groupes[service]) groupes[service] = [];
-        groupes[service].push(emp);
-    });
+    const enfantsDe = construireArbre(employees);
+    const racines = enfantsDe['__racine__'] || [];
 
-    container.innerHTML = Object.keys(groupes).sort().map(service => `
-        <div class="org-service-block">
-            <div class="org-service-title">${escapeHtml(service)}</div>
-            <div class="org-service-members">
-                ${groupes[service].map(emp => `
-                    <div class="org-member">
-                        <span class="org-member-name">${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}</span>
-                        <span class="org-member-role">${escapeHtml(emp.poste) || '—'}${emp.manager ? ' · reporte à ' + escapeHtml(emp.manager) : ''}</span>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `).join('');
+    if (racines.length === 0) {
+        container.innerHTML = `<p class="empty-hint">Impossible de construire l'organigramme (vérifie les champs Manager).</p>`;
+        return;
+    }
+
+    const visites = new Set();
+    container.innerHTML = `<div class="tree-roots">${racines.map(r => renderNoeudArbre(r, enfantsDe, visites)).join('')}</div>`;
+}
+
+function updateManagerSuggestions() {
+    const datalist = document.getElementById('managerSuggestions');
+    if (!datalist) return;
+    datalist.innerHTML = employees.map(e => `<option value="${escapeHtml(e.prenom + ' ' + e.nom)}">`).join('');
 }
 
 function updateServiceSuggestions() {
@@ -505,6 +825,21 @@ window.onload = async function () {
         document.getElementById('loginError').innerText = "Configuration Supabase manquante dans app.js (CONFIG.SUPABASE_ANON_KEY).";
         return;
     }
+
+    let recoveryEnCours = false;
+    supabaseClient.auth.onAuthStateChange((event) => {
+        if (event === 'PASSWORD_RECOVERY') {
+            recoveryEnCours = true;
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('dashboardView').classList.add('hidden');
+            document.getElementById('resetPasswordView').classList.remove('hidden');
+        }
+    });
+
+    // Laisse le SDK Supabase le temps de détecter un éventuel lien de récupération dans l'URL
+    await new Promise(r => setTimeout(r, 150));
+    if (recoveryEnCours) return;
+
     const { data } = await supabaseClient.auth.getSession();
     if (data.session) {
         await entrerDashboard(data.session.user);
