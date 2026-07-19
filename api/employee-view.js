@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     const { data: employee, error } = await supabase
         .from('employees')
-        .select('prenom, nom, poste, service, manager, email, date_arrivee, org_id')
+        .select('id, prenom, nom, poste, service, manager, email, date_arrivee, org_id, viewed_at')
         .eq('token', token)
         .single();
 
@@ -39,9 +39,14 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: 'Lien invalide ou expiré' });
     }
 
+    // Marque la première consultation (visible côté RH dans la liste des employés)
+    if (!employee.viewed_at) {
+        await supabase.from('employees').update({ viewed_at: new Date().toISOString() }).eq('id', employee.id);
+    }
+
     const { data: organization } = await supabase
         .from('organizations')
-        .select('nom, wifi, logo_data_url, documents')
+        .select('nom, wifi, logo_data_url, documents, useful_links, key_contacts, checklist')
         .eq('id', employee.org_id)
         .single();
 
@@ -51,11 +56,43 @@ export default async function handler(req, res) {
         .eq('org_id', employee.org_id)
         .eq('service', employee.service);
 
-    const { org_id, ...employeeSansOrgId } = employee;
+    // Reconstruit la chaîne hiérarchique (N+1, N+2, N+3...) en remontant
+    // le champ "manager" de proche en proche parmi les employés de la même entreprise.
+    const { data: touteLEquipe } = await supabase
+        .from('employees')
+        .select('prenom, nom, poste, manager')
+        .eq('org_id', employee.org_id);
+
+    const normaliser = (s) => (s || '').trim().toLowerCase();
+    const parNom = {};
+    (touteLEquipe || []).forEach(e => { parNom[normaliser(`${e.prenom} ${e.nom}`)] = e; });
+
+    const chaineHierarchique = [];
+    const visites = new Set([normaliser(`${employee.prenom} ${employee.nom}`)]);
+    let managerActuel = employee.manager;
+    let garde = 0;
+
+    while (managerActuel && garde < 8) {
+        const cle = normaliser(managerActuel);
+        if (visites.has(cle)) break; // anti-boucle
+        visites.add(cle);
+        const trouve = parNom[cle];
+        if (trouve) {
+            chaineHierarchique.push({ prenom: trouve.prenom, nom: trouve.nom, poste: trouve.poste, externe: false });
+            managerActuel = trouve.manager;
+        } else {
+            chaineHierarchique.push({ prenom: managerActuel, nom: '', poste: '', externe: true });
+            managerActuel = null;
+        }
+        garde++;
+    }
+
+    const { org_id, id, viewed_at, ...employeeSansChampsInternes } = employee;
 
     return res.status(200).json({
-        employee: employeeSansOrgId,
+        employee: employeeSansChampsInternes,
         organization: organization || null,
-        colleagues: colleagues || []
+        colleagues: colleagues || [],
+        chaineHierarchique
     });
 }
