@@ -7,7 +7,7 @@
 // dans les variables d'environnement Vercel, lues par /api/*.js.
 const CONFIG = {
     SUPABASE_URL: "https://qaydzplnxjdyyutjyqzy.supabase.co",
-    SUPABASE_ANON_KEY: "METS_ICI_TA_CLE_ANON_PUBLIC_DE_SUPABASE",
+    SUPABASE_ANON_KEY: "sb_publishable_yP4LRCrxH9ke4cuVKWnZbg_LtEGC-qn",
     SEND_EMAIL_ENDPOINT: "/api/send-email"
 };
 
