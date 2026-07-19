@@ -33,16 +33,44 @@
                 <label for="loginEmail">Email professionnel</label>
                 <input id="loginEmail" type="email" placeholder="rh@monentreprise.com" autocomplete="email">
             </div>
-            <div class="field">
+            <div id="passwordFieldWrapper" class="field">
                 <label for="loginPassword">Mot de passe</label>
                 <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
             </div>
+
+            <button id="forgotPasswordBtn" class="link-btn login-forgot" onclick="basculerModeMotDePasseOublie()">
+                Mot de passe oublié ?
+            </button>
 
             <button id="loginSubmitBtn" class="btn-primary" onclick="soumettreLogin()">Se connecter</button>
 
             <button id="loginToggleBtn" class="link-btn login-toggle" onclick="basculerModeLogin()">
                 Pas encore de compte ? Créer un espace RH
             </button>
+            <button id="backToLoginBtn" class="link-btn login-toggle hidden" onclick="revenirALaConnexion()">
+                ← Retour à la connexion
+            </button>
+        </div>
+    </div>
+
+    <!-- ============ NOUVEAU MOT DE PASSE (après clic sur le lien reçu par email) ============ -->
+    <div id="resetPasswordView" class="login-screen hidden">
+        <div class="login-card">
+            <div class="brand brand-center">
+                <span class="brand-mark">D1</span>
+                <div class="brand-text">
+                    <span class="brand-name">DayOne</span>
+                    <span class="brand-tag">Espace Ressources Humaines</span>
+                </div>
+            </div>
+            <h2 class="login-title">Nouveau mot de passe</h2>
+            <p class="login-sub">Choisis un nouveau mot de passe pour ton compte RH.</p>
+            <div id="resetError" class="login-error hidden"></div>
+            <div class="field">
+                <label for="newPassword">Nouveau mot de passe</label>
+                <input id="newPassword" type="password" placeholder="••••••••" autocomplete="new-password">
+            </div>
+            <button class="btn-primary" onclick="soumettreNouveauMotDePasse()">Mettre à jour le mot de passe</button>
         </div>
     </div>
 
@@ -129,6 +157,13 @@
                             <button class="link-btn" onclick="viderFormulaireEmploye()">Repartir de zéro</button>
                         </div>
 
+                        <div class="field">
+                            <label for="templateSelect">Utiliser un modèle de poste (optionnel)</label>
+                            <select id="templateSelect" onchange="appliquerModelePoste()">
+                                <option value="">— Aucun modèle —</option>
+                            </select>
+                        </div>
+
                         <div class="field-row">
                             <div class="field">
                                 <label for="empPrenom">Prénom</label>
@@ -155,7 +190,8 @@
                         <div class="field-row">
                             <div class="field">
                                 <label for="empManager">Manager direct</label>
-                                <input id="empManager" type="text" placeholder="Prénom Nom (Poste)">
+                                <input id="empManager" type="text" list="managerSuggestions" placeholder="Prénom Nom (laisser vide si direction)">
+                                <datalist id="managerSuggestions"></datalist>
                             </div>
                             <div class="field">
                                 <label for="empEmail">Email personnel</label>
@@ -196,6 +232,52 @@
                     </section>
                 </div>
             </div>
+
+            <!-- CONTENUS OPTIONNELS POUR LA PAGE EMPLOYÉ -->
+            <section class="card">
+                <h3 class="card-title">Contenus optionnels de la page employé</h3>
+                <p class="hint-text">Laisse une section vide si tu ne veux pas qu'elle apparaisse chez l'employé — rien n'est affiché tant que rien n'est ajouté.</p>
+
+                <div class="optional-sections-grid">
+
+                    <div class="optional-block">
+                        <h4>🔗 Liens utiles</h4>
+                        <input id="linkNom" placeholder="Nom (ex : Intranet)">
+                        <input id="linkUrl" placeholder="https://...">
+                        <button class="link-btn" onclick="ajouterLien()">+ Ajouter le lien</button>
+                        <div id="linksListRH" class="mini-list"></div>
+                    </div>
+
+                    <div class="optional-block">
+                        <h4>📇 Contacts clés</h4>
+                        <input id="contactNom" placeholder="Nom">
+                        <input id="contactRole" placeholder="Rôle (ex : Support IT)">
+                        <input id="contactInfo" placeholder="Email ou téléphone">
+                        <button class="link-btn" onclick="ajouterContact()">+ Ajouter le contact</button>
+                        <div id="contactsListRH" class="mini-list"></div>
+                    </div>
+
+                    <div class="optional-block">
+                        <h4>🗺️ Checklist d'intégration</h4>
+                        <input id="checklistTitre" placeholder="Étape (ex : Jour 1 — Accueil)">
+                        <input id="checklistDesc" placeholder="Description courte">
+                        <button class="link-btn" onclick="ajouterEtapeChecklist()">+ Ajouter l'étape</button>
+                        <div id="checklistListRH" class="mini-list"></div>
+                    </div>
+
+                    <div class="optional-block">
+                        <h4>🧩 Modèles de poste</h4>
+                        <input id="templateNom" placeholder="Nom du modèle (ex : Dev Front)">
+                        <input id="templatePoste" placeholder="Intitulé du poste">
+                        <input id="templateService" placeholder="Service">
+                        <input id="templateManager" placeholder="Manager par défaut">
+                        <button class="link-btn" onclick="ajouterModelePoste()">+ Enregistrer le modèle</button>
+                        <div id="templatesListRH" class="mini-list"></div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="enregistrerContenusOptionnels()">Enregistrer ces contenus</button>
+            </section>
         </main>
 
         <footer class="app-footer">
