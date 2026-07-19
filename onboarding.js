@@ -17,8 +17,8 @@ async function chargerEspacePersonnel() {
     try {
         const res = await fetch(`/api/employee-view?token=${encodeURIComponent(token)}`);
         if (!res.ok) { afficherErreur(); return; }
-        const { employee, organization, colleagues } = await res.json();
-        afficherContenu(employee, organization, colleagues);
+        const { employee, organization, colleagues, chaineHierarchique } = await res.json();
+        afficherContenu(employee, organization, colleagues, chaineHierarchique || []);
     } catch (err) {
         console.error(err);
         afficherErreur();
@@ -30,7 +30,7 @@ function afficherErreur() {
     document.getElementById('errorState').classList.remove('hidden');
 }
 
-function afficherContenu(employee, organization, colleagues) {
+function afficherContenu(employee, organization, colleagues, chaineHierarchique) {
     document.getElementById('loadingState').classList.add('hidden');
     document.getElementById('contentState').classList.remove('hidden');
 
@@ -55,16 +55,70 @@ function afficherContenu(employee, organization, colleagues) {
     const teamContainer = document.getElementById('teamContainer');
     const equipe = (colleagues || []).filter(c => !(c.prenom === employee.prenom && c.nom === employee.nom));
 
-    let html = "";
-    if (employee.manager) {
-        html += `<div class="team-manager">👔 ${escapeHtml(employee.manager)} — ton manager</div>`;
-    }
-    html += `<div class="team-self">✨ ${escapeHtml(employee.prenom)} ${escapeHtml(employee.nom)} (toi) — ${escapeHtml(employee.poste) || '—'}</div>`;
+    // La chaîne remonte : N+1, N+2, N+3... on l'affiche donc du sommet vers toi.
+    const chaineOrdreDescendant = [...chaineHierarchique].reverse();
+
+    let html = `<div class="chain-list">`;
+    chaineOrdreDescendant.forEach((personne, i) => {
+        const niveau = chaineHierarchique.length - i; // niveau N+x le plus haut affiché en premier
+        html += `
+            <div class="chain-item">
+                <span class="chain-level">N+${niveau}</span>
+                <span>${escapeHtml(personne.prenom)}${personne.nom ? ' ' + escapeHtml(personne.nom) : ''}${personne.poste ? ' — ' + escapeHtml(personne.poste) : ''}</span>
+            </div>
+        `;
+    });
+    html += `
+        <div class="chain-item is-self">
+            <span class="chain-level">Toi</span>
+            <span>${escapeHtml(employee.prenom)} ${escapeHtml(employee.nom)} — ${escapeHtml(employee.poste) || '—'}</span>
+        </div>
+    </div>`;
+
     if (equipe.length > 0) {
         html += `<div class="team-others-label">Collègues du service ${escapeHtml(employee.service || '')}</div>`;
-        html += equipe.map(c => `<div class="team-other">${escapeHtml(c.prenom)} ${escapeHtml(c.nom)} — ${escapeHtml(c.poste) || '—'}</div>`).join('');
+        html += `<div class="team-list">` + equipe.map(c =>
+            `<div class="team-other">${escapeHtml(c.prenom)} ${escapeHtml(c.nom)} — ${escapeHtml(c.poste) || '—'}</div>`
+        ).join('') + `</div>`;
     }
+
     teamContainer.innerHTML = html;
+
+    // ---- Sections optionnelles : n'apparaissent que si la RH les a remplies ----
+    const checklist = organization?.checklist || [];
+    if (checklist.length > 0) {
+        document.getElementById('checklistSection').classList.remove('hidden');
+        document.getElementById('checklistContainer').innerHTML = checklist.map((etape, i) => `
+            <div class="checklist-employee-item">
+                <span class="checklist-employee-num">${i + 1}</span>
+                <div>
+                    <h4>${escapeHtml(etape.titre)}</h4>
+                    ${etape.description ? `<p>${escapeHtml(etape.description)}</p>` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    const liens = organization?.useful_links || [];
+    if (liens.length > 0) {
+        document.getElementById('linksSection').classList.remove('hidden');
+        document.getElementById('linksContainer').innerHTML = liens.map(l => `
+            <a class="mini-list-item" href="${escapeHtml(l.url)}" target="_blank" rel="noopener">
+                🔗 ${escapeHtml(l.nom)}
+            </a>
+        `).join('');
+    }
+
+    const contacts = organization?.key_contacts || [];
+    if (contacts.length > 0) {
+        document.getElementById('contactsSection').classList.remove('hidden');
+        document.getElementById('contactsContainer').innerHTML = contacts.map(c => `
+            <div class="mini-list-item">
+                <strong>${escapeHtml(c.nom)}</strong> — ${escapeHtml(c.role)}<br>
+                <span class="mono">${escapeHtml(c.contact)}</span>
+            </div>
+        `).join('');
+    }
 }
 
 window.onload = chargerEspacePersonnel;
