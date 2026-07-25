@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DayOne — Espace Ressources Humaines</title>
+    <title>DayOne — Onboarding</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -13,7 +13,7 @@
 
     <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-    <!-- ============ ÉCRAN DE CONNEXION RH ============ -->
+    <!-- ============ ECRAN DE CONNEXION RH ============ -->
     <div id="loginView" class="login-screen">
         <div class="login-card">
             <div class="brand brand-center">
@@ -25,7 +25,7 @@
             </div>
 
             <h2 id="loginModeLabel" class="login-title">Connexion</h2>
-            <p class="login-sub">Réservé à l'équipe RH. Chaque entreprise dispose de son propre espace privé.</p>
+            <p class="login-sub">Reserve a l'equipe RH. Chaque entreprise dispose de son propre espace prive.</p>
 
             <div id="loginError" class="login-error hidden"></div>
 
@@ -35,25 +35,25 @@
             </div>
             <div id="passwordFieldWrapper" class="field">
                 <label for="loginPassword">Mot de passe</label>
-                <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+                <input id="loginPassword" type="password" placeholder="********" autocomplete="current-password">
             </div>
 
             <button id="forgotPasswordBtn" class="link-btn login-forgot" onclick="basculerModeMotDePasseOublie()">
-                Mot de passe oublié ?
+                Mot de passe oublie ?
             </button>
 
             <button id="loginSubmitBtn" class="btn-primary" onclick="soumettreLogin()">Se connecter</button>
 
             <button id="loginToggleBtn" class="link-btn login-toggle" onclick="basculerModeLogin()">
-                Pas encore de compte ? Créer un espace RH
+                Pas encore de compte ? Creer un espace RH
             </button>
             <button id="backToLoginBtn" class="link-btn login-toggle hidden" onclick="revenirALaConnexion()">
-                ← Retour à la connexion
+                Retour a la connexion
             </button>
         </div>
     </div>
 
-    <!-- ============ NOUVEAU MOT DE PASSE (après clic sur le lien reçu par email) ============ -->
+    <!-- ============ NOUVEAU MOT DE PASSE ============ -->
     <div id="resetPasswordView" class="login-screen hidden">
         <div class="login-card">
             <div class="brand brand-center">
@@ -68,32 +68,35 @@
             <div id="resetError" class="login-error hidden"></div>
             <div class="field">
                 <label for="newPassword">Nouveau mot de passe</label>
-                <input id="newPassword" type="password" placeholder="••••••••" autocomplete="new-password">
+                <input id="newPassword" type="password" placeholder="********" autocomplete="new-password">
             </div>
-            <button class="btn-primary" onclick="soumettreNouveauMotDePasse()">Mettre à jour le mot de passe</button>
+            <button class="btn-primary" onclick="soumettreNouveauMotDePasse()">Mettre a jour le mot de passe</button>
         </div>
     </div>
 
-    <!-- ============ DASHBOARD RH ============ -->
+    <!-- ============ DASHBOARD ONBOARDING ============ -->
     <div id="dashboardView" class="hidden">
         <header class="app-header">
             <div class="brand">
                 <span class="brand-mark">D1</span>
                 <div class="brand-text">
                     <span class="brand-name">DayOne</span>
-                    <span class="brand-tag">Espace Ressources Humaines</span>
+                    <span class="brand-tag">Onboarding</span>
                 </div>
             </div>
-            <button class="view-btn logout-btn" onclick="deconnexion()">Déconnexion</button>
+            <nav class="app-nav">
+                <a href="index.html" class="app-nav-link is-active">Onboarding</a>
+                <a href="organigramme.html" class="app-nav-link">Organigramme</a>
+                <a href="evaluations.html" class="app-nav-link">Evaluations &amp; Remuneration</a>
+                <button class="view-btn logout-btn" onclick="deconnexion()">Deconnexion</button>
+            </nav>
         </header>
 
         <main class="page">
             <div class="grid">
 
-                <!-- COLONNE GAUCHE -->
                 <div class="col col-left">
 
-                    <!-- Configuration entreprise -->
                     <section class="card">
                         <h3 class="card-title"><span class="step-badge">1</span>Configuration entreprise</h3>
                         <div class="field-row">
@@ -112,18 +115,18 @@
                             <div class="upload-box">
                                 <input type="file" id="logoInput" accept="image/*" onchange="chargerLogo(event)">
                                 <div id="logoPreview" class="upload-hint">
-                                    <span class="upload-icon">↑</span>
+                                    <span class="upload-icon">^</span>
                                     Cliquer pour importer un logo
                                 </div>
                             </div>
                         </div>
 
                         <div class="field">
-                            <label>Documents communs (règlement, charte…)</label>
+                            <label>Documents communs (reglement, charte...)</label>
                             <div class="upload-box">
                                 <input type="file" id="docInput" multiple onchange="chargerDocuments(event)">
                                 <div class="upload-hint">
-                                    <span class="upload-icon">↑</span>
+                                    <span class="upload-icon">^</span>
                                     Ajouter des documents
                                 </div>
                             </div>
@@ -135,171 +138,69 @@
                             <input id="cfgEmailSubject" type="text" placeholder="Bienvenue chez [Entreprise] !">
                         </div>
                         <div class="field">
-                            <label for="cfgEmailMessage">Message d'accueil personnalisé</label>
-                            <textarea id="cfgEmailMessage" rows="3" placeholder="Toute l'équipe est ravie de t'accueillir en tant que [poste]. À très vite !"></textarea>
-                            <p class="hint-text hint-text-tight">Laisse vide pour garder le message par défaut.</p>
+                            <label for="cfgEmailMessage">Message d'accueil personnalise</label>
+                            <textarea id="cfgEmailMessage" rows="3" placeholder="Toute l'equipe est ravie de t'accueillir en tant que [poste]. A tres vite !"></textarea>
+                            <p class="hint-text hint-text-tight">Laisse vide pour garder le message par defaut.</p>
                         </div>
 
                         <button class="btn-primary" onclick="enregistrerOrganisation()">Enregistrer les infos entreprise</button>
                     </section>
 
-                    <!-- Import Excel / CSV -->
                     <section class="card">
-                        <div class="card-title-row">
-                            <h3 class="card-title"><span class="step-badge">2</span>Import en masse</h3>
-                            <button class="link-btn" onclick="telechargerModeleExcel()">Modèle CSV</button>
-                        </div>
-                        <p class="hint-text">Colonnes attendues : Prenom, Nom, Poste, Service, Manager, Email, Date (AAAA-MM-JJ)</p>
-                        <div class="upload-box upload-box-muted">
-                            <input type="file" id="csvInput" accept=".csv" onchange="importerCSV(event)">
-                            <div class="upload-hint">
-                                <span class="upload-icon">↑</span>
-                                Importer une liste d'employés
+                        <h3 class="card-title"><span class="step-badge">2</span>Contenus optionnels de la page employe</h3>
+                        <p class="hint-text">Laisse une section vide si tu ne veux pas qu'elle apparaisse chez l'employe.</p>
+
+                        <div class="optional-sections-grid">
+                            <div class="optional-block">
+                                <h4>Liens utiles</h4>
+                                <input id="linkNom" placeholder="Nom (ex : Intranet)">
+                                <input id="linkUrl" placeholder="https://...">
+                                <button class="link-btn" onclick="ajouterLien()">+ Ajouter le lien</button>
+                                <div id="linksListRH" class="mini-list"></div>
                             </div>
-                        </div>
-                    </section>
 
-                    <!-- Nouveau collaborateur -->
-                    <section class="card">
-                        <h3 class="card-title"><span class="step-badge">3</span>Lancer un onboarding</h3>
-                        <div id="editionBanner" class="duplicate-banner edition-banner hidden">
-                            Modification de <strong id="editionNomLabel"></strong> — aucun email ne sera renvoyé.
-                            <button class="link-btn" onclick="viderFormulaireEmploye()">Annuler la modification</button>
-                        </div>
-
-                        <div id="duplicateBanner" class="duplicate-banner hidden">
-                            Pré-rempli à partir d'un profil existant — modifie ce qui change puis envoie.
-                            <button class="link-btn" onclick="viderFormulaireEmploye()">Repartir de zéro</button>
-                        </div>
-
-                        <div class="field">
-                            <label for="templateSelect">Utiliser un modèle de poste (optionnel)</label>
-                            <select id="templateSelect" onchange="appliquerModelePoste()">
-                                <option value="">— Aucun modèle —</option>
-                            </select>
-                            <p class="hint-text hint-text-tight">Crée d'abord un modèle plus bas (section "Contenus optionnels") pour qu'il apparaisse ici.</p>
-                        </div>
-
-                        <div class="field-row">
-                            <div class="field">
-                                <label for="empPrenom">Prénom</label>
-                                <input id="empPrenom" type="text" oninput="mettreAJourChecklist()">
+                            <div class="optional-block">
+                                <h4>Contacts cles</h4>
+                                <input id="contactNom" placeholder="Nom">
+                                <input id="contactRole" placeholder="Role (ex : Support IT)">
+                                <input id="contactInfo" placeholder="Email ou telephone">
+                                <button class="link-btn" onclick="ajouterContact()">+ Ajouter le contact</button>
+                                <div id="contactsListRH" class="mini-list"></div>
                             </div>
-                            <div class="field">
-                                <label for="empNom">Nom</label>
-                                <input id="empNom" type="text" oninput="mettreAJourChecklist()">
+
+                            <div class="optional-block">
+                                <h4>Checklist d'integration</h4>
+                                <input id="checklistTitre" placeholder="Etape (ex : Jour 1 - Accueil)">
+                                <input id="checklistDesc" placeholder="Description courte">
+                                <button class="link-btn" onclick="ajouterEtapeChecklist()">+ Ajouter l'etape</button>
+                                <div id="checklistListRH" class="mini-list"></div>
                             </div>
                         </div>
 
-                        <div class="field-row">
-                            <div class="field">
-                                <label for="empPoste">Intitulé du poste</label>
-                                <input id="empPoste" type="text" oninput="mettreAJourChecklist()">
-                            </div>
-                            <div class="field">
-                                <label for="empService">Service</label>
-                                <input id="empService" type="text" list="serviceSuggestions" placeholder="Finance, Tech, Ventes…" oninput="mettreAJourChecklist()">
-                                <datalist id="serviceSuggestions"></datalist>
-                            </div>
+                        <div class="button-row">
+                            <button class="btn-primary" onclick="enregistrerContenusOptionnels()">Enregistrer ces contenus</button>
+                            <button class="btn-danger" onclick="viderContenusOptionnels()">Vider ces contenus</button>
                         </div>
-
-                        <div class="field-row">
-                            <div class="field">
-                                <label for="empManagerSelect">Manager direct</label>
-                                <select id="empManagerSelect" onchange="gererChangementManager()">
-                                    <option value="">— Aucun (sommet de l'organigramme) —</option>
-                                    <option value="__externe__">Autre / externe (préciser)…</option>
-                                </select>
-                                <input id="empManagerExterne" type="text" placeholder="Nom du manager externe" class="hidden manager-externe-input">
-                            </div>
-                            <div class="field">
-                                <label for="empEmail">Email personnel</label>
-                                <input id="empEmail" type="email" oninput="mettreAJourChecklist()">
-                            </div>
-                        </div>
-
-                        <div class="field">
-                            <label for="empDate">Date d'arrivée</label>
-                            <input id="empDate" type="date">
-                        </div>
-
-                        <ul class="checklist">
-                            <li id="chkFiche" class="checklist-item"><span class="chk-dot"></span>Fiche complète</li>
-                            <li id="chkEmail" class="checklist-item"><span class="chk-dot"></span>Email valide</li>
-                        </ul>
-
-                        <button id="empSubmitBtn" onclick="declencherOnboardingGeneral()" class="btn-primary">
-                            Enregistrer et envoyer l'invitation
-                        </button>
                     </section>
                 </div>
 
-                <!-- COLONNE DROITE -->
                 <div class="col col-right">
                     <section class="card">
-                        <h3 class="card-title">Organigramme (généré automatiquement)</h3>
-                        <div id="orgChartContainer" class="org-chart-dynamic">
-                            <p class="empty-hint">Ajoute des employés pour voir apparaître l'organigramme.</p>
+                        <h3 class="card-title">Employes a onboarder</h3>
+                        <p class="hint-text">Cree les fiches employes depuis la page <a href="organigramme.html">Organigramme</a>. Elles apparaissent ici pretes a etre invitees.</p>
+                        <div id="pendingListContainer" class="employee-list">
+                            <p class="empty-hint">Aucun employe en attente d'invitation.</p>
                         </div>
                     </section>
 
                     <section class="card">
-                        <h3 class="card-title">Employés enregistrés</h3>
-                        <div id="employeeListContainer" class="employee-list">
-                            <p class="empty-hint">Aucun employé pour le moment.</p>
+                        <h3 class="card-title">Suivi des invitations envoyees</h3>
+                        <div id="sentListContainer" class="employee-list">
+                            <p class="empty-hint">Aucune invitation envoyee pour le moment.</p>
                         </div>
                     </section>
                 </div>
             </div>
-
-            <!-- CONTENUS OPTIONNELS POUR LA PAGE EMPLOYÉ -->
-            <section class="card">
-                <h3 class="card-title">Contenus optionnels de la page employé</h3>
-                <p class="hint-text">Laisse une section vide si tu ne veux pas qu'elle apparaisse chez l'employé — rien n'est affiché tant que rien n'est ajouté.</p>
-
-                <div class="optional-sections-grid">
-
-                    <div class="optional-block">
-                        <h4>🔗 Liens utiles</h4>
-                        <input id="linkNom" placeholder="Nom (ex : Intranet)">
-                        <input id="linkUrl" placeholder="https://...">
-                        <button class="link-btn" onclick="ajouterLien()">+ Ajouter le lien</button>
-                        <div id="linksListRH" class="mini-list"></div>
-                    </div>
-
-                    <div class="optional-block">
-                        <h4>📇 Contacts clés</h4>
-                        <input id="contactNom" placeholder="Nom">
-                        <input id="contactRole" placeholder="Rôle (ex : Support IT)">
-                        <input id="contactInfo" placeholder="Email ou téléphone">
-                        <button class="link-btn" onclick="ajouterContact()">+ Ajouter le contact</button>
-                        <div id="contactsListRH" class="mini-list"></div>
-                    </div>
-
-                    <div class="optional-block">
-                        <h4>🗺️ Checklist d'intégration</h4>
-                        <input id="checklistTitre" placeholder="Étape (ex : Jour 1 — Accueil)">
-                        <input id="checklistDesc" placeholder="Description courte">
-                        <button class="link-btn" onclick="ajouterEtapeChecklist()">+ Ajouter l'étape</button>
-                        <div id="checklistListRH" class="mini-list"></div>
-                    </div>
-
-                    <div class="optional-block">
-                        <h4>🧩 Modèles de poste</h4>
-                        <input id="templateNom" placeholder="Nom du modèle (ex : Dev Front)">
-                        <input id="templatePoste" placeholder="Intitulé du poste">
-                        <input id="templateService" placeholder="Service">
-                        <input id="templateManager" placeholder="Manager par défaut">
-                        <button class="link-btn" onclick="ajouterModelePoste()">+ Enregistrer le modèle</button>
-                        <div id="templatesListRH" class="mini-list"></div>
-                    </div>
-                </div>
-
-                <div class="button-row">
-                    <button class="btn-primary" onclick="enregistrerContenusOptionnels()">Enregistrer ces contenus</button>
-                    <button class="btn-danger" onclick="viderContenusOptionnels()">Vider ces contenus</button>
-                </div>
-            </section>
         </main>
 
         <footer class="app-footer">
@@ -307,6 +208,7 @@
         </footer>
     </div>
 
+    <script src="shared.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
