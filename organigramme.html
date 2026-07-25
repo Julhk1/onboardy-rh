@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DayOne — Organigramme</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <header class="app-header">
+        <div class="brand">
+            <span class="brand-mark">D1</span>
+            <div class="brand-text">
+                <span class="brand-name">DayOne</span>
+                <span class="brand-tag">Organigramme</span>
+            </div>
+        </div>
+        <nav class="app-nav">
+            <a href="index.html" class="app-nav-link">Onboarding</a>
+            <a href="organigramme.html" class="app-nav-link is-active">Organigramme</a>
+            <a href="evaluations.html" class="app-nav-link">Evaluations &amp; Remuneration</a>
+            <button class="view-btn logout-btn" onclick="deconnexion()">Deconnexion</button>
+        </nav>
+    </header>
+
+    <main class="page">
+        <div class="grid">
+
+            <div class="col col-left">
+
+                <section class="card">
+                    <h3 class="card-title">Ajouter / modifier un employe</h3>
+
+                    <div id="editionBanner" class="duplicate-banner edition-banner hidden">
+                        Modification de <strong id="editionNomLabel"></strong>.
+                        <button class="link-btn" onclick="viderFormulaireEmploye()">Annuler la modification</button>
+                    </div>
+
+                    <div class="field">
+                        <label for="templateSelect">Utiliser un modele de poste (optionnel)</label>
+                        <select id="templateSelect" onchange="appliquerModelePoste()">
+                            <option value="">— Aucun modele —</option>
+                        </select>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="empPrenom">Prenom</label>
+                            <input id="empPrenom" type="text">
+                        </div>
+                        <div class="field">
+                            <label for="empNom">Nom</label>
+                            <input id="empNom" type="text">
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="empPoste">Intitule du poste</label>
+                            <input id="empPoste" type="text">
+                        </div>
+                        <div class="field">
+                            <label for="empService">Service</label>
+                            <input id="empService" type="text" list="serviceSuggestions" placeholder="Finance, Tech, Ventes...">
+                            <datalist id="serviceSuggestions"></datalist>
+                        </div>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="empManagerSelect">Manager direct</label>
+                            <select id="empManagerSelect" onchange="gererChangementManager()">
+                                <option value="">— Aucun (sommet de l'organigramme) —</option>
+                                <option value="__externe__">Autre / externe (preciser)...</option>
+                            </select>
+                            <input id="empManagerExterne" type="text" placeholder="Nom du manager externe" class="hidden manager-externe-input">
+                        </div>
+                        <div class="field">
+                            <label for="empEmail">Email personnel</label>
+                            <input id="empEmail" type="email">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="empDate">Date d'arrivee</label>
+                        <input id="empDate" type="date">
+                    </div>
+
+                    <button id="empSubmitBtn" onclick="enregistrerEmploye()" class="btn-primary">
+                        Ajouter cet employe
+                    </button>
+                </section>
+
+                <section class="card">
+                    <h3 class="card-title">Import en masse</h3>
+                    <p class="hint-text">Cree ou met a jour la structure uniquement — n'envoie aucun email. Colonnes attendues : Prenom, Nom, Poste, Service, Manager, Email, Date (AAAA-MM-JJ)</p>
+                    <div class="card-title-row">
+                        <span></span>
+                        <button class="link-btn" onclick="telechargerModeleExcel()">Modele CSV</button>
+                    </div>
+                    <div class="upload-box upload-box-muted">
+                        <input type="file" id="csvInput" accept=".csv" onchange="importerCSV(event)">
+                        <div class="upload-hint">
+                            <span class="upload-icon">^</span>
+                            Importer une liste d'employes
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h3 class="card-title">Modeles de poste</h3>
+                    <p class="hint-text">Cree un modele une fois, reutilise-le pour chaque futur recrutement sur ce poste.</p>
+                    <input id="templateNom" placeholder="Nom du modele (ex : Dev Front)">
+                    <input id="templatePoste" placeholder="Intitule du poste">
+                    <input id="templateService" placeholder="Service">
+                    <input id="templateManager" placeholder="Manager par defaut">
+                    <button class="link-btn" onclick="ajouterModelePoste()">+ Enregistrer le modele</button>
+                    <div id="templatesListRH" class="mini-list"></div>
+                </section>
+            </div>
+
+            <div class="col col-right">
+                <section class="card">
+                    <h3 class="card-title">Organigramme</h3>
+                    <p class="hint-text">Clique sur les icones d'un profil pour le modifier ou le supprimer directement.</p>
+                    <div id="orgChartContainer" class="org-chart-dynamic">
+                        <p class="empty-hint">Ajoute des employes pour voir apparaitre l'organigramme.</p>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h3 class="card-title">Liste des employes</h3>
+                    <div id="employeeListContainer" class="employee-list">
+                        <p class="empty-hint">Aucun employe pour le moment.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>© 2026 DayOne — Onboarding Cloud</p>
+    </footer>
+
+    <script src="shared.js"></script>
+    <script src="app-organigramme.js"></script>
+</body>
+</html>
