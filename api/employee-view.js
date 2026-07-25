@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     const { data: employee, error } = await supabase
         .from('employees')
-        .select('id, prenom, nom, poste, service, manager, email, date_arrivee, org_id, viewed_at')
+        .select('id, prenom, nom, poste, service, manager, email, date_arrivee, org_id, viewed_at, chart_visibility')
         .eq('token', token)
         .single();
 
@@ -87,12 +87,22 @@ export default async function handler(req, res) {
         garde++;
     }
 
-    const { org_id, id, viewed_at, ...employeeSansChampsInternes } = employee;
+    const { org_id, id, viewed_at, chart_visibility, ...employeeSansChampsInternes } = employee;
+
+    let organigrammeComplet = null;
+    if (chart_visibility === 'complet') {
+        const { data: tousLesEmployes } = await supabase
+            .from('employees')
+            .select('prenom, nom, poste, service, manager')
+            .eq('org_id', employee.org_id);
+        organigrammeComplet = tousLesEmployes || [];
+    }
 
     return res.status(200).json({
         employee: employeeSansChampsInternes,
         organization: organization || null,
         colleagues: colleagues || [],
-        chaineHierarchique
+        chaineHierarchique,
+        organigrammeComplet
     });
 }
