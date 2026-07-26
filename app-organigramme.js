@@ -350,7 +350,7 @@ function renderNoeudArbre(emp, enfantsDe, visites) {
     const couleur = couleurService(emp.service);
 
     return `
-        <div class="tree-node">
+        <li>
             <div class="tree-box" style="border-top-color:${couleur}">
                 <div class="tree-box-header">
                     <span class="tree-avatar" style="background:${couleur}">${initiales(emp.prenom, emp.nom)}</span>
@@ -367,8 +367,8 @@ function renderNoeudArbre(emp, enfantsDe, visites) {
                     </span>
                 </div>
             </div>
-            ${enfants.length ? `<div class="tree-children">${enfants.map(e => renderNoeudArbre(e, enfantsDe, visites)).join('')}</div>` : ''}
-        </div>
+            ${enfants.length ? `<ul>${enfants.map(e => renderNoeudArbre(e, enfantsDe, visites)).join('')}</ul>` : ''}
+        </li>
     `;
 }
 
@@ -385,7 +385,7 @@ function renderOrgChart() {
         return;
     }
     const visites = new Set();
-    container.innerHTML = `<div class="tree-roots">${racines.map(r => renderNoeudArbre(r, enfantsDe, visites)).join('')}</div>`;
+    container.innerHTML = `<div class="orgtree"><ul>${racines.map(r => renderNoeudArbre(r, enfantsDe, visites)).join('')}</ul></div>`;
 }
 
 // ============================================================
