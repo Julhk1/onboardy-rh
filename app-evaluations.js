@@ -6,13 +6,16 @@ let reviews = [];
 let compensations = [];
 let selectedReviewEmployeeId = null;
 let selectedCompEmployeeId = null;
+let editingReviewId = null;
+let editingCompId = null;
+let filtreRecherche = "";
 
 // ============================================================
 // CHARGEMENT
 // ============================================================
 async function chargerTout() {
     const [empRes, reviewRes, compRes] = await Promise.all([
-        supabaseClient.from('employees').select('id, prenom, nom, poste, service, email, token, date_arrivee').eq('org_id', currentOrg.id).order('created_at', { ascending: false }),
+        supabaseClient.from('employees').select('id, prenom, nom, poste, service, email, token, date_arrivee, next_review_date, prep_notes').eq('org_id', currentOrg.id).order('created_at', { ascending: false }),
         supabaseClient.from('reviews').select('*').eq('org_id', currentOrg.id).order('date_entretien', { ascending: false }),
         supabaseClient.from('compensations').select('*').eq('org_id', currentOrg.id).order('date_effet', { ascending: false })
     ]);
@@ -25,6 +28,26 @@ async function chargerTout() {
     employees = empRes.data || [];
     reviews = reviewRes.data || [];
     compensations = compRes.data || [];
+
+    document.getElementById('cadenceSelect').value = String(currentOrg.review_cadence_months || 3);
+
+    renderEmployeeReviewList();
+}
+
+async function enregistrerCadence() {
+    const valeur = parseInt(document.getElementById('cadenceSelect').value, 10);
+    const { error } = await supabaseClient.from('organizations').update({ review_cadence_months: valeur }).eq('id', currentOrg.id);
+    if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
+    currentOrg.review_cadence_months = valeur;
+    toast("Fréquence mise à jour pour tous les employés sans date fixée manuellement.");
+    renderEmployeeReviewList();
+}
+
+// ============================================================
+// RECHERCHE
+// ============================================================
+function filtrerListeEmployes() {
+    filtreRecherche = val('employeeSearch').toLowerCase();
     renderEmployeeReviewList();
 }
 
@@ -34,14 +57,19 @@ async function chargerTout() {
 function calculerStatutEntretien(emp) {
     const historique = reviews.filter(r => r.employee_id === emp.id).sort((a, b) => new Date(b.date_entretien) - new Date(a.date_entretien));
     const dernier = historique[0];
-    const dateReference = dernier ? new Date(dernier.date_entretien) : (emp.date_arrivee ? new Date(emp.date_arrivee) : null);
 
-    if (!dateReference || isNaN(dateReference)) {
-        return { label: "Date d'arrivée manquante", classe: 'status-neutral', historique, prochaine: null };
+    let prochaine;
+    if (emp.next_review_date) {
+        prochaine = new Date(emp.next_review_date);
+    } else {
+        const dateReference = dernier ? new Date(dernier.date_entretien) : (emp.date_arrivee ? new Date(emp.date_arrivee) : null);
+        if (!dateReference || isNaN(dateReference)) {
+            return { label: "Date d'arrivée manquante", classe: 'status-neutral', historique, prochaine: null };
+        }
+        prochaine = new Date(dateReference);
+        prochaine.setMonth(prochaine.getMonth() + (currentOrg.review_cadence_months || 3));
     }
 
-    const prochaine = new Date(dateReference);
-    prochaine.setMonth(prochaine.getMonth() + 3);
     const joursRestants = Math.round((prochaine - new Date()) / (1000 * 60 * 60 * 24));
 
     let label, classe;
@@ -78,7 +106,16 @@ function renderEmployeeReviewList() {
         return;
     }
 
-    container.innerHTML = employees.map(emp => {
+    const liste = employees.filter(e =>
+        !filtreRecherche || `${e.prenom} ${e.nom}`.toLowerCase().includes(filtreRecherche)
+    );
+
+    if (liste.length === 0) {
+        container.innerHTML = `<p class="empty-hint">Aucun employé ne correspond à cette recherche.</p>`;
+        return;
+    }
+
+    container.innerHTML = liste.map(emp => {
         const { label, classe, historique, prochaine } = calculerStatutEntretien(emp);
         const historiqueComp = historiqueRemuneration(emp.id);
 
@@ -96,6 +133,19 @@ function renderEmployeeReviewList() {
                     </div>
                 </div>
 
+                <div class="next-review-row">
+                    <span>Date précise du prochain entretien :</span>
+                    <input type="date" value="${emp.next_review_date || ''}" onchange="fixerDateEntretien('${emp.id}', this.value)">
+                    ${emp.next_review_date ? `<button class="link-btn" onclick="fixerDateEntretien('${emp.id}', '')">Réinitialiser (utiliser la fréquence par défaut)</button>` : ''}
+                </div>
+
+                ${emp.prep_notes ? `
+                    <div class="prep-notes-block">
+                        <strong>Notes de préparation écrites par l'employé</strong>
+                        ${escapeHtml(emp.prep_notes)}
+                    </div>
+                ` : ''}
+
                 <div class="review-links-row">
                     <button class="link-btn" onclick="copierLienPreparation('${emp.id}')">Copier le lien de préparation</button>
                     <button class="link-btn" onclick="envoyerLienPreparation('${emp.id}')">Envoyer le lien par email</button>
@@ -110,6 +160,11 @@ function renderEmployeeReviewList() {
                             ${r.points_forts ? `<p>Points forts : ${escapeHtml(r.points_forts)}</p>` : ''}
                             ${r.points_amelioration ? `<p>Axes d'amélioration : ${escapeHtml(r.points_amelioration)}</p>` : ''}
                             ${r.objectifs ? `<p>Objectifs : ${escapeHtml(r.objectifs)}</p>` : ''}
+                            ${r.commentaire_rh ? `<p><em>Commentaire RH (privé) : ${escapeHtml(r.commentaire_rh)}</em></p>` : ''}
+                            <div class="history-item-actions">
+                                <button class="link-btn" onclick="modifierEntretien('${r.id}')">Modifier</button>
+                                <button class="link-btn link-btn-danger" onclick="supprimerEntretien('${r.id}')">Supprimer</button>
+                            </div>
                         </div>
                     `).join('')}
 
@@ -122,6 +177,10 @@ function renderEmployeeReviewList() {
                                     ${delta ? `<span class="employee-status ${delta.classe} comp-delta">${delta.texte}</span>` : ''}
                                 </p>
                                 ${c.note ? `<p>${escapeHtml(c.note)}</p>` : ''}
+                                <div class="history-item-actions">
+                                    <button class="link-btn" onclick="modifierRemuneration('${c.id}')">Modifier</button>
+                                    <button class="link-btn link-btn-danger" onclick="supprimerRemuneration('${c.id}')">Supprimer</button>
+                                </div>
                             </div>
                         `;
                     }).join('')}
@@ -134,17 +193,48 @@ function renderEmployeeReviewList() {
 }
 
 // ============================================================
-// FORMULAIRE ENTRETIEN
+// DATE D'ENTRETIEN FIXÉE MANUELLEMENT
+// ============================================================
+async function fixerDateEntretien(employeeId, date) {
+    const { error } = await supabaseClient.from('employees').update({ next_review_date: date || null }).eq('id', employeeId);
+    if (error) { toast("Erreur lors de la mise à jour.", "error"); return; }
+    const emp = employees.find(e => e.id === employeeId);
+    if (emp) emp.next_review_date = date || null;
+    toast(date ? "Date fixée pour cet employé." : "Retour à la fréquence par défaut.");
+    renderEmployeeReviewList();
+}
+
+// ============================================================
+// FORMULAIRE ENTRETIEN (ajout + édition)
 // ============================================================
 function ouvrirFormulaireEntretien(employeeId) {
     const emp = employees.find(e => e.id === employeeId);
     if (!emp) return;
     selectedReviewEmployeeId = employeeId;
+    editingReviewId = null;
     document.getElementById('reviewFormLabel').innerText = `Compte-rendu pour ${emp.prenom} ${emp.nom}`;
     document.getElementById('reviewDate').value = new Date().toISOString().slice(0, 10);
     document.getElementById('reviewPointsForts').value = "";
     document.getElementById('reviewPointsAmelioration').value = "";
     document.getElementById('reviewObjectifs').value = "";
+    document.getElementById('reviewCommentaireRH').value = "";
+    const section = document.getElementById('reviewFormSection');
+    section.classList.remove('hidden');
+    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function modifierEntretien(reviewId) {
+    const r = reviews.find(x => x.id === reviewId);
+    if (!r) return;
+    const emp = employees.find(e => e.id === r.employee_id);
+    editingReviewId = reviewId;
+    selectedReviewEmployeeId = r.employee_id;
+    document.getElementById('reviewFormLabel').innerText = `Modifier l'entretien de ${emp ? emp.prenom + ' ' + emp.nom : ''}`;
+    document.getElementById('reviewDate').value = r.date_entretien;
+    document.getElementById('reviewPointsForts').value = r.points_forts || "";
+    document.getElementById('reviewPointsAmelioration').value = r.points_amelioration || "";
+    document.getElementById('reviewObjectifs').value = r.objectifs || "";
+    document.getElementById('reviewCommentaireRH').value = r.commentaire_rh || "";
     const section = document.getElementById('reviewFormSection');
     section.classList.remove('hidden');
     section.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -152,6 +242,7 @@ function ouvrirFormulaireEntretien(employeeId) {
 
 function fermerFormulaireEntretien() {
     selectedReviewEmployeeId = null;
+    editingReviewId = null;
     document.getElementById('reviewFormSection').classList.add('hidden');
 }
 
@@ -160,28 +251,44 @@ async function enregistrerEntretien() {
     const date_entretien = val('reviewDate');
     if (!date_entretien) { toast("Renseigne la date de l'entretien.", "error"); return; }
 
-    const { error } = await supabaseClient.from('reviews').insert([{
-        employee_id: selectedReviewEmployeeId,
-        org_id: currentOrg.id,
+    const payload = {
         date_entretien,
         points_forts: val('reviewPointsForts'),
         points_amelioration: val('reviewPointsAmelioration'),
-        objectifs: val('reviewObjectifs')
-    }]);
+        objectifs: val('reviewObjectifs'),
+        commentaire_rh: val('reviewCommentaireRH')
+    };
+
+    let error;
+    if (editingReviewId) {
+        ({ error } = await supabaseClient.from('reviews').update(payload).eq('id', editingReviewId));
+    } else {
+        ({ error } = await supabaseClient.from('reviews').insert([{ ...payload, employee_id: selectedReviewEmployeeId, org_id: currentOrg.id }]));
+    }
 
     if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
-    toast("Compte-rendu enregistré.");
+    toast(editingReviewId ? "Entretien mis à jour." : "Compte-rendu enregistré.");
     fermerFormulaireEntretien();
     await chargerTout();
 }
 
+async function supprimerEntretien(reviewId) {
+    const ok = confirm("Supprimer définitivement cet entretien ?");
+    if (!ok) return;
+    const { error } = await supabaseClient.from('reviews').delete().eq('id', reviewId);
+    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
+    toast("Entretien supprimé.");
+    await chargerTout();
+}
+
 // ============================================================
-// FORMULAIRE RÉMUNÉRATION
+// FORMULAIRE RÉMUNÉRATION (ajout + édition)
 // ============================================================
 function ouvrirFormulaireRemuneration(employeeId) {
     const emp = employees.find(e => e.id === employeeId);
     if (!emp) return;
     selectedCompEmployeeId = employeeId;
+    editingCompId = null;
     document.getElementById('compFormLabel').innerText = `Nouvelle rémunération pour ${emp.prenom} ${emp.nom}`;
     document.getElementById('compDate').value = new Date().toISOString().slice(0, 10);
     document.getElementById('compFixe').value = "";
@@ -192,8 +299,25 @@ function ouvrirFormulaireRemuneration(employeeId) {
     section.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
+function modifierRemuneration(compId) {
+    const c = compensations.find(x => x.id === compId);
+    if (!c) return;
+    const emp = employees.find(e => e.id === c.employee_id);
+    editingCompId = compId;
+    selectedCompEmployeeId = c.employee_id;
+    document.getElementById('compFormLabel').innerText = `Modifier la rémunération de ${emp ? emp.prenom + ' ' + emp.nom : ''}`;
+    document.getElementById('compDate').value = c.date_effet;
+    document.getElementById('compFixe').value = c.salaire_fixe ?? "";
+    document.getElementById('compVariable').value = c.salaire_variable ?? "";
+    document.getElementById('compNote').value = c.note || "";
+    const section = document.getElementById('compFormSection');
+    section.classList.remove('hidden');
+    section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 function fermerFormulaireRemuneration() {
     selectedCompEmployeeId = null;
+    editingCompId = null;
     document.getElementById('compFormSection').classList.add('hidden');
 }
 
@@ -203,18 +327,32 @@ async function enregistrerRemuneration() {
     const salaire_fixe = val('compFixe');
     if (!date_effet || !salaire_fixe) { toast("Renseigne au moins la date d'effet et le salaire fixe.", "error"); return; }
 
-    const { error } = await supabaseClient.from('compensations').insert([{
-        employee_id: selectedCompEmployeeId,
-        org_id: currentOrg.id,
+    const payload = {
         date_effet,
         salaire_fixe: Number(salaire_fixe),
         salaire_variable: val('compVariable') ? Number(val('compVariable')) : null,
         note: val('compNote')
-    }]);
+    };
+
+    let error;
+    if (editingCompId) {
+        ({ error } = await supabaseClient.from('compensations').update(payload).eq('id', editingCompId));
+    } else {
+        ({ error } = await supabaseClient.from('compensations').insert([{ ...payload, employee_id: selectedCompEmployeeId, org_id: currentOrg.id }]));
+    }
 
     if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
-    toast("Rémunération enregistrée.");
+    toast(editingCompId ? "Rémunération mise à jour." : "Rémunération enregistrée.");
     fermerFormulaireRemuneration();
+    await chargerTout();
+}
+
+async function supprimerRemuneration(compId) {
+    const ok = confirm("Supprimer définitivement cette entrée de rémunération ?");
+    if (!ok) return;
+    const { error } = await supabaseClient.from('compensations').delete().eq('id', compId);
+    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
+    toast("Rémunération supprimée.");
     await chargerTout();
 }
 
