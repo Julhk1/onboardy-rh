@@ -487,13 +487,47 @@ body {
     background: var(--paper);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: 18px 14px;
+    padding: 24px 14px;
     overflow-x: auto;
 }
 
-.tree-roots { display: flex; flex-direction: column; gap: 14px; }
+/* Organigramme horizontal classique (technique table-cell éprouvée) */
+.orgtree, .orgtree ul, .orgtree li { margin: 0; padding: 0; list-style: none; }
+.orgtree { display: table; margin: 0 auto; text-align: center; }
+.orgtree ul { display: table; width: 100%; }
 
-.tree-node { display: flex; flex-direction: column; align-items: flex-start; }
+.orgtree li {
+    display: table-cell;
+    vertical-align: top;
+    padding: 24px 12px 0 12px;
+    position: relative;
+}
+
+.orgtree li::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 24px;
+    border-top: 2px solid var(--border);
+}
+.orgtree li:first-child::before { left: 50%; }
+.orgtree li:last-child::before { right: 50%; }
+.orgtree li:only-child { padding-top: 0; }
+.orgtree li:only-child::before { display: none; }
+
+.orgtree ul::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 24px;
+    margin: 0 auto;
+    border-left: 2px solid var(--border);
+}
+
+/* Pas de connecteur au-dessus des racines : rien ne les relie entre elles */
+.orgtree > ul > li { padding-top: 0; }
+.orgtree > ul > li::before { display: none; }
+.orgtree > ul::before { display: none; }
 
 .tree-box {
     background: var(--surface);
@@ -501,10 +535,11 @@ body {
     border-top: 3px solid var(--gold);
     border-radius: var(--radius-sm);
     padding: 10px 12px;
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     gap: 8px;
     min-width: 190px;
+    text-align: left;
     box-shadow: var(--shadow-card);
 }
 
@@ -546,28 +581,6 @@ body {
     color: var(--text-muted);
 }
 .tree-icon-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-.tree-children {
-    position: relative;
-    margin-left: 32px;
-    padding-left: 24px;
-    border-left: 2px solid var(--border);
-    margin-top: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.tree-children .tree-node { position: relative; }
-.tree-children .tree-node::before {
-    content: '';
-    position: absolute;
-    left: -24px;
-    top: 22px;
-    width: 24px;
-    height: 2px;
-    background: var(--border);
-}
 
 /* ---------- CHAÎNE HIÉRARCHIQUE (page employé) ---------- */
 .chain-list { display: flex; flex-direction: column; gap: 6px; }
@@ -767,11 +780,13 @@ a.mini-list-item:hover { border-color: var(--gold); }
 
 /* ---------- SUIVI DES ENTRETIENS TRIMESTRIELS ---------- */
 .review-form {
-    background: var(--paper);
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-    margin-bottom: 16px;
+    border-top: 3px solid var(--gold);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 22px;
+    margin-bottom: 20px;
 }
 
 .review-form h4 {
@@ -877,8 +892,31 @@ a.mini-list-item:hover { border-color: var(--gold); }
     margin-top: 10px;
     font-size: 12px;
     color: var(--ink);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
 }
 .prep-notes-block strong { display: block; margin-bottom: 4px; color: var(--gold); font-size: 11px; text-transform: uppercase; }
+.prep-notes-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.prep-notes-head strong { margin-bottom: 0; }
+
+.prep-textarea {
+    width: 100%;
+    min-height: 180px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text);
+    resize: vertical;
+}
+.prep-textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-soft);
+}
 
 .history-item-actions { display: flex; gap: 10px; margin-top: 6px; }
 .history-item-actions .link-btn { font-size: 11px; }
