@@ -37,6 +37,29 @@ body {
 .hidden { display: none !important; }
 
 /* ---------- LOGIN ---------- */
+.auth-loading {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ink);
+}
+.auth-loading-mark {
+    background: var(--gold);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.5px;
+    animation: auth-pulse 1.1s ease-in-out infinite;
+}
+@keyframes auth-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
 .login-screen {
     min-height: 100vh;
     display: flex;
@@ -239,6 +262,8 @@ body {
     border-bottom: 1px solid var(--border);
     padding-bottom: 12px;
     margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .card-title-row .card-title { border: none; padding: 0; margin: 0; }
@@ -447,6 +472,40 @@ body {
 /* ---------- EMPLOYEE LIST ---------- */
 .employee-list { display: flex; flex-direction: column; gap: 10px; }
 
+/* ---------- PANNEAUX A HAUTEUR FIXE (listes qui peuvent devenir longues) ---------- */
+.scroll-panel {
+    max-height: 480px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.panel-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.panel-title-row .search-input-wrapper,
+.card-title-row .search-input-wrapper { flex: 1; min-width: 180px; max-width: 260px; margin-bottom: 0; }
+.panel-title-row input,
+.card-title-row .search-input-wrapper input {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--text);
+}
+.panel-title-row input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
 .employee-row {
     display: grid;
     grid-template-columns: 1fr auto auto;
@@ -488,8 +547,25 @@ body {
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 24px 14px;
+    height: 560px;
+    overflow-y: auto;
     overflow-x: auto;
 }
+
+/* Réduction automatique de la taille des profils selon le nombre d'employés,
+   pour que le cadre reste stable au lieu de s'élargir indéfiniment. */
+.org-chart-dynamic.tree-size-compact .tree-box { min-width: 150px; padding: 8px 10px; }
+.org-chart-dynamic.tree-size-compact .tree-avatar { width: 26px; height: 26px; font-size: 10px; }
+.org-chart-dynamic.tree-size-compact .tree-name { font-size: 11px; }
+.org-chart-dynamic.tree-size-compact .tree-role { font-size: 10px; }
+.org-chart-dynamic.tree-size-compact .tree-service { font-size: 9px; padding: 1px 6px; }
+
+.org-chart-dynamic.tree-size-mini .tree-box { min-width: 118px; padding: 6px 8px; gap: 5px; }
+.org-chart-dynamic.tree-size-mini .tree-avatar { width: 22px; height: 22px; font-size: 9px; }
+.org-chart-dynamic.tree-size-mini .tree-name { font-size: 10px; }
+.org-chart-dynamic.tree-size-mini .tree-role { font-size: 9px; }
+.org-chart-dynamic.tree-size-mini .tree-service { display: none; }
+.org-chart-dynamic.tree-size-mini .tree-icons { transform: scale(0.85); }
 
 /* Organigramme horizontal classique (technique table-cell éprouvée) */
 .orgtree, .orgtree ul, .orgtree li { margin: 0; padding: 0; list-style: none; }
