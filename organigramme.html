@@ -135,8 +135,13 @@
                 </section>
 
                 <section class="card">
-                    <h3 class="card-title">Liste des employes</h3>
-                    <div id="employeeListContainer" class="employee-list">
+                    <div class="card-title-row">
+                        <h3 class="card-title">Liste des employes</h3>
+                        <div class="search-input-wrapper">
+                            <input id="employeeListSearch" type="text" placeholder="Rechercher..." oninput="renderEmployeeList()">
+                        </div>
+                    </div>
+                    <div id="employeeListContainer" class="employee-list scroll-panel">
                         <p class="empty-hint">Aucun employe pour le moment.</p>
                     </div>
                 </section>
