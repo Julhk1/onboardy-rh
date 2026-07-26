@@ -21,6 +21,7 @@ function setLoginMode(mode) {
     const backBtn = document.getElementById('backToLoginBtn');
     const titleEl = document.getElementById('loginModeLabel');
     const submitBtn = document.getElementById('loginSubmitBtn');
+    const passwordHint = document.getElementById('passwordHint');
 
     document.getElementById('loginError').classList.add('hidden');
 
@@ -32,6 +33,7 @@ function setLoginMode(mode) {
         toggleBtn.classList.remove('hidden');
         toggleBtn.innerText = "Pas encore de compte ? Créer un espace RH";
         backBtn.classList.add('hidden');
+        passwordHint.classList.add('hidden');
     } else if (mode === 'signup') {
         titleEl.innerText = "Créer un espace RH";
         submitBtn.innerText = "Créer mon espace";
@@ -40,6 +42,7 @@ function setLoginMode(mode) {
         toggleBtn.classList.remove('hidden');
         toggleBtn.innerText = "Déjà un compte ? Se connecter";
         backBtn.classList.add('hidden');
+        passwordHint.classList.remove('hidden');
     } else if (mode === 'forgot') {
         titleEl.innerText = "Mot de passe oublié";
         submitBtn.innerText = "Envoyer le lien de réinitialisation";
@@ -47,7 +50,20 @@ function setLoginMode(mode) {
         forgotBtn.classList.add('hidden');
         toggleBtn.classList.add('hidden');
         backBtn.classList.remove('hidden');
+        passwordHint.classList.add('hidden');
     }
+}
+
+function basculerVisibiliteMotDePasse(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const estMasque = input.type === 'password';
+    input.type = estMasque ? 'text' : 'password';
+    btn.innerText = estMasque ? '🙈' : '👁';
+    btn.setAttribute('aria-label', estMasque ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+}
+
+function motDePasseValide(pwd) {
+    return pwd.length >= 8 && /\d/.test(pwd);
 }
 
 function basculerModeLogin() {
@@ -94,6 +110,11 @@ async function soumettreLogin() {
         return;
     }
 
+    if (loginMode === 'signup' && !motDePasseValide(password)) {
+        afficherErreurLogin("Le mot de passe doit contenir au moins 8 caractères, dont un chiffre.");
+        return;
+    }
+
     const btn = document.getElementById('loginSubmitBtn');
     btn.disabled = true;
     btn.innerText = "Un instant…";
@@ -131,9 +152,9 @@ async function soumettreLogin() {
 
 async function soumettreNouveauMotDePasse() {
     const newPassword = val('newPassword');
-    if (!newPassword || newPassword.length < 6) {
+    if (!motDePasseValide(newPassword)) {
         const el = document.getElementById('resetError');
-        el.innerText = "Le mot de passe doit contenir au moins 6 caractères.";
+        el.innerText = "Le mot de passe doit contenir au moins 8 caractères, dont un chiffre.";
         el.classList.remove('hidden');
         return;
     }
@@ -154,7 +175,7 @@ async function soumettreNouveauMotDePasse() {
 function traduireErreurAuth(msg) {
     if (/invalid login credentials/i.test(msg)) return "Email ou mot de passe incorrect.";
     if (/already registered/i.test(msg)) return "Un compte existe déjà avec cet email — connecte-toi plutôt.";
-    if (/password/i.test(msg) && /6/i.test(msg)) return "Le mot de passe doit contenir au moins 6 caractères.";
+    if (/password/i.test(msg) && /(characters|caractères|6|8)/i.test(msg)) return "Le mot de passe doit contenir au moins 8 caractères, dont un chiffre.";
     return msg;
 }
 
