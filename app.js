@@ -353,11 +353,17 @@ async function chargerEmployes() {
     renderSentList();
 }
 
+function filtrerListesEmployes() {
+    renderPendingList();
+    renderSentList();
+}
+
 function renderPendingList() {
     const container = document.getElementById('pendingListContainer');
-    const pending = employees.filter(e => !e.invite_sent);
+    const terme = val('pendingSearch').toLowerCase();
+    const pending = employees.filter(e => !e.invite_sent && (!terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme)));
     if (pending.length === 0) {
-        container.innerHTML = `<p class="empty-hint">Aucun employé en attente d'invitation.</p>`;
+        container.innerHTML = `<p class="empty-hint">${terme ? "Aucun résultat pour cette recherche." : "Aucun employé en attente d'invitation."}</p>`;
         return;
     }
     container.innerHTML = pending.map(emp => `
@@ -379,9 +385,10 @@ function renderPendingList() {
 
 function renderSentList() {
     const container = document.getElementById('sentListContainer');
-    const sent = employees.filter(e => e.invite_sent);
+    const terme = val('sentSearch').toLowerCase();
+    const sent = employees.filter(e => e.invite_sent && (!terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme)));
     if (sent.length === 0) {
-        container.innerHTML = `<p class="empty-hint">Aucune invitation envoyée pour le moment.</p>`;
+        container.innerHTML = `<p class="empty-hint">${terme ? "Aucun résultat pour cette recherche." : "Aucune invitation envoyée pour le moment."}</p>`;
         return;
     }
     container.innerHTML = sent.map(emp => `
@@ -462,6 +469,8 @@ async function envoyerInvitation(emp) {
 // ============================================================
 window.onload = async function () {
     if (!CONFIGURED) {
+        document.getElementById('authLoading').classList.add('hidden');
+        document.getElementById('loginView').classList.remove('hidden');
         document.getElementById('loginError').classList.remove('hidden');
         document.getElementById('loginError').innerText = "Configuration Supabase manquante dans shared.js.";
         return;
@@ -471,6 +480,7 @@ window.onload = async function () {
     supabaseClient.auth.onAuthStateChange((event) => {
         if (event === 'PASSWORD_RECOVERY') {
             recoveryEnCours = true;
+            document.getElementById('authLoading').classList.add('hidden');
             document.getElementById('loginView').classList.add('hidden');
             document.getElementById('dashboardView').classList.add('hidden');
             document.getElementById('resetPasswordView').classList.remove('hidden');
@@ -481,7 +491,11 @@ window.onload = async function () {
     if (recoveryEnCours) return;
 
     const { data } = await supabaseClient.auth.getSession();
+    document.getElementById('authLoading').classList.add('hidden');
+
     if (data.session) {
         await entrerDashboard(data.session.user);
+    } else {
+        document.getElementById('loginView').classList.remove('hidden');
     }
 };
