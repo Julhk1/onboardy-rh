@@ -382,10 +382,6 @@ function renderNoeudArbre(emp, enfantsDe, visites) {
 function renderOrgChart() {
     const container = document.getElementById('orgChartContainer');
 
-    container.classList.remove('tree-size-compact', 'tree-size-mini');
-    if (employees.length > 20) container.classList.add('tree-size-mini');
-    else if (employees.length > 8) container.classList.add('tree-size-compact');
-
     if (employees.length === 0) {
         container.innerHTML = `<p class="empty-hint">Ajoute des employés pour voir apparaître l'organigramme.</p>`;
         return;
@@ -397,8 +393,39 @@ function renderOrgChart() {
         return;
     }
     const visites = new Set();
-    container.innerHTML = `<div class="orgtree"><ul>${racines.map(r => renderNoeudArbre(r, enfantsDe, visites)).join('')}</ul></div>`;
+    container.innerHTML = `<div class="orgtree-scale-wrapper"><div class="orgtree"><ul>${racines.map(r => renderNoeudArbre(r, enfantsDe, visites)).join('')}</ul></div></div>`;
+
+    ajusterEchelleOrganigramme(container);
 }
+
+// Mesure la taille réelle de l'organigramme rendu et l'échelle pour qu'il
+// remplisse le cadre fixe, que l'entreprise compte 3 ou 300 employés.
+function ajusterEchelleOrganigramme(container) {
+    const tree = container.querySelector('.orgtree');
+    if (!tree) return;
+
+    tree.style.transform = 'none';
+    const largeurNaturelle = tree.scrollWidth;
+    const hauteurNaturelle = tree.scrollHeight;
+    if (!largeurNaturelle || !hauteurNaturelle) return;
+
+    const largeurDisponible = container.clientWidth - 20;
+    const hauteurDisponible = container.clientHeight - 20;
+
+    let echelle = Math.min(largeurDisponible / largeurNaturelle, hauteurDisponible / hauteurNaturelle);
+    echelle = Math.max(0.4, Math.min(echelle, 1.3));
+
+    tree.style.transform = `scale(${echelle})`;
+}
+
+let redimensionnementTimer = null;
+window.addEventListener('resize', () => {
+    clearTimeout(redimensionnementTimer);
+    redimensionnementTimer = setTimeout(() => {
+        const container = document.getElementById('orgChartContainer');
+        if (container) ajusterEchelleOrganigramme(container);
+    }, 200);
+});
 
 // ============================================================
 // DÉMARRAGE
