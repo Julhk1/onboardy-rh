@@ -141,7 +141,10 @@ function renderEmployeeReviewList() {
 
                 ${emp.prep_notes ? `
                     <div class="prep-notes-block">
-                        <strong>Notes de préparation écrites par l'employé</strong>
+                        <div class="prep-notes-head">
+                            <strong>Notes de préparation écrites par l'employé</strong>
+                            <button class="link-btn" onclick="viderNotesPreparation('${emp.id}')">Vider ces notes</button>
+                        </div>
                         ${escapeHtml(emp.prep_notes)}
                     </div>
                 ` : ''}
@@ -190,6 +193,17 @@ function renderEmployeeReviewList() {
             </div>
         `;
     }).join('');
+}
+
+async function viderNotesPreparation(employeeId) {
+    const ok = confirm("Vider les notes de préparation de cet employé ? Il pourra en réécrire de nouvelles avant son prochain entretien.");
+    if (!ok) return;
+    const { error } = await supabaseClient.from('employees').update({ prep_notes: '' }).eq('id', employeeId);
+    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
+    const emp = employees.find(e => e.id === employeeId);
+    if (emp) emp.prep_notes = '';
+    toast("Notes vidées.");
+    renderEmployeeReviewList();
 }
 
 // ============================================================
