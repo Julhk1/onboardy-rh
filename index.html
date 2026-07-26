@@ -40,7 +40,11 @@
             </div>
             <div id="passwordFieldWrapper" class="field">
                 <label for="loginPassword">Mot de passe</label>
-                <input id="loginPassword" type="password" placeholder="********" autocomplete="current-password">
+                <div class="password-field-wrapper">
+                    <input id="loginPassword" type="password" placeholder="********" autocomplete="current-password">
+                    <button type="button" class="password-toggle-btn" onclick="basculerVisibiliteMotDePasse('loginPassword', this)" aria-label="Afficher le mot de passe">👁</button>
+                </div>
+                <p id="passwordHint" class="hint-text hint-text-tight hidden">8 caractères minimum, avec au moins un chiffre.</p>
             </div>
 
             <button id="forgotPasswordBtn" class="link-btn login-forgot" onclick="basculerModeMotDePasseOublie()">
@@ -73,7 +77,11 @@
             <div id="resetError" class="login-error hidden"></div>
             <div class="field">
                 <label for="newPassword">Nouveau mot de passe</label>
-                <input id="newPassword" type="password" placeholder="********" autocomplete="new-password">
+                <div class="password-field-wrapper">
+                    <input id="newPassword" type="password" placeholder="********" autocomplete="new-password">
+                    <button type="button" class="password-toggle-btn" onclick="basculerVisibiliteMotDePasse('newPassword', this)" aria-label="Afficher le mot de passe">👁</button>
+                </div>
+                <p class="hint-text hint-text-tight">8 caractères minimum, avec au moins un chiffre.</p>
             </div>
             <button class="btn-primary" onclick="soumettreNouveauMotDePasse()">Mettre a jour le mot de passe</button>
         </div>
