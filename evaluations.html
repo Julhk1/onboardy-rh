@@ -22,8 +22,8 @@
             </div>
         </div>
         <nav class="app-nav">
-            <a href="index.html" class="app-nav-link">Onboarding</a>
             <a href="organigramme.html" class="app-nav-link">Organigramme</a>
+            <a href="index.html" class="app-nav-link">Onboarding</a>
             <a href="evaluations.html" class="app-nav-link is-active">Evaluations &amp; Remuneration</a>
             <button class="view-btn logout-btn" onclick="deconnexion()">Deconnexion</button>
         </nav>
@@ -44,65 +44,59 @@
             </div>
         </section>
 
-        <section class="card">
-            <h3 class="card-title">Entretien</h3>
-            <div id="reviewFormSection" class="review-form hidden">
-                <h4 id="reviewFormLabel">Compte-rendu</h4>
-                <div class="field">
-                    <label for="reviewDate">Date de l'entretien</label>
-                    <input id="reviewDate" type="date">
-                </div>
-                <div class="field">
-                    <label for="reviewPointsForts">Points forts</label>
-                    <textarea id="reviewPointsForts" rows="2"></textarea>
-                </div>
-                <div class="field">
-                    <label for="reviewPointsAmelioration">Axes d'amelioration</label>
-                    <textarea id="reviewPointsAmelioration" rows="2"></textarea>
-                </div>
-                <div class="field">
-                    <label for="reviewObjectifs">Objectifs pour le prochain trimestre</label>
-                    <textarea id="reviewObjectifs" rows="2"></textarea>
-                </div>
-                <div class="field">
-                    <label for="reviewCommentaireRH">Commentaire RH (prive, jamais visible par l'employe)</label>
-                    <textarea id="reviewCommentaireRH" rows="2"></textarea>
-                </div>
-                <div class="button-row">
-                    <button class="btn-primary" onclick="enregistrerEntretien()">Enregistrer l'entretien</button>
-                    <button class="btn-danger" onclick="fermerFormulaireEntretien()">Annuler</button>
-                </div>
+        <div id="reviewFormSection" class="review-form hidden">
+            <h4 id="reviewFormLabel">Compte-rendu</h4>
+            <div class="field">
+                <label for="reviewDate">Date de l'entretien</label>
+                <input id="reviewDate" type="date">
             </div>
-        </section>
+            <div class="field">
+                <label for="reviewPointsForts">Points forts</label>
+                <textarea id="reviewPointsForts" rows="2"></textarea>
+            </div>
+            <div class="field">
+                <label for="reviewPointsAmelioration">Axes d'amelioration</label>
+                <textarea id="reviewPointsAmelioration" rows="2"></textarea>
+            </div>
+            <div class="field">
+                <label for="reviewObjectifs">Objectifs pour le prochain trimestre</label>
+                <textarea id="reviewObjectifs" rows="2"></textarea>
+            </div>
+            <div class="field">
+                <label for="reviewCommentaireRH">Commentaire RH (prive, jamais visible par l'employe)</label>
+                <textarea id="reviewCommentaireRH" rows="2"></textarea>
+            </div>
+            <div class="button-row">
+                <button class="btn-primary" onclick="enregistrerEntretien()">Enregistrer l'entretien</button>
+                <button class="btn-danger" onclick="fermerFormulaireEntretien()">Annuler</button>
+            </div>
+        </div>
 
-        <section class="card">
-            <h3 class="card-title">Remuneration</h3>
-            <div id="compFormSection" class="review-form hidden">
-                <h4 id="compFormLabel">Nouvelle remuneration</h4>
-                <div class="field-row">
-                    <div class="field">
-                        <label for="compDate">Date d'effet</label>
-                        <input id="compDate" type="date">
-                    </div>
-                    <div class="field">
-                        <label for="compFixe">Salaire fixe annuel brut (€)</label>
-                        <input id="compFixe" type="number" step="100" placeholder="42000">
-                    </div>
+        <div id="compFormSection" class="review-form hidden">
+            <h4 id="compFormLabel">Nouvelle remuneration</h4>
+            <div class="field-row">
+                <div class="field">
+                    <label for="compDate">Date d'effet</label>
+                    <input id="compDate" type="date">
                 </div>
                 <div class="field">
-                    <label for="compVariable">Part variable annuelle (€, optionnel)</label>
-                    <input id="compVariable" type="number" step="100" placeholder="5000">
-                </div>
-                <div class="field">
-                    <label for="compNote">Note (ex : Augmentation annuelle, ajustement marche...)</label>
-                    <input id="compNote" type="text">
-                </div>
-                <div class="button-row">
-                    <button class="btn-primary" onclick="enregistrerRemuneration()">Enregistrer</button>
-                    <button class="btn-danger" onclick="fermerFormulaireRemuneration()">Annuler</button>
+                    <label for="compFixe">Salaire fixe annuel brut (€)</label>
+                    <input id="compFixe" type="number" step="100" placeholder="42000">
                 </div>
             </div>
-        </section>
+            <div class="field">
+                <label for="compVariable">Part variable annuelle (€, optionnel)</label>
+                <input id="compVariable" type="number" step="100" placeholder="5000">
+            </div>
+            <div class="field">
+                <label for="compNote">Note (ex : Augmentation annuelle, ajustement marche...)</label>
+                <input id="compNote" type="text">
+            </div>
+            <div class="button-row">
+                <button class="btn-primary" onclick="enregistrerRemuneration()">Enregistrer</button>
+                <button class="btn-danger" onclick="fermerFormulaireRemuneration()">Annuler</button>
+            </div>
+        </div>
 
         <section class="card">
             <h3 class="card-title">Suivi par employe</h3>
