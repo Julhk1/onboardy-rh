@@ -218,14 +218,15 @@ body {
 
 .card-title {
     font-family: var(--font-display);
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
+    font-size: 16.5px;
+    font-weight: 700;
+    letter-spacing: -0.1px;
     color: var(--ink);
-    margin: 0 0 16px;
-    padding-bottom: 12px;
+    margin: 0 0 18px;
+    padding-bottom: 14px;
+    padding-left: 13px;
     border-bottom: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -826,6 +827,61 @@ a.mini-list-item:hover { border-color: var(--gold); }
 }
 
 .page-wide { max-width: 1000px; }
+
+.search-input-wrapper { margin-bottom: 18px; }
+.search-input-wrapper input {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-size: 13px;
+    color: var(--text);
+}
+.search-input-wrapper input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.cadence-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cadence-row select {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-size: 13px;
+}
+
+.next-review-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    font-size: 11px;
+}
+.next-review-row input[type="date"] {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+.prep-notes-block {
+    background: var(--gold-soft);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--ink);
+}
+.prep-notes-block strong { display: block; margin-bottom: 4px; color: var(--gold); font-size: 11px; text-transform: uppercase; }
+
+.history-item-actions { display: flex; gap: 10px; margin-top: 6px; }
+.history-item-actions .link-btn { font-size: 11px; }
 
 .visibility-select {
     background: var(--surface);
