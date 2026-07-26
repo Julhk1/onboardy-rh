@@ -13,8 +13,13 @@
 
     <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
+    <!-- ============ ECRAN DE CHARGEMENT (evite le flash de l'ecran de connexion) ============ -->
+    <div id="authLoading" class="auth-loading">
+        <div class="auth-loading-mark">D1</div>
+    </div>
+
     <!-- ============ ECRAN DE CONNEXION RH ============ -->
-    <div id="loginView" class="login-screen">
+    <div id="loginView" class="login-screen hidden">
         <div class="login-card">
             <div class="brand brand-center">
                 <span class="brand-mark">D1</span>
@@ -186,16 +191,26 @@
 
                 <div class="col col-right">
                     <section class="card">
-                        <h3 class="card-title">Employes a onboarder</h3>
+                        <div class="card-title-row">
+                            <h3 class="card-title">Employes a onboarder</h3>
+                            <div class="search-input-wrapper">
+                                <input id="pendingSearch" type="text" placeholder="Rechercher..." oninput="filtrerListesEmployes()">
+                            </div>
+                        </div>
                         <p class="hint-text">Cree les fiches employes depuis la page <a href="organigramme.html">Organigramme</a>. Elles apparaissent ici pretes a etre invitees.</p>
-                        <div id="pendingListContainer" class="employee-list">
+                        <div id="pendingListContainer" class="employee-list scroll-panel">
                             <p class="empty-hint">Aucun employe en attente d'invitation.</p>
                         </div>
                     </section>
 
                     <section class="card">
-                        <h3 class="card-title">Suivi des invitations envoyees</h3>
-                        <div id="sentListContainer" class="employee-list">
+                        <div class="card-title-row">
+                            <h3 class="card-title">Suivi des invitations envoyees</h3>
+                            <div class="search-input-wrapper">
+                                <input id="sentSearch" type="text" placeholder="Rechercher..." oninput="filtrerListesEmployes()">
+                            </div>
+                        </div>
+                        <div id="sentListContainer" class="employee-list scroll-panel">
                             <p class="empty-hint">Aucune invitation envoyee pour le moment.</p>
                         </div>
                     </section>
