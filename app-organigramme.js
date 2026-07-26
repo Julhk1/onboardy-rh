@@ -303,11 +303,18 @@ async function chargerEmployes() {
 
 function renderEmployeeList() {
     const container = document.getElementById('employeeListContainer');
+    const terme = val('employeeListSearch').toLowerCase();
+    const liste = employees.filter(e => !terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme));
+
     if (employees.length === 0) {
         container.innerHTML = `<p class="empty-hint">Aucun employé pour le moment.</p>`;
         return;
     }
-    container.innerHTML = employees.map(emp => `
+    if (liste.length === 0) {
+        container.innerHTML = `<p class="empty-hint">Aucun résultat pour cette recherche.</p>`;
+        return;
+    }
+    container.innerHTML = liste.map(emp => `
         <div class="employee-row">
             <div class="employee-info">
                 <span class="employee-name">${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}</span>
@@ -374,6 +381,11 @@ function renderNoeudArbre(emp, enfantsDe, visites) {
 
 function renderOrgChart() {
     const container = document.getElementById('orgChartContainer');
+
+    container.classList.remove('tree-size-compact', 'tree-size-mini');
+    if (employees.length > 20) container.classList.add('tree-size-mini');
+    else if (employees.length > 8) container.classList.add('tree-size-compact');
+
     if (employees.length === 0) {
         container.innerHTML = `<p class="empty-hint">Ajoute des employés pour voir apparaître l'organigramme.</p>`;
         return;
