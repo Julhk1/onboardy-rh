@@ -32,7 +32,20 @@
     <main class="page page-wide">
 
         <section class="card">
-            <h3 class="card-title">Entretien trimestriel</h3>
+            <h3 class="card-title">Frequence des entretiens</h3>
+            <p class="hint-text">S'applique par defaut a tous les employes, sauf si tu fixes une date precise pour l'un d'eux ci-dessous.</p>
+            <div class="cadence-row">
+                <select id="cadenceSelect" onchange="enregistrerCadence()">
+                    <option value="3">Tous les 3 mois</option>
+                    <option value="4">Tous les 4 mois</option>
+                    <option value="6">Tous les 6 mois</option>
+                    <option value="12">Une fois par an</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3 class="card-title">Entretien</h3>
             <div id="reviewFormSection" class="review-form hidden">
                 <h4 id="reviewFormLabel">Compte-rendu</h4>
                 <div class="field">
@@ -50,6 +63,10 @@
                 <div class="field">
                     <label for="reviewObjectifs">Objectifs pour le prochain trimestre</label>
                     <textarea id="reviewObjectifs" rows="2"></textarea>
+                </div>
+                <div class="field">
+                    <label for="reviewCommentaireRH">Commentaire RH (prive, jamais visible par l'employe)</label>
+                    <textarea id="reviewCommentaireRH" rows="2"></textarea>
                 </div>
                 <div class="button-row">
                     <button class="btn-primary" onclick="enregistrerEntretien()">Enregistrer l'entretien</button>
@@ -89,7 +106,10 @@
 
         <section class="card">
             <h3 class="card-title">Suivi par employe</h3>
-            <p class="hint-text">Un entretien est attendu tous les 3 mois par employe. La remuneration reste strictement reservee a la RH, sauf pour le lien de preparation envoye a l'employe concerne, qui voit sa propre evolution.</p>
+            <p class="hint-text">La remuneration reste strictement reservee a la RH, sauf pour le lien de preparation envoye a l'employe concerne, qui voit sa propre evolution.</p>
+            <div class="search-input-wrapper">
+                <input id="employeeSearch" type="text" placeholder="Rechercher un employe par nom..." oninput="filtrerListeEmployes()">
+            </div>
             <div id="employeeReviewList" class="review-list">
                 <p class="empty-hint">Aucun employe pour le moment.</p>
             </div>
