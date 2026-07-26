@@ -121,6 +121,24 @@ body {
     font-size: 11px;
 }
 
+.password-field-wrapper { position: relative; }
+.password-field-wrapper input { padding-right: 42px !important; width: 100%; }
+
+.password-toggle-btn {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 6px 8px;
+    color: var(--text-muted);
+    line-height: 1;
+}
+.password-toggle-btn:hover { color: var(--gold); }
+
 .logout-btn {
     color: rgba(255, 255, 255, 0.7) !important;
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -546,26 +564,22 @@ body {
     background: var(--paper);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
-    padding: 24px 14px;
+    padding: 14px;
     height: 560px;
-    overflow-y: auto;
-    overflow-x: auto;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
 }
 
-/* Réduction automatique de la taille des profils selon le nombre d'employés,
-   pour que le cadre reste stable au lieu de s'élargir indéfiniment. */
-.org-chart-dynamic.tree-size-compact .tree-box { min-width: 150px; padding: 8px 10px; }
-.org-chart-dynamic.tree-size-compact .tree-avatar { width: 26px; height: 26px; font-size: 10px; }
-.org-chart-dynamic.tree-size-compact .tree-name { font-size: 11px; }
-.org-chart-dynamic.tree-size-compact .tree-role { font-size: 10px; }
-.org-chart-dynamic.tree-size-compact .tree-service { font-size: 9px; padding: 1px 6px; }
+.orgtree-scale-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+}
 
-.org-chart-dynamic.tree-size-mini .tree-box { min-width: 118px; padding: 6px 8px; gap: 5px; }
-.org-chart-dynamic.tree-size-mini .tree-avatar { width: 22px; height: 22px; font-size: 9px; }
-.org-chart-dynamic.tree-size-mini .tree-name { font-size: 10px; }
-.org-chart-dynamic.tree-size-mini .tree-role { font-size: 9px; }
-.org-chart-dynamic.tree-size-mini .tree-service { display: none; }
-.org-chart-dynamic.tree-size-mini .tree-icons { transform: scale(0.85); }
+.orgtree { transform-origin: top center; }
 
 /* Organigramme horizontal classique (technique table-cell éprouvée) */
 .orgtree, .orgtree ul, .orgtree li { margin: 0; padding: 0; list-style: none; }
