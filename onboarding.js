@@ -152,7 +152,7 @@ function construireEtRendreArbre(liste) {
         visites.add(cle);
         const enfants = enfantsDe[cle] || [];
         return `
-            <div class="tree-node">
+            <li>
                 <div class="tree-box">
                     <div class="tree-box-header">
                         <span class="tree-avatar">${(e.prenom || '?').charAt(0)}${(e.nom || '?').charAt(0)}</span>
@@ -163,12 +163,12 @@ function construireEtRendreArbre(liste) {
                     </div>
                     <span class="service-chip tree-service">${escapeHtml(e.service)}</span>
                 </div>
-                ${enfants.length ? `<div class="tree-children">${enfants.map(rendre).join('')}</div>` : ''}
-            </div>
+                ${enfants.length ? `<ul>${enfants.map(rendre).join('')}</ul>` : ''}
+            </li>
         `;
     }
 
-    return `<div class="tree-roots">${racines.map(rendre).join('')}</div>`;
+    return `<div class="orgtree"><ul>${racines.map(rendre).join('')}</ul></div>`;
 }
 
 window.onload = chargerEspacePersonnel;
