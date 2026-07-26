@@ -123,6 +123,7 @@ function afficherContenu(employee, organization, colleagues, chaineHierarchique,
     if (organigrammeComplet && organigrammeComplet.length > 0) {
         document.getElementById('fullChartSection').classList.remove('hidden');
         document.getElementById('fullChartContainer').innerHTML = construireEtRendreArbre(organigrammeComplet);
+        ajusterEchelleOrganigramme(document.getElementById('fullChartContainer'));
     }
 }
 
@@ -168,7 +169,21 @@ function construireEtRendreArbre(liste) {
         `;
     }
 
-    return `<div class="orgtree"><ul>${racines.map(rendre).join('')}</ul></div>`;
+    return `<div class="orgtree-scale-wrapper"><div class="orgtree"><ul>${racines.map(rendre).join('')}</ul></div></div>`;
+}
+
+function ajusterEchelleOrganigramme(container) {
+    const tree = container.querySelector('.orgtree');
+    if (!tree) return;
+    tree.style.transform = 'none';
+    const largeurNaturelle = tree.scrollWidth;
+    const hauteurNaturelle = tree.scrollHeight;
+    if (!largeurNaturelle || !hauteurNaturelle) return;
+    const largeurDisponible = container.clientWidth - 20;
+    const hauteurDisponible = container.clientHeight - 20;
+    let echelle = Math.min(largeurDisponible / largeurNaturelle, hauteurDisponible / hauteurNaturelle);
+    echelle = Math.max(0.4, Math.min(echelle, 1.3));
+    tree.style.transform = `scale(${echelle})`;
 }
 
 window.onload = chargerEspacePersonnel;
