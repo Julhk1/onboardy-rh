@@ -176,13 +176,28 @@ function ajusterEchelleOrganigramme(container) {
     const tree = container.querySelector('.orgtree');
     if (!tree) return;
     tree.style.transform = 'none';
-    const largeurNaturelle = tree.scrollWidth;
-    const hauteurNaturelle = tree.scrollHeight;
-    if (!largeurNaturelle || !hauteurNaturelle) return;
+
+    const boites = tree.querySelectorAll('.tree-box');
+    if (boites.length === 0) return;
+
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    const refRect = container.getBoundingClientRect();
+    boites.forEach(boite => {
+        const r = boite.getBoundingClientRect();
+        minX = Math.min(minX, r.left - refRect.left);
+        minY = Math.min(minY, r.top - refRect.top);
+        maxX = Math.max(maxX, r.right - refRect.left);
+        maxY = Math.max(maxY, r.bottom - refRect.top);
+    });
+
+    const largeurNaturelle = maxX - minX;
+    const hauteurNaturelle = maxY - minY;
+    if (largeurNaturelle <= 0 || hauteurNaturelle <= 0) return;
+
     const largeurDisponible = container.clientWidth - 20;
     const hauteurDisponible = container.clientHeight - 20;
     let echelle = Math.min(largeurDisponible / largeurNaturelle, hauteurDisponible / hauteurNaturelle);
-    echelle = Math.max(0.4, Math.min(echelle, 1.3));
+    echelle = Math.max(0.4, Math.min(echelle, 1.6));
     tree.style.transform = `scale(${echelle})`;
 }
 
