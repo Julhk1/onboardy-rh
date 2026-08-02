@@ -624,11 +624,11 @@ body {
     border: 1px solid var(--border);
     border-top: 3px solid var(--gold);
     border-radius: var(--radius-sm);
-    padding: 10px 12px;
+    padding: 9px 11px;
     display: inline-flex;
     flex-direction: column;
-    gap: 8px;
-    min-width: 190px;
+    gap: 7px;
+    min-width: 160px;
     text-align: left;
     box-shadow: var(--shadow-card);
 }
