@@ -566,7 +566,7 @@ body {
     border-radius: var(--radius-sm);
     padding: 14px;
     height: 560px;
-    overflow: hidden;
+    overflow: auto;
     display: flex;
     align-items: flex-start;
     justify-content: center;
