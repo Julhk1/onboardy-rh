@@ -396,6 +396,13 @@ function renderOrgChart() {
     container.innerHTML = `<div class="orgtree-scale-wrapper"><div class="orgtree"><ul>${racines.map(r => renderNoeudArbre(r, enfantsDe, visites)).join('')}</ul></div></div>`;
 
     ajusterEchelleOrganigramme(container);
+
+    // Les polices Google Fonts peuvent finir de charger après ce premier
+    // rendu et changer légèrement la taille du texte : on recalcule une fois
+    // qu'elles sont prêtes pour garantir une échelle exacte.
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => ajusterEchelleOrganigramme(container));
+    }
 }
 
 // Mesure la taille réelle de l'organigramme rendu et l'échelle pour qu'il
@@ -429,9 +436,18 @@ function ajusterEchelleOrganigramme(container) {
     const hauteurDisponible = container.clientHeight - 20;
 
     let echelle = Math.min(largeurDisponible / largeurNaturelle, hauteurDisponible / hauteurNaturelle);
-    echelle = Math.max(0.4, Math.min(echelle, 1.6));
+    echelle = Math.max(0.15, Math.min(echelle, 1.4));
 
     tree.style.transform = `scale(${echelle})`;
+
+    // Le conteneur doit occuper l'espace réellement pris par l'arbre une fois
+    // réduit, sinon le wrapper flex garde la largeur/hauteur d'origine (non
+    // affectée par transform) et le scroll de secours ne fonctionne pas bien.
+    const wrapper = container.querySelector('.orgtree-scale-wrapper');
+    if (wrapper) {
+        wrapper.style.width = `${largeurNaturelle * echelle}px`;
+        wrapper.style.height = `${hauteurNaturelle * echelle}px`;
+    }
 }
 
 let redimensionnementTimer = null;
