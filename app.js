@@ -365,7 +365,7 @@ async function enregistrerContenusOptionnels() {
 
 async function viderContenusOptionnels() {
     if (!currentOrg) return;
-    const ok = confirm("Vider les liens, contacts et checklist ? Cette action est immédiate.");
+    const ok = await confirmerAction("Vider les liens, contacts et checklist ? Cette action est immédiate.");
     if (!ok) return;
     pendingLinks = []; pendingContacts = []; pendingChecklist = [];
     const { error } = await supabaseClient
