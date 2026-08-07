@@ -47,6 +47,14 @@
                 <p id="passwordHint" class="hint-text hint-text-tight hidden">8 caractères minimum, avec au moins un chiffre.</p>
             </div>
 
+            <div id="confirmPasswordFieldWrapper" class="field hidden">
+                <label for="confirmPassword">Confirmer le mot de passe</label>
+                <div class="password-field-wrapper">
+                    <input id="confirmPassword" type="password" placeholder="********" autocomplete="new-password">
+                    <button type="button" class="password-toggle-btn" onclick="basculerVisibiliteMotDePasse('confirmPassword', this)" aria-label="Afficher le mot de passe">👁</button>
+                </div>
+            </div>
+
             <button id="forgotPasswordBtn" class="link-btn login-forgot" onclick="basculerModeMotDePasseOublie()">
                 Mot de passe oublie ?
             </button>
@@ -206,6 +214,15 @@
                             </div>
                         </div>
                         <p class="hint-text">Cree les fiches employes depuis la page <a href="organigramme.html">Organigramme</a>. Elles apparaissent ici pretes a etre invitees.</p>
+                        <div class="pending-toolbar">
+                            <label class="pending-select-all">
+                                <input type="checkbox" id="pendingSelectAll" onchange="toggleSelectionTous(this.checked)">
+                                Tout selectionner
+                            </label>
+                            <button id="pendingBulkSendBtn" class="link-btn" onclick="envoyerInvitationsSelectionnees()" disabled>
+                                Envoyer l'invitation aux selectionnes (<span id="pendingSelectedCount">0</span>)
+                            </button>
+                        </div>
                         <div id="pendingListContainer" class="employee-list scroll-panel">
                             <p class="empty-hint">Aucun employe en attente d'invitation.</p>
                         </div>
