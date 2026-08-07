@@ -4,6 +4,7 @@
 let employees = [];
 let pendingTemplates = [];
 let editingEmployeeId = null;
+let employeeListSelection = new Set();
 
 const DEFAULT_SERVICES = ["Direction", "Finance", "Tech", "Ventes", "Marketing", "RH", "Opérations"];
 const COULEURS_SERVICE = ['#B8863B', '#2F7D5C', '#4A6FA5', '#A5504A', '#6B5B95', '#3E8E8E'];
@@ -343,16 +344,23 @@ function renderEmployeeList() {
     const terme = val('employeeListSearch').toLowerCase();
     const liste = employees.filter(e => !terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme));
 
+    // Retire de la sélection les employés qui n'existent plus.
+    const idsExistants = new Set(employees.map(e => e.id));
+    Array.from(employeeListSelection).forEach(id => { if (!idsExistants.has(id)) employeeListSelection.delete(id); });
+
     if (employees.length === 0) {
         container.innerHTML = `<p class="empty-hint">Aucun employé pour le moment.</p>`;
+        mettreAJourBarreSelectionEmployes();
         return;
     }
     if (liste.length === 0) {
         container.innerHTML = `<p class="empty-hint">Aucun résultat pour cette recherche.</p>`;
+        mettreAJourBarreSelectionEmployes();
         return;
     }
     container.innerHTML = liste.map(emp => `
         <div class="employee-row">
+            <input type="checkbox" class="pending-checkbox" aria-label="Selectionner ${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}" ${employeeListSelection.has(emp.id) ? 'checked' : ''} onchange="toggleSelectionEmployeListe('${emp.id}', this.checked)">
             <div class="employee-info">
                 <span class="employee-name">${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}</span>
                 <span class="employee-meta">${escapeHtml(emp.poste) || '—'} · <span class="service-chip">${escapeHtml(emp.service)}</span></span>
@@ -363,6 +371,73 @@ function renderEmployeeList() {
             </div>
         </div>
     `).join('');
+
+    mettreAJourBarreSelectionEmployes();
+}
+
+// Met à jour le compteur, l'état du bouton de suppression groupée et la
+// case "tout sélectionner" en fonction de la sélection actuelle.
+function mettreAJourBarreSelectionEmployes() {
+    const countEl = document.getElementById('employeeSelectedCount');
+    const bulkBtn = document.getElementById('employeeBulkDeleteBtn');
+    const selectAllBox = document.getElementById('employeeSelectAll');
+    if (!countEl || !bulkBtn || !selectAllBox) return;
+
+    const terme = val('employeeListSearch').toLowerCase();
+    const liste = employees.filter(e => !terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme));
+
+    countEl.innerText = employeeListSelection.size;
+    bulkBtn.disabled = employeeListSelection.size === 0;
+    selectAllBox.checked = liste.length > 0 && liste.every(e => employeeListSelection.has(e.id));
+    selectAllBox.disabled = liste.length === 0;
+}
+
+function toggleSelectionEmployeListe(employeeId, coche) {
+    if (coche) employeeListSelection.add(employeeId); else employeeListSelection.delete(employeeId);
+    mettreAJourBarreSelectionEmployes();
+}
+
+function toggleSelectionTousEmployes(coche) {
+    const terme = val('employeeListSearch').toLowerCase();
+    const liste = employees.filter(e => !terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme));
+    if (coche) liste.forEach(e => employeeListSelection.add(e.id));
+    else liste.forEach(e => employeeListSelection.delete(e.id));
+    renderEmployeeList();
+}
+
+async function supprimerEmployesSelectionnes() {
+    if (employeeListSelection.size === 0) return;
+    const ids = Array.from(employeeListSelection);
+    const selection = employees.filter(e => ids.includes(e.id));
+    if (selection.length === 0) return;
+
+    const noms = selection.length <= 4
+        ? selection.map(e => `${e.prenom} ${e.nom}`).join(', ')
+        : `${selection.length} employés`;
+    const ok = await confirmerAction(
+        `Supprimer définitivement ${noms} ? Leur lien d'onboarding cessera de fonctionner. Les employés qui les avaient comme manager se retrouveront au sommet de l'organigramme.`
+    );
+    if (!ok) return;
+
+    const btn = document.getElementById('employeeBulkDeleteBtn');
+    const texteInitial = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerText = "Suppression en cours…";
+
+    const { error } = await supabaseClient.from('employees').delete().in('id', ids);
+    if (error) {
+        toast("Erreur lors de la suppression.", "error");
+        btn.innerHTML = texteInitial;
+        btn.disabled = false;
+        return;
+    }
+
+    if (ids.includes(editingEmployeeId)) viderFormulaireEmploye();
+    employeeListSelection.clear();
+    toast(`${selection.length} employé(s) supprimé(s).`);
+    await chargerEmployes();
+    btn.innerHTML = texteInitial;
+    mettreAJourBarreSelectionEmployes();
 }
 
 function updateServiceSuggestions() {
