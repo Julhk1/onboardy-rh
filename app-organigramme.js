@@ -238,7 +238,7 @@ function telechargerModeleExcel() {
     const csvContent = "data:text/csv;charset=utf-8," + lignes.join("\n");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));
-    link.setAttribute("download", "Modele_DayOne.csv");
+    link.setAttribute("download", "Modele_Rootly.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
