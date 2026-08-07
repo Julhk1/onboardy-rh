@@ -559,7 +559,7 @@ body {
 
 .employee-actions { display: flex; gap: 10px; white-space: nowrap; }
 
-/* ---------- ORG CHART DYNAMIQUE (arbre hiérarchique) ---------- */
+/* ---------- ORG CHART DYNAMIQUE (arbre vertical indenté) ---------- */
 .org-chart-dynamic {
     background: var(--paper);
     border: 1px solid var(--border);
@@ -567,73 +567,43 @@ body {
     padding: 14px;
     height: 560px;
     overflow: auto;
+}
+
+.org-tree-list { display: flex; flex-direction: column; }
+
+.org-node { position: relative; min-width: 0; }
+
+.org-node-row {
     display: flex;
-    align-items: flex-start;
-    justify-content: center;
-}
-
-.orgtree-scale-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    overflow: visible;
-}
-
-.orgtree { transform-origin: top center; }
-
-/* Organigramme horizontal classique (technique table-cell éprouvée) */
-.orgtree, .orgtree ul, .orgtree li { margin: 0; padding: 0; list-style: none; }
-.orgtree { display: table; margin: 0 auto; text-align: center; }
-.orgtree ul { display: table; width: 100%; }
-
-.orgtree li {
-    display: table-cell;
-    vertical-align: top;
-    padding: 24px 12px 0 12px;
-    position: relative;
-}
-
-.orgtree li::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 24px;
-    border-top: 2px solid var(--border);
-}
-.orgtree li:first-child::before { left: 50%; }
-.orgtree li:last-child::before { right: 50%; }
-.orgtree li:only-child { padding-top: 0; }
-.orgtree li:only-child::before { display: none; }
-
-.orgtree ul::before {
-    content: '';
-    display: block;
-    width: 0;
-    height: 24px;
-    margin: 0 auto;
-    border-left: 2px solid var(--border);
-}
-
-/* Pas de connecteur au-dessus des racines : rien ne les relie entre elles */
-.orgtree > ul > li { padding-top: 0; }
-.orgtree > ul > li::before { display: none; }
-.orgtree > ul::before { display: none; }
-
-.tree-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-top: 3px solid var(--gold);
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
     border-radius: var(--radius-sm);
-    padding: 9px 11px;
-    display: inline-flex;
-    flex-direction: column;
-    gap: 7px;
-    min-width: 160px;
-    text-align: left;
-    box-shadow: var(--shadow-card);
+    min-width: 0;
+}
+.org-node-row:hover { background: var(--surface); }
+
+.org-toggle-btn,
+.org-toggle-spacer {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
 }
 
-.tree-box-header { display: flex; align-items: center; gap: 10px; }
+.org-toggle-btn {
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.org-toggle-btn:hover { border-color: var(--gold); color: var(--gold); }
 
 .tree-avatar {
     width: 32px;
@@ -650,14 +620,35 @@ body {
     flex-shrink: 0;
 }
 
-.tree-box-text { display: flex; flex-direction: column; gap: 1px; }
+.org-node-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+    margin-right: auto;
+}
+.tree-name, .tree-role {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .tree-name { font-weight: 700; font-size: 12.5px; color: var(--ink); }
 .tree-role { font-size: 11px; color: var(--text-muted); }
 
-.tree-box-footer { display: flex; align-items: center; justify-content: space-between; }
-.tree-service { font-size: 10px; padding: 2px 8px; border-radius: 100px; font-weight: 600; }
+.org-service { flex-shrink: 0; font-size: 10px; padding: 2px 8px; border-radius: 100px; font-weight: 600; }
 
-.tree-icons { display: flex; gap: 4px; }
+.org-child-count {
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 1px 7px;
+}
+
+.org-node-icons { flex-shrink: 0; display: flex; gap: 4px; }
 
 .tree-icon-btn {
     background: var(--paper);
@@ -671,6 +662,14 @@ body {
     color: var(--text-muted);
 }
 .tree-icon-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+.org-children {
+    margin-left: 19px;
+    padding-left: 18px;
+    border-left: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
 
 /* ---------- CHAÎNE HIÉRARCHIQUE (page employé) ---------- */
 .chain-list { display: flex; flex-direction: column; gap: 6px; }
