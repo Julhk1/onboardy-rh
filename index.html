@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DayOne — Onboarding</title>
+    <title>Rootly — Onboarding</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -15,16 +15,16 @@
 
     <!-- ============ ECRAN DE CHARGEMENT (evite le flash de l'ecran de connexion) ============ -->
     <div id="authLoading" class="auth-loading">
-        <div class="auth-loading-mark">D1</div>
+        <div class="auth-loading-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></div>
     </div>
 
     <!-- ============ ECRAN DE CONNEXION RH ============ -->
     <div id="loginView" class="login-screen hidden">
         <div class="login-card">
             <div class="brand brand-center">
-                <span class="brand-mark">D1</span>
+                <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></span>
                 <div class="brand-text">
-                    <span class="brand-name">DayOne</span>
+                    <span class="brand-name">Rootly</span>
                     <span class="brand-tag">Espace Ressources Humaines</span>
                 </div>
             </div>
@@ -74,9 +74,9 @@
     <div id="resetPasswordView" class="login-screen hidden">
         <div class="login-card">
             <div class="brand brand-center">
-                <span class="brand-mark">D1</span>
+                <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></span>
                 <div class="brand-text">
-                    <span class="brand-name">DayOne</span>
+                    <span class="brand-name">Rootly</span>
                     <span class="brand-tag">Espace Ressources Humaines</span>
                 </div>
             </div>
@@ -99,15 +99,15 @@
     <div id="dashboardView" class="hidden">
         <header class="app-header">
             <div class="brand">
-                <span class="brand-mark">D1</span>
+                <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></span>
                 <div class="brand-text">
-                    <span class="brand-name">DayOne</span>
+                    <span class="brand-name">Rootly</span>
                     <span class="brand-tag">Onboarding</span>
                 </div>
             </div>
             <nav class="app-nav">
                 <a href="organigramme.html" class="app-nav-link">Organigramme</a>
-                <a href="index.html" class="app-nav-link is-active">Onboarding</a>
+                <a href="index.html?dashboard=1" class="app-nav-link is-active">Onboarding</a>
                 <a href="evaluations.html" class="app-nav-link">Evaluations &amp; Remuneration</a>
                 <button class="view-btn logout-btn" onclick="deconnexion()">Deconnexion</button>
             </nav>
@@ -219,9 +219,15 @@
                                 <input type="checkbox" id="pendingSelectAll" onchange="toggleSelectionTous(this.checked)">
                                 Tout selectionner
                             </label>
-                            <button id="pendingBulkSendBtn" class="link-btn" onclick="envoyerInvitationsSelectionnees()" disabled>
-                                Envoyer l'invitation aux selectionnes (<span id="pendingSelectedCount">0</span>)
-                            </button>
+                            <div class="pending-toolbar-actions">
+                                <span id="pendingSelectedLabel" class="pending-selected-label hidden">0 selectionne(s)</span>
+                                <button id="pendingBulkSkipBtn" class="link-btn" onclick="marquerSelectionnesSansInvitation()" disabled>
+                                    Marquer sans invitation
+                                </button>
+                                <button id="pendingBulkSendBtn" class="link-btn" onclick="envoyerInvitationsSelectionnees()" disabled>
+                                    Envoyer l'invitation
+                                </button>
+                            </div>
                         </div>
                         <div id="pendingListContainer" class="employee-list scroll-panel">
                             <p class="empty-hint">Aucun employe en attente d'invitation.</p>
@@ -244,7 +250,7 @@
         </main>
 
         <footer class="app-footer">
-            <p>© 2026 DayOne — Onboarding Cloud</p>
+            <p>© 2026 Rootly — Plateforme RH &amp; Onboarding</p>
         </footer>
     </div>
 
