@@ -111,11 +111,22 @@ async function deconnexion() {
 }
 
 // ============================================================
+// MENU MOBILE (hamburger)
+// ============================================================
+function toggleMobileNav() {
+    const nav = document.getElementById('appNav');
+    const btn = document.querySelector('.nav-toggle-btn');
+    if (!nav) return;
+    const ouvert = nav.classList.toggle('app-nav-open');
+    if (btn) btn.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+}
+
+// ============================================================
 // MODALE DE CONFIRMATION (remplace window.confirm, natif et moche)
 // ============================================================
 // Usage : const ok = await confirmerAction("Supprimer X ?");
 function confirmerAction(message, options = {}) {
-    const { titre = "Confirmation", texteOui = "Confirmer", texteNon = "Annuler", danger = true } = options;
+    const { titre = t("Confirmation"), texteOui = t("Confirmer"), texteNon = t("Annuler"), danger = true } = options;
 
     return new Promise((resolve) => {
         const overlay = document.createElement('div');
