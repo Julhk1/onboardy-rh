@@ -349,33 +349,47 @@ function construireArbre(liste) {
     return enfantsDe;
 }
 
-function renderNoeudArbre(emp, enfantsDe, visites) {
+// Mémorise quelles branches sont repliées (par id d'employé), pour que
+// l'état survive aux ré-affichages successifs.
+const orgNoeudsReplies = new Set();
+
+function toggleNoeudOrganigramme(id) {
+    if (orgNoeudsReplies.has(id)) orgNoeudsReplies.delete(id);
+    else orgNoeudsReplies.add(id);
+    renderOrgChart();
+}
+
+function renderNoeudArbre(emp, enfantsDe, visites, profondeur) {
     const cle = normaliserNom(`${emp.prenom} ${emp.nom}`);
     if (visites.has(cle)) return '';
     visites.add(cle);
     const enfants = enfantsDe[cle] || [];
     const couleur = couleurService(emp.service);
+    const aDesEnfants = enfants.length > 0;
+    const estReplie = orgNoeudsReplies.has(emp.id);
 
     return `
-        <li>
-            <div class="tree-box" style="border-top-color:${couleur}">
-                <div class="tree-box-header">
-                    <span class="tree-avatar" style="background:${couleur}">${initiales(emp.prenom, emp.nom)}</span>
-                    <div class="tree-box-text">
-                        <span class="tree-name">${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}</span>
-                        <span class="tree-role">${escapeHtml(emp.poste) || '—'}</span>
-                    </div>
+        <div class="org-node">
+            <div class="org-node-row">
+                ${aDesEnfants
+                    ? `<button class="org-toggle-btn" title="${estReplie ? 'Deplier' : 'Replier'}" onclick="toggleNoeudOrganigramme('${emp.id}')">${estReplie ? '+' : '−'}</button>`
+                    : `<span class="org-toggle-spacer"></span>`}
+                <span class="tree-avatar" style="background:${couleur}">${initiales(emp.prenom, emp.nom)}</span>
+                <div class="org-node-text">
+                    <span class="tree-name">${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}</span>
+                    <span class="tree-role">${escapeHtml(emp.poste) || '—'}</span>
                 </div>
-                <div class="tree-box-footer">
-                    <span class="service-chip tree-service" style="background:${couleur}22; color:${couleur}">${escapeHtml(emp.service)}</span>
-                    <span class="tree-icons">
-                        <button class="tree-icon-btn" title="Modifier" onclick="modifierEmploye('${emp.id}')">✎</button>
-                        <button class="tree-icon-btn" title="Supprimer" onclick="supprimerEmploye('${emp.id}')">✕</button>
-                    </span>
-                </div>
+                <span class="service-chip org-service" style="background:${couleur}22; color:${couleur}">${escapeHtml(emp.service)}</span>
+                ${aDesEnfants ? `<span class="org-child-count">${enfants.length}</span>` : ''}
+                <span class="org-node-icons">
+                    <button class="tree-icon-btn" title="Modifier" onclick="modifierEmploye('${emp.id}')">✎</button>
+                    <button class="tree-icon-btn" title="Supprimer" onclick="supprimerEmploye('${emp.id}')">✕</button>
+                </span>
             </div>
-            ${enfants.length ? `<ul>${enfants.map(e => renderNoeudArbre(e, enfantsDe, visites)).join('')}</ul>` : ''}
-        </li>
+            ${aDesEnfants && !estReplie
+                ? `<div class="org-children">${enfants.map(e => renderNoeudArbre(e, enfantsDe, visites, profondeur + 1)).join('')}</div>`
+                : ''}
+        </div>
     `;
 }
 
@@ -393,71 +407,8 @@ function renderOrgChart() {
         return;
     }
     const visites = new Set();
-    container.innerHTML = `<div class="orgtree-scale-wrapper"><div class="orgtree"><ul>${racines.map(r => renderNoeudArbre(r, enfantsDe, visites)).join('')}</ul></div></div>`;
-
-    ajusterEchelleOrganigramme(container);
-
-    // Les polices Google Fonts peuvent finir de charger après ce premier
-    // rendu et changer légèrement la taille du texte : on recalcule une fois
-    // qu'elles sont prêtes pour garantir une échelle exacte.
-    if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => ajusterEchelleOrganigramme(container));
-    }
+    container.innerHTML = `<div class="org-tree-list">${racines.map(r => renderNoeudArbre(r, enfantsDe, visites, 0)).join('')}</div>`;
 }
-
-// Mesure la taille réelle de l'organigramme rendu et l'échelle pour qu'il
-// remplisse le cadre fixe, que l'entreprise compte 3 ou 300 employés.
-function ajusterEchelleOrganigramme(container) {
-    const tree = container.querySelector('.orgtree');
-    if (!tree) return;
-
-    tree.style.transform = 'none';
-
-    const boites = tree.querySelectorAll('.tree-box');
-    if (boites.length === 0) return;
-
-    // Mesure la boîte englobante réelle des profils (plus fiable que scrollWidth/Height,
-    // qui peut être faussé par la mise en page en tableau utilisée pour les connecteurs).
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    const refRect = container.getBoundingClientRect();
-    boites.forEach(boite => {
-        const r = boite.getBoundingClientRect();
-        minX = Math.min(minX, r.left - refRect.left);
-        minY = Math.min(minY, r.top - refRect.top);
-        maxX = Math.max(maxX, r.right - refRect.left);
-        maxY = Math.max(maxY, r.bottom - refRect.top);
-    });
-
-    const largeurNaturelle = maxX - minX;
-    const hauteurNaturelle = maxY - minY;
-    if (largeurNaturelle <= 0 || hauteurNaturelle <= 0) return;
-
-    const largeurDisponible = container.clientWidth - 20;
-    const hauteurDisponible = container.clientHeight - 20;
-
-    let echelle = Math.min(largeurDisponible / largeurNaturelle, hauteurDisponible / hauteurNaturelle);
-    echelle = Math.max(0.15, Math.min(echelle, 1.4));
-
-    tree.style.transform = `scale(${echelle})`;
-
-    // Le conteneur doit occuper l'espace réellement pris par l'arbre une fois
-    // réduit, sinon le wrapper flex garde la largeur/hauteur d'origine (non
-    // affectée par transform) et le scroll de secours ne fonctionne pas bien.
-    const wrapper = container.querySelector('.orgtree-scale-wrapper');
-    if (wrapper) {
-        wrapper.style.width = `${largeurNaturelle * echelle}px`;
-        wrapper.style.height = `${hauteurNaturelle * echelle}px`;
-    }
-}
-
-let redimensionnementTimer = null;
-window.addEventListener('resize', () => {
-    clearTimeout(redimensionnementTimer);
-    redimensionnementTimer = setTimeout(() => {
-        const container = document.getElementById('orgChartContainer');
-        if (container) ajusterEchelleOrganigramme(container);
-    }, 200);
-});
 
 // ============================================================
 // DÉMARRAGE
