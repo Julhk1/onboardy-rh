@@ -109,3 +109,45 @@ async function deconnexion() {
     if (supabaseClient) await supabaseClient.auth.signOut();
     window.location.href = 'index.html';
 }
+
+// ============================================================
+// MODALE DE CONFIRMATION (remplace window.confirm, natif et moche)
+// ============================================================
+// Usage : const ok = await confirmerAction("Supprimer X ?");
+function confirmerAction(message, options = {}) {
+    const { titre = "Confirmation", texteOui = "Confirmer", texteNon = "Annuler", danger = true } = options;
+
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'confirm-overlay';
+        overlay.innerHTML = `
+            <div class="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirmModalTitre">
+                <h4 id="confirmModalTitre" class="confirm-modal-title">${escapeHtml(titre)}</h4>
+                <p class="confirm-modal-text">${escapeHtml(message)}</p>
+                <div class="confirm-modal-actions">
+                    <button type="button" class="btn-secondary confirm-btn-non">${escapeHtml(texteNon)}</button>
+                    <button type="button" class="${danger ? 'btn-danger' : 'btn-primary'} confirm-btn-oui">${escapeHtml(texteOui)}</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const nettoyer = (valeur) => {
+            overlay.classList.add('confirm-overlay-out');
+            setTimeout(() => overlay.remove(), 120);
+            document.removeEventListener('keydown', surTouche);
+            resolve(valeur);
+        };
+        const surTouche = (e) => {
+            if (e.key === 'Escape') nettoyer(false);
+            if (e.key === 'Enter') nettoyer(true);
+        };
+
+        overlay.querySelector('.confirm-btn-non').addEventListener('click', () => nettoyer(false));
+        overlay.querySelector('.confirm-btn-oui').addEventListener('click', () => nettoyer(true));
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) nettoyer(false); });
+        document.addEventListener('keydown', surTouche);
+
+        overlay.querySelector('.confirm-btn-oui').focus();
+    });
+}
