@@ -129,7 +129,12 @@ function afficherContenu(employee, organization, colleagues, chaineHierarchique,
 
 // ---- Organigramme complet : mêmes règles de construction que côté RH ----
 function normaliserNomPersonne(s) {
-    return (s || '').trim().toLowerCase();
+    return (s || '')
+        .replace(/\(.*?\)/g, ' ')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
 }
 
 function construireEtRendreArbre(liste) {
