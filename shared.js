@@ -44,8 +44,16 @@ function genererToken() {
     return (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`).replace(/-/g, '');
 }
 
+// Normalise un nom pour le comparer de façon fiable : insensible aux accents,
+// à la casse, aux espaces multiples, et ignore tout ce qui est entre
+// parenthèses (ex : un poste ajouté par erreur après le nom du manager).
 function normaliserNom(s) {
-    return (s || '').trim().toLowerCase();
+    return (s || '')
+        .replace(/\(.*?\)/g, ' ')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ');
 }
 
 function formatDateFR(date) {
