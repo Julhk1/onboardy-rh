@@ -141,9 +141,25 @@ function construireEtRendreArbre(liste) {
     const parNom = {};
     liste.forEach(e => { parNom[normaliserNomPersonne(`${e.prenom} ${e.nom}`)] = e; });
 
+    function faitPartieDunCycle(emp) {
+        const cleDepart = normaliserNomPersonne(`${emp.prenom} ${emp.nom}`);
+        const vus = new Set();
+        let courant = emp;
+        while (courant && courant.manager) {
+            const cleManager = normaliserNomPersonne(courant.manager);
+            if (cleManager === cleDepart) return true;
+            if (vus.has(cleManager)) return true;
+            vus.add(cleManager);
+            courant = parNom[cleManager];
+        }
+        return false;
+    }
+
     const enfantsDe = {};
     liste.forEach(e => {
-        const cle = e.manager && parNom[normaliserNomPersonne(e.manager)] ? normaliserNomPersonne(e.manager) : '__racine__';
+        const managerReconnu = e.manager && parNom[normaliserNomPersonne(e.manager)];
+        const dansUnCycle = managerReconnu && faitPartieDunCycle(e);
+        const cle = (managerReconnu && !dansUnCycle) ? normaliserNomPersonne(e.manager) : '__racine__';
         if (!enfantsDe[cle]) enfantsDe[cle] = [];
         enfantsDe[cle].push(e);
     });
