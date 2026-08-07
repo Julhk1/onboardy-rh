@@ -15,40 +15,40 @@
 
     <!-- ============ ECRAN DE CHARGEMENT (evite le flash de l'ecran de connexion) ============ -->
     <div id="authLoading" class="auth-loading">
-        <div class="auth-loading-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></div>
+        <div class="auth-loading-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="M9 4V3.3A1.3 1.3 0 0 1 10.3 2h3.4A1.3 1.3 0 0 1 15 3.3V4"/><path d="M8.6 12.2l2.1 2.1 4.7-4.7"/><path d="M8.5 17h7"/></svg></div>
     </div>
 
     <!-- ============ ECRAN DE CONNEXION RH ============ -->
     <div id="loginView" class="login-screen hidden">
         <div class="login-card">
             <div class="brand brand-center">
-                <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></span>
+                <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="M9 4V3.3A1.3 1.3 0 0 1 10.3 2h3.4A1.3 1.3 0 0 1 15 3.3V4"/><path d="M8.6 12.2l2.1 2.1 4.7-4.7"/><path d="M8.5 17h7"/></svg></span>
                 <div class="brand-text">
                     <span class="brand-name">Rootly</span>
-                    <span class="brand-tag">Espace Ressources Humaines</span>
+                    <span class="brand-tag" data-i18n="Espace Ressources Humaines">Espace Ressources Humaines</span>
                 </div>
             </div>
 
-            <h2 id="loginModeLabel" class="login-title">Connexion</h2>
-            <p class="login-sub">Reserve a l'equipe RH. Chaque entreprise dispose de son propre espace prive.</p>
+            <h2 id="loginModeLabel" class="login-title" data-i18n="Connexion">Connexion</h2>
+            <p class="login-sub" data-i18n="Reserve a l'equipe RH. Chaque entreprise dispose de son propre espace prive.">Reserve a l'equipe RH. Chaque entreprise dispose de son propre espace prive.</p>
 
             <div id="loginError" class="login-error hidden"></div>
 
             <div class="field">
-                <label for="loginEmail">Email professionnel</label>
-                <input id="loginEmail" type="email" placeholder="rh@monentreprise.com" autocomplete="email">
+                <label for="loginEmail" data-i18n="Email professionnel">Email professionnel</label>
+                <input id="loginEmail" type="email" placeholder="rh@monentreprise.com" data-i18n-ph="rh@monentreprise.com" autocomplete="email">
             </div>
             <div id="passwordFieldWrapper" class="field">
-                <label for="loginPassword">Mot de passe</label>
+                <label for="loginPassword" data-i18n="Mot de passe">Mot de passe</label>
                 <div class="password-field-wrapper">
                     <input id="loginPassword" type="password" placeholder="********" autocomplete="current-password">
-                    <button type="button" class="password-toggle-btn" onclick="basculerVisibiliteMotDePasse('loginPassword', this)" aria-label="Afficher le mot de passe">👁</button>
+                    <button type="button" class="password-toggle-btn" onclick="basculerVisibiliteMotDePasse('loginPassword', this)" data-i18n-title="Afficher le mot de passe" aria-label="Afficher le mot de passe">👁</button>
                 </div>
-                <p id="passwordHint" class="hint-text hint-text-tight hidden">8 caractères minimum, avec au moins un chiffre.</p>
+                <p id="passwordHint" class="hint-text hint-text-tight hidden" data-i18n="8 caractères minimum, avec au moins un chiffre.">8 caractères minimum, avec au moins un chiffre.</p>
             </div>
 
             <div id="confirmPasswordFieldWrapper" class="field hidden">
-                <label for="confirmPassword">Confirmer le mot de passe</label>
+                <label for="confirmPassword" data-i18n="Confirmer le mot de passe">Confirmer le mot de passe</label>
                 <div class="password-field-wrapper">
                     <input id="confirmPassword" type="password" placeholder="********" autocomplete="new-password">
                     <button type="button" class="password-toggle-btn" onclick="basculerVisibiliteMotDePasse('confirmPassword', this)" aria-label="Afficher le mot de passe">👁</button>
@@ -56,16 +56,16 @@
             </div>
 
             <button id="forgotPasswordBtn" class="link-btn login-forgot" onclick="basculerModeMotDePasseOublie()">
-                Mot de passe oublie ?
+                <span data-i18n="Mot de passe oublie ?">Mot de passe oublie ?</span>
             </button>
 
-            <button id="loginSubmitBtn" class="btn-primary" onclick="soumettreLogin()">Se connecter</button>
+            <button id="loginSubmitBtn" class="btn-primary" onclick="soumettreLogin()" data-i18n="Se connecter">Se connecter</button>
 
             <button id="loginToggleBtn" class="link-btn login-toggle" onclick="basculerModeLogin()">
-                Pas encore de compte ? Creer un espace RH
+                <span data-i18n="Pas encore de compte ? Creer un espace RH">Pas encore de compte ? Creer un espace RH</span>
             </button>
             <button id="backToLoginBtn" class="link-btn login-toggle hidden" onclick="revenirALaConnexion()">
-                Retour a la connexion
+                <span data-i18n="Retour a la connexion">Retour a la connexion</span>
             </button>
         </div>
     </div>
@@ -74,24 +74,24 @@
     <div id="resetPasswordView" class="login-screen hidden">
         <div class="login-card">
             <div class="brand brand-center">
-                <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></span>
+                <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="M9 4V3.3A1.3 1.3 0 0 1 10.3 2h3.4A1.3 1.3 0 0 1 15 3.3V4"/><path d="M8.6 12.2l2.1 2.1 4.7-4.7"/><path d="M8.5 17h7"/></svg></span>
                 <div class="brand-text">
                     <span class="brand-name">Rootly</span>
-                    <span class="brand-tag">Espace Ressources Humaines</span>
+                    <span class="brand-tag" data-i18n="Espace Ressources Humaines">Espace Ressources Humaines</span>
                 </div>
             </div>
-            <h2 class="login-title">Nouveau mot de passe</h2>
-            <p class="login-sub">Choisis un nouveau mot de passe pour ton compte RH.</p>
+            <h2 class="login-title" data-i18n="Nouveau mot de passe">Nouveau mot de passe</h2>
+            <p class="login-sub" data-i18n="Choisis un nouveau mot de passe pour ton compte RH.">Choisis un nouveau mot de passe pour ton compte RH.</p>
             <div id="resetError" class="login-error hidden"></div>
             <div class="field">
-                <label for="newPassword">Nouveau mot de passe</label>
+                <label for="newPassword" data-i18n="Nouveau mot de passe">Nouveau mot de passe</label>
                 <div class="password-field-wrapper">
                     <input id="newPassword" type="password" placeholder="********" autocomplete="new-password">
                     <button type="button" class="password-toggle-btn" onclick="basculerVisibiliteMotDePasse('newPassword', this)" aria-label="Afficher le mot de passe">👁</button>
                 </div>
-                <p class="hint-text hint-text-tight">8 caractères minimum, avec au moins un chiffre.</p>
+                <p class="hint-text hint-text-tight" data-i18n="8 caractères minimum, avec au moins un chiffre.">8 caractères minimum, avec au moins un chiffre.</p>
             </div>
-            <button class="btn-primary" onclick="soumettreNouveauMotDePasse()">Mettre a jour le mot de passe</button>
+            <button class="btn-primary" onclick="soumettreNouveauMotDePasse()" data-i18n="Mettre a jour le mot de passe">Mettre a jour le mot de passe</button>
         </div>
     </div>
 
@@ -99,17 +99,19 @@
     <div id="dashboardView" class="hidden">
         <header class="app-header">
             <div class="brand">
-                <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></span>
+                <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="M9 4V3.3A1.3 1.3 0 0 1 10.3 2h3.4A1.3 1.3 0 0 1 15 3.3V4"/><path d="M8.6 12.2l2.1 2.1 4.7-4.7"/><path d="M8.5 17h7"/></svg></span>
                 <div class="brand-text">
                     <span class="brand-name">Rootly</span>
-                    <span class="brand-tag">Onboarding</span>
+                    <span class="brand-tag" data-i18n="Onboarding">Onboarding</span>
                 </div>
             </div>
-            <nav class="app-nav">
-                <a href="organigramme.html" class="app-nav-link">Organigramme</a>
-                <a href="index.html?dashboard=1" class="app-nav-link is-active">Onboarding</a>
-                <a href="evaluations.html" class="app-nav-link">Evaluations &amp; Remuneration</a>
-                <button class="view-btn logout-btn" onclick="deconnexion()">Deconnexion</button>
+            <button class="nav-toggle-btn" onclick="toggleMobileNav()" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg></button>
+            <nav class="app-nav" id="appNav">
+                <a href="organigramme.html" class="app-nav-link" data-i18n="Organigramme">Organigramme</a>
+                <a href="index.html?dashboard=1" class="app-nav-link is-active" data-i18n="Onboarding">Onboarding</a>
+                <a href="evaluations.html" class="app-nav-link" data-i18n="Evaluations &amp; Remuneration">Evaluations &amp; Remuneration</a>
+                <button class="lang-toggle-btn" onclick="basculerLangue()" title="Switch language / Changer de langue">EN</button>
+            <button class="view-btn logout-btn" onclick="deconnexion()" data-i18n="Deconnexion">Deconnexion</button>
             </nav>
         </header>
 
@@ -119,88 +121,88 @@
                 <div class="col col-left">
 
                     <section class="card">
-                        <h3 class="card-title"><span class="step-badge">1</span>Configuration entreprise</h3>
+                        <h3 class="card-title"><span class="step-badge">1</span><span data-i18n="Configuration entreprise">Configuration entreprise</span></h3>
                         <div class="field-row">
                             <div class="field">
-                                <label for="cfgBoite">Nom de l'entreprise</label>
+                                <label for="cfgBoite" data-i18n="Nom de l'entreprise">Nom de l'entreprise</label>
                                 <input id="cfgBoite" type="text" placeholder="InnovCorp">
                             </div>
                             <div class="field">
-                                <label for="cfgWifi">Code Wi-Fi bureaux</label>
+                                <label for="cfgWifi" data-i18n="Code Wi-Fi bureaux">Code Wi-Fi bureaux</label>
                                 <input id="cfgWifi" type="text" placeholder="InnovCorp_Secure_2026">
                             </div>
                         </div>
 
                         <div class="field">
-                            <label>Logo officiel</label>
+                            <label data-i18n="Logo officiel">Logo officiel</label>
                             <div class="upload-box">
                                 <input type="file" id="logoInput" accept="image/*" onchange="chargerLogo(event)">
                                 <div id="logoPreview" class="upload-hint">
                                     <span class="upload-icon">^</span>
-                                    Cliquer pour importer un logo
+                                    <span data-i18n="Cliquer pour importer un logo">Cliquer pour importer un logo</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="field">
-                            <label>Documents communs (reglement, charte...)</label>
+                            <label data-i18n="Documents communs (reglement, charte...)">Documents communs (reglement, charte...)</label>
                             <div class="upload-box">
                                 <input type="file" id="docInput" multiple onchange="chargerDocuments(event)">
                                 <div class="upload-hint">
                                     <span class="upload-icon">^</span>
-                                    Ajouter des documents
+                                    <span data-i18n="Ajouter des documents">Ajouter des documents</span>
                                 </div>
                             </div>
                             <div id="docList" class="doc-list"></div>
                         </div>
 
                         <div class="field">
-                            <label for="cfgEmailSubject">Objet de l'email d'invitation</label>
-                            <input id="cfgEmailSubject" type="text" placeholder="Bienvenue chez [Entreprise] !">
+                            <label for="cfgEmailSubject" data-i18n="Objet de l'email d'invitation">Objet de l'email d'invitation</label>
+                            <input id="cfgEmailSubject" type="text" placeholder="Bienvenue chez [Entreprise] !" data-i18n-ph="Bienvenue chez [Entreprise] !">
                         </div>
                         <div class="field">
-                            <label for="cfgEmailMessage">Message d'accueil personnalise</label>
-                            <textarea id="cfgEmailMessage" rows="3" placeholder="Toute l'equipe est ravie de t'accueillir en tant que [poste]. A tres vite !"></textarea>
-                            <p class="hint-text hint-text-tight">Laisse vide pour garder le message par defaut.</p>
+                            <label for="cfgEmailMessage" data-i18n="Message d'accueil personnalise">Message d'accueil personnalise</label>
+                            <textarea id="cfgEmailMessage" rows="3" placeholder="Toute l'equipe est ravie de t'accueillir en tant que [poste]. A tres vite !" data-i18n-ph="Toute l'equipe est ravie de t'accueillir en tant que [poste]. A tres vite !"></textarea>
+                            <p class="hint-text hint-text-tight" data-i18n="Laisse vide pour garder le message par defaut.">Laisse vide pour garder le message par defaut.</p>
                         </div>
 
-                        <button class="btn-primary" onclick="enregistrerOrganisation()">Enregistrer les infos entreprise</button>
+                        <button class="btn-primary" onclick="enregistrerOrganisation()" data-i18n="Enregistrer les infos entreprise">Enregistrer les infos entreprise</button>
                     </section>
 
                     <section class="card">
-                        <h3 class="card-title"><span class="step-badge">2</span>Contenus optionnels de la page employe</h3>
-                        <p class="hint-text">Laisse une section vide si tu ne veux pas qu'elle apparaisse chez l'employe.</p>
+                        <h3 class="card-title"><span class="step-badge">2</span><span data-i18n="Contenus optionnels de la page employe">Contenus optionnels de la page employe</span></h3>
+                        <p class="hint-text" data-i18n="Laisse une section vide si tu ne veux pas qu'elle apparaisse chez l'employe.">Laisse une section vide si tu ne veux pas qu'elle apparaisse chez l'employe.</p>
 
                         <div class="optional-sections-grid">
                             <div class="optional-block">
-                                <h4>Liens utiles</h4>
-                                <input id="linkNom" placeholder="Nom (ex : Intranet)">
+                                <h4 data-i18n="Liens utiles">Liens utiles</h4>
+                                <input id="linkNom" placeholder="Nom (ex : Intranet)" data-i18n-ph="Nom (ex : Intranet)">
                                 <input id="linkUrl" placeholder="https://...">
-                                <button class="link-btn" onclick="ajouterLien()">+ Ajouter le lien</button>
+                                <button class="link-btn" onclick="ajouterLien()" data-i18n="+ Ajouter le lien">+ Ajouter le lien</button>
                                 <div id="linksListRH" class="mini-list"></div>
                             </div>
 
                             <div class="optional-block">
-                                <h4>Contacts cles</h4>
-                                <input id="contactNom" placeholder="Nom">
-                                <input id="contactRole" placeholder="Role (ex : Support IT)">
-                                <input id="contactInfo" placeholder="Email ou telephone">
-                                <button class="link-btn" onclick="ajouterContact()">+ Ajouter le contact</button>
+                                <h4 data-i18n="Contacts cles">Contacts cles</h4>
+                                <input id="contactNom" placeholder="Nom" data-i18n-ph="Nom">
+                                <input id="contactRole" placeholder="Role (ex : Support IT)" data-i18n-ph="Role (ex : Support IT)">
+                                <input id="contactInfo" placeholder="Email ou telephone" data-i18n-ph="Email ou telephone">
+                                <button class="link-btn" onclick="ajouterContact()" data-i18n="+ Ajouter le contact">+ Ajouter le contact</button>
                                 <div id="contactsListRH" class="mini-list"></div>
                             </div>
 
                             <div class="optional-block">
-                                <h4>Checklist d'integration</h4>
-                                <input id="checklistTitre" placeholder="Etape (ex : Jour 1 - Accueil)">
-                                <input id="checklistDesc" placeholder="Description courte">
-                                <button class="link-btn" onclick="ajouterEtapeChecklist()">+ Ajouter l'etape</button>
+                                <h4 data-i18n="Checklist d'integration">Checklist d'integration</h4>
+                                <input id="checklistTitre" placeholder="Etape (ex : Jour 1 - Accueil)" data-i18n-ph="Etape (ex : Jour 1 - Accueil)">
+                                <input id="checklistDesc" placeholder="Description courte" data-i18n-ph="Description courte">
+                                <button class="link-btn" onclick="ajouterEtapeChecklist()" data-i18n="+ Ajouter l'etape">+ Ajouter l'etape</button>
                                 <div id="checklistListRH" class="mini-list"></div>
                             </div>
                         </div>
 
                         <div class="button-row">
-                            <button class="btn-primary" onclick="enregistrerContenusOptionnels()">Enregistrer ces contenus</button>
-                            <button class="btn-danger" onclick="viderContenusOptionnels()">Vider ces contenus</button>
+                            <button class="btn-primary" onclick="enregistrerContenusOptionnels()" data-i18n="Enregistrer ces contenus">Enregistrer ces contenus</button>
+                            <button class="btn-danger" onclick="viderContenusOptionnels()" data-i18n="Vider ces contenus">Vider ces contenus</button>
                         </div>
                     </section>
                 </div>
@@ -208,41 +210,41 @@
                 <div class="col col-right">
                     <section class="card">
                         <div class="card-title-row">
-                            <h3 class="card-title">Employes a onboarder</h3>
+                            <h3 class="card-title" data-i18n="Employes a onboarder">Employes a onboarder</h3>
                             <div class="search-input-wrapper">
-                                <input id="pendingSearch" type="text" placeholder="Rechercher..." oninput="filtrerListesEmployes()">
+                                <input id="pendingSearch" type="text" placeholder="Rechercher..." data-i18n-ph="Rechercher..." oninput="filtrerListesEmployes()">
                             </div>
                         </div>
-                        <p class="hint-text">Cree les fiches employes depuis la page <a href="organigramme.html">Organigramme</a>. Elles apparaissent ici pretes a etre invitees.</p>
+                        <p class="hint-text" data-i18n-html="Cree les fiches employes depuis la page &lt;a href=&quot;organigramme.html&quot;&gt;Organigramme&lt;/a&gt;. Elles apparaissent ici pretes a etre invitees.">Cree les fiches employes depuis la page <a href="organigramme.html">Organigramme</a>. Elles apparaissent ici pretes a etre invitees.</p>
                         <div class="pending-toolbar">
                             <label class="pending-select-all">
                                 <input type="checkbox" id="pendingSelectAll" onchange="toggleSelectionTous(this.checked)">
-                                Tout selectionner
+                                <span data-i18n="Tout selectionner">Tout selectionner</span>
                             </label>
                             <div class="pending-toolbar-actions">
                                 <span id="pendingSelectedLabel" class="pending-selected-label hidden">0 selectionne(s)</span>
                                 <button id="pendingBulkSkipBtn" class="link-btn" onclick="marquerSelectionnesSansInvitation()" disabled>
-                                    Marquer sans invitation
+                                    <span data-i18n="Marquer sans invitation">Marquer sans invitation</span>
                                 </button>
                                 <button id="pendingBulkSendBtn" class="link-btn" onclick="envoyerInvitationsSelectionnees()" disabled>
-                                    Envoyer l'invitation
+                                    <span data-i18n="Envoyer l'invitation">Envoyer l'invitation</span>
                                 </button>
                             </div>
                         </div>
                         <div id="pendingListContainer" class="employee-list scroll-panel">
-                            <p class="empty-hint">Aucun employe en attente d'invitation.</p>
+                            <p class="empty-hint" data-i18n="Aucun employe en attente d'invitation.">Aucun employe en attente d'invitation.</p>
                         </div>
                     </section>
 
                     <section class="card">
                         <div class="card-title-row">
-                            <h3 class="card-title">Suivi des invitations envoyees</h3>
+                            <h3 class="card-title" data-i18n="Suivi des invitations envoyees">Suivi des invitations envoyees</h3>
                             <div class="search-input-wrapper">
-                                <input id="sentSearch" type="text" placeholder="Rechercher..." oninput="filtrerListesEmployes()">
+                                <input id="sentSearch" type="text" placeholder="Rechercher..." data-i18n-ph="Rechercher..." oninput="filtrerListesEmployes()">
                             </div>
                         </div>
                         <div id="sentListContainer" class="employee-list scroll-panel">
-                            <p class="empty-hint">Aucune invitation envoyee pour le moment.</p>
+                            <p class="empty-hint" data-i18n="Aucune invitation envoyee pour le moment.">Aucune invitation envoyee pour le moment.</p>
                         </div>
                     </section>
                 </div>
@@ -254,6 +256,7 @@
         </footer>
     </div>
 
+    <script src="i18n.js"></script>
     <script src="shared.js"></script>
     <script src="app.js"></script>
 </body>
