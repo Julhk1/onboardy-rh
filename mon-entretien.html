@@ -11,48 +11,50 @@
 <body>
 
     <div id="toastContainer" class="toast-container no-print" aria-live="polite"></div>
+    <button class="lang-toggle-btn lang-toggle-floating no-print" onclick="basculerLangue()" title="Switch language / Changer de langue">EN</button>
 
     <main class="page onboarding-page">
-        <div id="loadingState" class="onboarding-loading">Chargement de ton espace…</div>
+        <div id="loadingState" class="onboarding-loading" data-i18n="Chargement de ton espace…">Chargement de ton espace…</div>
 
         <div id="errorState" class="onboarding-error hidden">
-            <h2>Lien invalide ou expiré</h2>
-            <p>Contacte ton service RH pour en recevoir un nouveau.</p>
+            <h2 data-i18n="Lien invalide ou expiré">Lien invalide ou expiré</h2>
+            <p data-i18n="Contacte ton service RH pour en recevoir un nouveau.">Contacte ton service RH pour en recevoir un nouveau.</p>
         </div>
 
         <div id="contentState" class="hidden">
             <div class="print-toolbar no-print">
-                <button class="btn-primary print-btn" onclick="window.print()">Télécharger en PDF</button>
+                <button class="btn-primary print-btn" onclick="window.print()" data-i18n="Télécharger en PDF">Télécharger en PDF</button>
             </div>
 
             <section class="card welcome-card">
-                <h2 class="welcome-title">Prépare ton entretien, <span id="empNom" class="accent"></span></h2>
+                <h2 class="welcome-title"><span data-i18n="Prépare ton entretien,">Prépare ton entretien,</span> <span id="empNom" class="accent"></span></h2>
                 <p class="welcome-sub" id="empPoste"></p>
             </section>
 
             <section class="card no-print">
-                <h3 class="card-title">Notes de préparation</h3>
-                <p class="hint-text">Note ici ce que tu veux aborder — enregistré automatiquement, visible uniquement par toi et ta RH.</p>
-                <textarea id="prepNotes" class="prep-textarea" rows="8" placeholder="Points que je veux aborder, questions, objectifs..."></textarea>
+                <h3 class="card-title" data-i18n="Notes de préparation">Notes de préparation</h3>
+                <p class="hint-text" data-i18n="Note ici ce que tu veux aborder — enregistré automatiquement, visible uniquement par toi et ta RH.">Note ici ce que tu veux aborder — enregistré automatiquement, visible uniquement par toi et ta RH.</p>
+                <textarea id="prepNotes" class="prep-textarea" rows="8" placeholder="Points que je veux aborder, questions, objectifs..." data-i18n-ph="Points que je veux aborder, questions, objectifs..."></textarea>
                 <p id="saveStatus" class="hint-text hint-text-tight"></p>
             </section>
 
             <section class="card">
-                <h3 class="card-title">Historique de mes entretiens</h3>
+                <h3 class="card-title" data-i18n="Historique de mes entretiens">Historique de mes entretiens</h3>
                 <div id="reviewsContainer" class="chain-list"></div>
             </section>
 
             <section class="card">
-                <h3 class="card-title">Mon évolution salariale</h3>
+                <h3 class="card-title" data-i18n="Mon évolution salariale">Mon évolution salariale</h3>
                 <div id="compContainer" class="chain-list"></div>
             </section>
         </div>
     </main>
 
     <footer class="app-footer no-print">
-        <p>© 2026 Rootly — Plateforme RH &amp; Onboarding</p>
+        <p>© 2026 Rootly — <span data-i18n="Plateforme RH &amp; Onboarding">Plateforme RH &amp; Onboarding</span></p>
     </footer>
 
+    <script src="i18n.js"></script>
     <script src="mon-entretien.js"></script>
 </body>
 </html>
