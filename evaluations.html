@@ -15,97 +15,99 @@
 
     <header class="app-header">
         <div class="brand">
-            <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></span>
+            <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="M9 4V3.3A1.3 1.3 0 0 1 10.3 2h3.4A1.3 1.3 0 0 1 15 3.3V4"/><path d="M8.6 12.2l2.1 2.1 4.7-4.7"/><path d="M8.5 17h7"/></svg></span>
             <div class="brand-text">
                 <span class="brand-name">Rootly</span>
                 <span class="brand-tag">Evaluations &amp; Remuneration</span>
             </div>
         </div>
-        <nav class="app-nav">
-            <a href="organigramme.html" class="app-nav-link">Organigramme</a>
-            <a href="index.html?dashboard=1" class="app-nav-link">Onboarding</a>
-            <a href="evaluations.html" class="app-nav-link is-active">Evaluations &amp; Remuneration</a>
-            <button class="view-btn logout-btn" onclick="deconnexion()">Deconnexion</button>
+        <button class="nav-toggle-btn" onclick="toggleMobileNav()" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg></button>
+        <nav class="app-nav" id="appNav">
+            <a href="organigramme.html" class="app-nav-link" data-i18n="Organigramme">Organigramme</a>
+            <a href="index.html?dashboard=1" class="app-nav-link" data-i18n="Onboarding">Onboarding</a>
+            <a href="evaluations.html" class="app-nav-link is-active" data-i18n="Evaluations &amp; Remuneration">Evaluations &amp; Remuneration</a>
+            <button class="lang-toggle-btn" onclick="basculerLangue()" title="Switch language / Changer de langue">EN</button>
+            <button class="view-btn logout-btn" onclick="deconnexion()" data-i18n="Deconnexion">Deconnexion</button>
         </nav>
     </header>
 
     <main class="page page-wide">
 
         <section class="card">
-            <h3 class="card-title">Frequence des entretiens</h3>
-            <p class="hint-text">S'applique par defaut a tous les employes, sauf si tu fixes une date precise pour l'un d'eux ci-dessous.</p>
+            <h3 class="card-title" data-i18n="Frequence des entretiens">Frequence des entretiens</h3>
+            <p class="hint-text" data-i18n="S'applique par defaut a tous les employes, sauf si tu fixes une date precise pour l'un d'eux ci-dessous.">S'applique par defaut a tous les employes, sauf si tu fixes une date precise pour l'un d'eux ci-dessous.</p>
             <div class="cadence-row">
                 <select id="cadenceSelect" onchange="enregistrerCadence()">
-                    <option value="3">Tous les 3 mois</option>
-                    <option value="4">Tous les 4 mois</option>
-                    <option value="6">Tous les 6 mois</option>
-                    <option value="12">Une fois par an</option>
+                    <option value="3" data-i18n="Tous les 3 mois">Tous les 3 mois</option>
+                    <option value="4" data-i18n="Tous les 4 mois">Tous les 4 mois</option>
+                    <option value="6" data-i18n="Tous les 6 mois">Tous les 6 mois</option>
+                    <option value="12" data-i18n="Une fois par an">Une fois par an</option>
                 </select>
             </div>
         </section>
 
         <div id="reviewFormSection" class="review-form hidden">
-            <h4 id="reviewFormLabel">Compte-rendu</h4>
+            <h4 id="reviewFormLabel" data-i18n="Compte-rendu">Compte-rendu</h4>
             <div class="field">
-                <label for="reviewDate">Date de l'entretien</label>
+                <label for="reviewDate" data-i18n="Date de l'entretien">Date de l'entretien</label>
                 <input id="reviewDate" type="date">
             </div>
             <div class="field">
-                <label for="reviewPointsForts">Points forts</label>
+                <label for="reviewPointsForts" data-i18n="Points forts">Points forts</label>
                 <textarea id="reviewPointsForts" rows="2"></textarea>
             </div>
             <div class="field">
-                <label for="reviewPointsAmelioration">Axes d'amelioration</label>
+                <label for="reviewPointsAmelioration" data-i18n="Axes d'amelioration">Axes d'amelioration</label>
                 <textarea id="reviewPointsAmelioration" rows="2"></textarea>
             </div>
             <div class="field">
-                <label for="reviewObjectifs">Objectifs pour le prochain trimestre</label>
+                <label for="reviewObjectifs" data-i18n="Objectifs pour le prochain trimestre">Objectifs pour le prochain trimestre</label>
                 <textarea id="reviewObjectifs" rows="2"></textarea>
             </div>
             <div class="field">
-                <label for="reviewCommentaireRH">Commentaire RH (prive, jamais visible par l'employe)</label>
+                <label for="reviewCommentaireRH" data-i18n="Commentaire RH (prive, jamais visible par l'employe)">Commentaire RH (prive, jamais visible par l'employe)</label>
                 <textarea id="reviewCommentaireRH" rows="2"></textarea>
             </div>
             <div class="button-row">
-                <button class="btn-primary" onclick="enregistrerEntretien()">Enregistrer l'entretien</button>
-                <button class="btn-danger" onclick="fermerFormulaireEntretien()">Annuler</button>
+                <button class="btn-primary" onclick="enregistrerEntretien()" data-i18n="Enregistrer l'entretien">Enregistrer l'entretien</button>
+                <button class="btn-danger" onclick="fermerFormulaireEntretien()" data-i18n="Annuler">Annuler</button>
             </div>
         </div>
 
         <div id="compFormSection" class="review-form hidden">
-            <h4 id="compFormLabel">Nouvelle remuneration</h4>
+            <h4 id="compFormLabel" data-i18n="Nouvelle remuneration">Nouvelle remuneration</h4>
             <div class="field-row">
                 <div class="field">
-                    <label for="compDate">Date d'effet</label>
+                    <label for="compDate" data-i18n="Date d'effet">Date d'effet</label>
                     <input id="compDate" type="date">
                 </div>
                 <div class="field">
-                    <label for="compFixe">Salaire fixe annuel brut (€)</label>
+                    <label for="compFixe" data-i18n="Salaire fixe annuel brut (€)">Salaire fixe annuel brut (€)</label>
                     <input id="compFixe" type="number" step="100" placeholder="42000">
                 </div>
             </div>
             <div class="field">
-                <label for="compVariable">Part variable annuelle (€, optionnel)</label>
+                <label for="compVariable" data-i18n="Part variable annuelle (€, optionnel)">Part variable annuelle (€, optionnel)</label>
                 <input id="compVariable" type="number" step="100" placeholder="5000">
             </div>
             <div class="field">
-                <label for="compNote">Note (ex : Augmentation annuelle, ajustement marche...)</label>
+                <label for="compNote" data-i18n="Note (ex : Augmentation annuelle, ajustement marche...)">Note (ex : Augmentation annuelle, ajustement marche...)</label>
                 <input id="compNote" type="text">
             </div>
             <div class="button-row">
-                <button class="btn-primary" onclick="enregistrerRemuneration()">Enregistrer</button>
-                <button class="btn-danger" onclick="fermerFormulaireRemuneration()">Annuler</button>
+                <button class="btn-primary" onclick="enregistrerRemuneration()" data-i18n="Enregistrer">Enregistrer</button>
+                <button class="btn-danger" onclick="fermerFormulaireRemuneration()" data-i18n="Annuler">Annuler</button>
             </div>
         </div>
 
         <section class="card">
-            <h3 class="card-title">Suivi par employe</h3>
-            <p class="hint-text">La remuneration reste strictement reservee a la RH, sauf pour le lien de preparation envoye a l'employe concerne, qui voit sa propre evolution.</p>
+            <h3 class="card-title" data-i18n="Suivi par employe">Suivi par employe</h3>
+            <p class="hint-text" data-i18n="La remuneration reste strictement reservee a la RH, sauf pour le lien de preparation envoye a l'employe concerne, qui voit sa propre evolution.">La remuneration reste strictement reservee a la RH, sauf pour le lien de preparation envoye a l'employe concerne, qui voit sa propre evolution.</p>
             <div class="search-input-wrapper">
-                <input id="employeeSearch" type="text" placeholder="Rechercher un employe par nom..." oninput="filtrerListeEmployes()">
+                <input id="employeeSearch" type="text" placeholder="Rechercher un employe par nom..." data-i18n-ph="Rechercher un employe par nom..." oninput="filtrerListeEmployes()">
             </div>
             <div id="employeeReviewList" class="review-list scroll-panel">
-                <p class="empty-hint">Aucun employe pour le moment.</p>
+                <p class="empty-hint" data-i18n="Aucun employe pour le moment.">Aucun employe pour le moment.</p>
             </div>
         </section>
     </main>
@@ -114,6 +116,7 @@
         <p>© 2026 Rootly — Plateforme RH &amp; Onboarding</p>
     </footer>
 
+    <script src="i18n.js"></script>
     <script src="shared.js"></script>
     <script src="app-evaluations.js"></script>
 </body>
