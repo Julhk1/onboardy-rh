@@ -21,7 +21,7 @@ async function chargerTout() {
     ]);
 
     if (empRes.error || reviewRes.error || compRes.error) {
-        toast("Erreur de chargement des données.", "error");
+        toast(t("Erreur de chargement des données."), "error");
         return;
     }
 
@@ -37,9 +37,9 @@ async function chargerTout() {
 async function enregistrerCadence() {
     const valeur = parseInt(document.getElementById('cadenceSelect').value, 10);
     const { error } = await supabaseClient.from('organizations').update({ review_cadence_months: valeur }).eq('id', currentOrg.id);
-    if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
+    if (error) { toast(t("Erreur lors de l'enregistrement."), "error"); return; }
     currentOrg.review_cadence_months = valeur;
-    toast("Fréquence mise à jour pour tous les employés sans date fixée manuellement.");
+    toast(t("Fréquence mise à jour pour tous les employés sans date fixée manuellement."));
     renderEmployeeReviewList();
 }
 
@@ -102,7 +102,7 @@ function calculerDelta(entree, entreeSuivantePlusAncienne) {
 function renderEmployeeReviewList() {
     const container = document.getElementById('employeeReviewList');
     if (employees.length === 0) {
-        container.innerHTML = `<p class="empty-hint">Aucun employé pour le moment. Ajoute-le depuis la page <a href="organigramme.html">Organigramme</a>.</p>`;
+        container.innerHTML = `<p class="empty-hint">${t('Aucun employé pour le moment. Ajoute-le depuis la page')} <a href="organigramme.html">${t('Organigramme')}</a>.</p>`;
         return;
     }
 
@@ -111,7 +111,7 @@ function renderEmployeeReviewList() {
     );
 
     if (liste.length === 0) {
-        container.innerHTML = `<p class="empty-hint">Aucun employé ne correspond à cette recherche.</p>`;
+        container.innerHTML = `<p class="empty-hint">${t('Aucun employé ne correspond à cette recherche.')}</p>`;
         return;
     }
 
@@ -124,49 +124,49 @@ function renderEmployeeReviewList() {
                 <div class="review-row-main">
                     <div class="employee-info">
                         <span class="employee-name">${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}</span>
-                        <span class="employee-meta">${prochaine ? 'Prochain entretien : ' + formatDateFR(prochaine) : "Renseigne sa date d'arrivée"}</span>
+                        <span class="employee-meta">${prochaine ? t('Prochain entretien : ') + formatDateFR(prochaine) : t("Renseigne sa date d'arrivée")}</span>
                     </div>
                     <div class="employee-status ${classe}">${label}</div>
                     <div class="employee-actions">
-                        <button class="link-btn" onclick="ouvrirFormulaireEntretien('${emp.id}')">+ Entretien</button>
-                        <button class="link-btn" onclick="ouvrirFormulaireRemuneration('${emp.id}')">+ Rémunération</button>
+                        <button class="link-btn" onclick="ouvrirFormulaireEntretien('${emp.id}')">${t('+ Entretien')}</button>
+                        <button class="link-btn" onclick="ouvrirFormulaireRemuneration('${emp.id}')">${t('+ Rémunération')}</button>
                     </div>
                 </div>
 
                 <div class="next-review-row">
-                    <span>Date précise du prochain entretien :</span>
+                    <span>${t('Date précise du prochain entretien :')}</span>
                     <input type="date" value="${emp.next_review_date || ''}" onchange="fixerDateEntretien('${emp.id}', this.value)">
-                    ${emp.next_review_date ? `<button class="link-btn" onclick="fixerDateEntretien('${emp.id}', '')">Réinitialiser (utiliser la fréquence par défaut)</button>` : ''}
+                    ${emp.next_review_date ? `<button class="link-btn" onclick="fixerDateEntretien('${emp.id}', '')">${t('Réinitialiser (utiliser la fréquence par défaut)')}</button>` : ''}
                 </div>
 
                 ${emp.prep_notes ? `
                     <div class="prep-notes-block">
                         <div class="prep-notes-head">
-                            <strong>Notes de préparation écrites par l'employé</strong>
-                            <button class="link-btn" onclick="viderNotesPreparation('${emp.id}')">Vider ces notes</button>
+                            <strong>${t("Notes de préparation écrites par l'employé")}</strong>
+                            <button class="link-btn" onclick="viderNotesPreparation('${emp.id}')">${t('Vider ces notes')}</button>
                         </div>
                         ${escapeHtml(emp.prep_notes)}
                     </div>
                 ` : ''}
 
                 <div class="review-links-row">
-                    <button class="link-btn" onclick="copierLienPreparation('${emp.id}')">Copier le lien de préparation</button>
-                    <button class="link-btn" onclick="envoyerLienPreparation('${emp.id}')">Envoyer le lien par email</button>
+                    <button class="link-btn" onclick="copierLienPreparation('${emp.id}')">${t('Copier le lien de préparation')}</button>
+                    <button class="link-btn" onclick="envoyerLienPreparation('${emp.id}')">${t('Envoyer le lien par email')}</button>
                 </div>
 
                 <details class="review-history">
-                    <summary>Historique entretiens (${historique.length}) &amp; rémunération (${historiqueComp.length})</summary>
+                    <summary>${t('Historique entretiens')} (${historique.length}) &amp; ${t('rémunération')} (${historiqueComp.length})</summary>
 
                     ${historique.map(r => `
                         <div class="review-history-item">
-                            <strong>${formatDateFR(r.date_entretien)} — Entretien</strong>
-                            ${r.points_forts ? `<p>Points forts : ${escapeHtml(r.points_forts)}</p>` : ''}
-                            ${r.points_amelioration ? `<p>Axes d'amélioration : ${escapeHtml(r.points_amelioration)}</p>` : ''}
-                            ${r.objectifs ? `<p>Objectifs : ${escapeHtml(r.objectifs)}</p>` : ''}
-                            ${r.commentaire_rh ? `<p><em>Commentaire RH (privé) : ${escapeHtml(r.commentaire_rh)}</em></p>` : ''}
+                            <strong>${formatDateFR(r.date_entretien)} — ${t('Entretien')}</strong>
+                            ${r.points_forts ? `<p>${t('Points forts')} : ${escapeHtml(r.points_forts)}</p>` : ''}
+                            ${r.points_amelioration ? `<p>${t("Axes d'amélioration")} : ${escapeHtml(r.points_amelioration)}</p>` : ''}
+                            ${r.objectifs ? `<p>${t('Objectifs')} : ${escapeHtml(r.objectifs)}</p>` : ''}
+                            ${r.commentaire_rh ? `<p><em>${t('Commentaire RH (privé)')} : ${escapeHtml(r.commentaire_rh)}</em></p>` : ''}
                             <div class="history-item-actions">
-                                <button class="link-btn" onclick="modifierEntretien('${r.id}')">Modifier</button>
-                                <button class="link-btn link-btn-danger" onclick="supprimerEntretien('${r.id}')">Supprimer</button>
+                                <button class="link-btn" onclick="modifierEntretien('${r.id}')">${t('Modifier')}</button>
+                                <button class="link-btn link-btn-danger" onclick="supprimerEntretien('${r.id}')">${t('Supprimer')}</button>
                             </div>
                         </div>
                     `).join('')}
@@ -175,20 +175,20 @@ function renderEmployeeReviewList() {
                         const delta = calculerDelta(c, historiqueComp[i + 1]);
                         return `
                             <div class="review-history-item comp-history-item">
-                                <strong>${formatDateFR(c.date_effet)} — Rémunération</strong>
-                                <p>Fixe : ${formatMontant(c.salaire_fixe)}${c.salaire_variable ? ' · Variable : ' + formatMontant(c.salaire_variable) : ''}
+                                <strong>${formatDateFR(c.date_effet)} — ${t('Rémunération')}</strong>
+                                <p>${t('Fixe')} : ${formatMontant(c.salaire_fixe)}${c.salaire_variable ? ' · ' + t('Variable') + ' : ' + formatMontant(c.salaire_variable) : ''}
                                     ${delta ? `<span class="employee-status ${delta.classe} comp-delta">${delta.texte}</span>` : ''}
                                 </p>
                                 ${c.note ? `<p>${escapeHtml(c.note)}</p>` : ''}
                                 <div class="history-item-actions">
-                                    <button class="link-btn" onclick="modifierRemuneration('${c.id}')">Modifier</button>
-                                    <button class="link-btn link-btn-danger" onclick="supprimerRemuneration('${c.id}')">Supprimer</button>
+                                    <button class="link-btn" onclick="modifierRemuneration('${c.id}')">${t('Modifier')}</button>
+                                    <button class="link-btn link-btn-danger" onclick="supprimerRemuneration('${c.id}')">${t('Supprimer')}</button>
                                 </div>
                             </div>
                         `;
                     }).join('')}
 
-                    ${historique.length === 0 && historiqueComp.length === 0 ? `<p class="empty-hint">Rien d'enregistré pour le moment.</p>` : ''}
+                    ${historique.length === 0 && historiqueComp.length === 0 ? `<p class="empty-hint">${t("Rien d'enregistré pour le moment.")}</p>` : ''}
                 </details>
             </div>
         `;
@@ -196,13 +196,13 @@ function renderEmployeeReviewList() {
 }
 
 async function viderNotesPreparation(employeeId) {
-    const ok = await confirmerAction("Vider les notes de préparation de cet employé ? Il pourra en réécrire de nouvelles avant son prochain entretien.", { danger: false, texteOui: "Vider" });
+    const ok = await confirmerAction(t("Vider les notes de préparation de cet employé ? Il pourra en réécrire de nouvelles avant son prochain entretien."), { danger: false, texteOui: t("Vider") });
     if (!ok) return;
     const { error } = await supabaseClient.from('employees').update({ prep_notes: '' }).eq('id', employeeId);
-    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
+    if (error) { toast(t("Erreur lors de la suppression."), "error"); return; }
     const emp = employees.find(e => e.id === employeeId);
     if (emp) emp.prep_notes = '';
-    toast("Notes vidées.");
+    toast(t("Notes vidées."));
     renderEmployeeReviewList();
 }
 
@@ -211,10 +211,10 @@ async function viderNotesPreparation(employeeId) {
 // ============================================================
 async function fixerDateEntretien(employeeId, date) {
     const { error } = await supabaseClient.from('employees').update({ next_review_date: date || null }).eq('id', employeeId);
-    if (error) { toast("Erreur lors de la mise à jour.", "error"); return; }
+    if (error) { toast(t("Erreur lors de la mise à jour."), "error"); return; }
     const emp = employees.find(e => e.id === employeeId);
     if (emp) emp.next_review_date = date || null;
-    toast(date ? "Date fixée pour cet employé." : "Retour à la fréquence par défaut.");
+    toast(date ? t("Date fixée pour cet employé.") : t("Retour à la fréquence par défaut."));
     renderEmployeeReviewList();
 }
 
@@ -263,7 +263,7 @@ function fermerFormulaireEntretien() {
 async function enregistrerEntretien() {
     if (!selectedReviewEmployeeId) return;
     const date_entretien = val('reviewDate');
-    if (!date_entretien) { toast("Renseigne la date de l'entretien.", "error"); return; }
+    if (!date_entretien) { toast(t("Renseigne la date de l'entretien."), "error"); return; }
 
     const payload = {
         date_entretien,
@@ -280,18 +280,18 @@ async function enregistrerEntretien() {
         ({ error } = await supabaseClient.from('reviews').insert([{ ...payload, employee_id: selectedReviewEmployeeId, org_id: currentOrg.id }]));
     }
 
-    if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
-    toast(editingReviewId ? "Entretien mis à jour." : "Compte-rendu enregistré.");
+    if (error) { toast(t("Erreur lors de l'enregistrement."), "error"); return; }
+    toast(editingReviewId ? t("Entretien mis à jour.") : t("Compte-rendu enregistré."));
     fermerFormulaireEntretien();
     await chargerTout();
 }
 
 async function supprimerEntretien(reviewId) {
-    const ok = await confirmerAction("Supprimer définitivement cet entretien ?");
+    const ok = await confirmerAction(t("Supprimer définitivement cet entretien ?"));
     if (!ok) return;
     const { error } = await supabaseClient.from('reviews').delete().eq('id', reviewId);
-    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
-    toast("Entretien supprimé.");
+    if (error) { toast(t("Erreur lors de la suppression."), "error"); return; }
+    toast(t("Entretien supprimé."));
     await chargerTout();
 }
 
@@ -339,7 +339,7 @@ async function enregistrerRemuneration() {
     if (!selectedCompEmployeeId) return;
     const date_effet = val('compDate');
     const salaire_fixe = val('compFixe');
-    if (!date_effet || !salaire_fixe) { toast("Renseigne au moins la date d'effet et le salaire fixe.", "error"); return; }
+    if (!date_effet || !salaire_fixe) { toast(t("Renseigne au moins la date d'effet et le salaire fixe."), "error"); return; }
 
     const payload = {
         date_effet,
@@ -355,18 +355,18 @@ async function enregistrerRemuneration() {
         ({ error } = await supabaseClient.from('compensations').insert([{ ...payload, employee_id: selectedCompEmployeeId, org_id: currentOrg.id }]));
     }
 
-    if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
-    toast(editingCompId ? "Rémunération mise à jour." : "Rémunération enregistrée.");
+    if (error) { toast(t("Erreur lors de l'enregistrement."), "error"); return; }
+    toast(editingCompId ? t("Rémunération mise à jour.") : t("Rémunération enregistrée."));
     fermerFormulaireRemuneration();
     await chargerTout();
 }
 
 async function supprimerRemuneration(compId) {
-    const ok = await confirmerAction("Supprimer définitivement cette entrée de rémunération ?");
+    const ok = await confirmerAction(t("Supprimer définitivement cette entrée de rémunération ?"));
     if (!ok) return;
     const { error } = await supabaseClient.from('compensations').delete().eq('id', compId);
-    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
-    toast("Rémunération supprimée.");
+    if (error) { toast(t("Erreur lors de la suppression."), "error"); return; }
+    toast(t("Rémunération supprimée."));
     await chargerTout();
 }
 
@@ -383,7 +383,7 @@ async function copierLienPreparation(employeeId) {
     const lien = lienPreparation(emp);
     try {
         await navigator.clipboard.writeText(lien);
-        toast("Lien copié dans le presse-papiers.");
+        toast(t("Lien copié dans le presse-papiers."));
     } catch (err) {
         toast(lien, "error");
     }
@@ -392,7 +392,7 @@ async function copierLienPreparation(employeeId) {
 async function envoyerLienPreparation(employeeId) {
     const emp = employees.find(e => e.id === employeeId);
     if (!emp) return;
-    if (!emp.email) { toast("Cet employé n'a pas d'email enregistré (voir la page Organigramme).", "error"); return; }
+    if (!emp.email) { toast(t("Cet employé n'a pas d'email enregistré (voir la page Organigramme)."), "error"); return; }
     const lien = lienPreparation(emp);
 
     try {
@@ -415,11 +415,11 @@ async function envoyerLienPreparation(employeeId) {
                 `
             })
         });
-        if (res.ok) { toast(`Lien envoyé à ${emp.email}`); }
-        else { toast("Erreur lors de l'envoi.", "error"); }
+        if (res.ok) { toast(t('Lien envoyé à {email}', { email: emp.email })); }
+        else { toast(t("Erreur lors de l'envoi."), "error"); }
     } catch (err) {
         console.error(err);
-        toast("Impossible de contacter le serveur d'envoi.", "error");
+        toast(t("Impossible de contacter le serveur d'envoi."), "error");
     }
 }
 
