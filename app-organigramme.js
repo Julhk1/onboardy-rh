@@ -34,9 +34,9 @@ function populateManagerSelect() {
         .join('');
 
     select.innerHTML = `
-        <option value="">— Aucun (sommet de l'organigramme) —</option>
+        <option value="">${t("— Aucun (sommet de l'organigramme) —")}</option>
         ${options}
-        <option value="__externe__">Autre / externe (préciser)…</option>
+        <option value="__externe__">${t("Autre / externe (preciser)...")}</option>
     `;
 
     if ([...select.options].some(o => o.value === valeurActuelle)) {
@@ -116,13 +116,13 @@ function modifierEmploye(id) {
 async function supprimerEmploye(id) {
     const emp = employees.find(e => e.id === id);
     if (!emp) return;
-    const ok = await confirmerAction(`Supprimer définitivement ${emp.prenom} ${emp.nom} ? Son lien d'onboarding cessera de fonctionner.`);
+    const ok = await confirmerAction(t("Supprimer définitivement {nom} ? Son lien d'onboarding cessera de fonctionner.", { nom: `${emp.prenom} ${emp.nom}` }));
     if (!ok) return;
 
     const { error } = await supabaseClient.from('employees').delete().eq('id', id);
-    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
+    if (error) { toast(t("Erreur lors de la suppression."), "error"); return; }
     if (editingEmployeeId === id) viderFormulaireEmploye();
-    toast(`${emp.prenom} ${emp.nom} supprimé(e).`);
+    toast(t('{nom} supprimé(e).', { nom: `${emp.prenom} ${emp.nom}` }));
     await chargerEmployes();
 }
 
@@ -136,11 +136,11 @@ async function enregistrerEmploye() {
     const date = val('empDate');
 
     if (!prenom || !nom) {
-        toast("Merci de renseigner au minimum le prénom et le nom.", "error");
+        toast(t("Merci de renseigner au minimum le prénom et le nom."), "error");
         return;
     }
     if (email && !emailEstValide(email)) {
-        toast("L'adresse email ne semble pas valide.", "error");
+        toast(t("L'adresse email ne semble pas valide."), "error");
         return;
     }
 
@@ -154,21 +154,21 @@ async function enregistrerEmploye() {
                 .update({ prenom, nom, poste, service, manager, email, date_arrivee: date || null })
                 .eq('id', editingEmployeeId);
             if (error) throw error;
-            toast(`Fiche de ${prenom} ${nom} mise à jour.`);
+            toast(t('Fiche de {nom} mise à jour.', { nom: `${prenom} ${nom}` }));
         } else {
             const token = genererToken();
             const { error } = await supabaseClient
                 .from('employees')
                 .insert([{ org_id: currentOrg.id, token, prenom, nom, poste, service, manager, email, date_arrivee: date || null }]);
             if (error) throw error;
-            toast(`${prenom} ${nom} ajouté(e) à l'organigramme.`);
+            toast(t('{nom} ajouté(e) à l\'organigramme.', { nom: `${prenom} ${nom}` }));
         }
 
         viderFormulaireEmploye();
         await chargerEmployes();
     } catch (err) {
         console.error(err);
-        toast("Erreur lors de l'enregistrement.", "error");
+        toast(t("Erreur lors de l'enregistrement."), "error");
     } finally {
         btn.disabled = false;
     }
@@ -182,7 +182,7 @@ function ajouterModelePoste() {
     const poste = val('templatePoste');
     const service = val('templateService');
     const manager = val('templateManager');
-    if (!nom || !poste) { toast("Renseigne au moins un nom de modèle et un poste.", "error"); return; }
+    if (!nom || !poste) { toast(t("Renseigne au moins un nom de modèle et un poste."), "error"); return; }
     pendingTemplates.push({ nom, poste, service, manager });
     ['templateNom', 'templatePoste', 'templateService', 'templateManager'].forEach(id => document.getElementById(id).value = "");
     renderTemplatesListRH();
@@ -199,30 +199,30 @@ function retirerModelePoste(index) {
 
 async function sauvegarderTemplates() {
     const { error } = await supabaseClient.from('organizations').update({ job_templates: pendingTemplates }).eq('id', currentOrg.id);
-    if (error) { toast("Erreur lors de l'enregistrement du modèle.", "error"); return; }
+    if (error) { toast(t("Erreur lors de l'enregistrement du modèle."), "error"); return; }
     currentOrg.job_templates = pendingTemplates;
 }
 
 function renderTemplatesListRH() {
-    document.getElementById('templatesListRH').innerHTML = pendingTemplates.map((t, i) => `
-        <div class="mini-list-row"><span>${escapeHtml(t.nom)}</span><button class="link-btn" onclick="retirerModelePoste(${i})">retirer</button></div>
+    document.getElementById('templatesListRH').innerHTML = pendingTemplates.map((tpl, i) => `
+        <div class="mini-list-row"><span>${escapeHtml(tpl.nom)}</span><button class="link-btn" onclick="retirerModelePoste(${i})">${t('retirer')}</button></div>
     `).join('');
 }
 
 function populateTemplateSelect() {
     const select = document.getElementById('templateSelect');
-    select.innerHTML = `<option value="">— Aucun modèle —</option>` +
-        pendingTemplates.map((t, i) => `<option value="${i}">${escapeHtml(t.nom)}</option>`).join('');
+    select.innerHTML = `<option value="">${t("— Aucun modele —")}</option>` +
+        pendingTemplates.map((tpl, i) => `<option value="${i}">${escapeHtml(tpl.nom)}</option>`).join('');
 }
 
 function appliquerModelePoste() {
     const index = document.getElementById('templateSelect').value;
     if (index === "") return;
-    const t = pendingTemplates[index];
-    if (!t) return;
-    document.getElementById('empPoste').value = t.poste || "";
-    document.getElementById('empService').value = t.service || "";
-    setManagerFieldValue(t.manager || "");
+    const tpl = pendingTemplates[index];
+    if (!tpl) return;
+    document.getElementById('empPoste').value = tpl.poste || "";
+    document.getElementById('empService').value = tpl.service || "";
+    setManagerFieldValue(tpl.manager || "");
 }
 
 // ============================================================
@@ -250,7 +250,7 @@ function importerCSV(event) {
     const reader = new FileReader();
     reader.onload = async (e) => {
         const lignes = e.target.result.split(/\r?\n/).filter(l => l.trim() !== "");
-        if (lignes.length < 2) { toast("Le fichier CSV est vide.", "error"); return; }
+        if (lignes.length < 2) { toast(t("Le fichier CSV est vide."), "error"); return; }
 
         const entetes = lignes[0].split(',').map(h => h.trim().toLowerCase());
         const idx = {
@@ -260,7 +260,7 @@ function importerCSV(event) {
         };
 
         if (idx.prenom === -1 || idx.nom === -1) {
-            toast("Le CSV doit contenir au minimum les colonnes Prenom, Nom.", "error");
+            toast(t("Le CSV doit contenir au minimum les colonnes Prenom, Nom."), "error");
             return;
         }
 
@@ -279,10 +279,10 @@ function importerCSV(event) {
             };
         }).filter(e => e.prenom && e.nom);
 
-        if (nouveaux.length === 0) { toast("Aucune ligne valide trouvée.", "error"); return; }
+        if (nouveaux.length === 0) { toast(t("Aucune ligne valide trouvée."), "error"); return; }
 
         const { error } = await supabaseClient.from('employees').insert(nouveaux);
-        if (error) { toast("Erreur lors de l'import.", "error"); return; }
+        if (error) { toast(t("Erreur lors de l'import."), "error"); return; }
 
         // Vérifie que chaque "Manager" renseigné correspond bien à quelqu'un
         // (déjà existant ou tout juste importé) : sinon la personne se
@@ -299,19 +299,21 @@ function importerCSV(event) {
             e.manager && normaliserNom(e.manager) === normaliserNom(`${e.prenom} ${e.nom}`)
         );
 
-        toast(`${nouveaux.length} employé(s) importé(s) dans l'organigramme.`);
+        toast(t('{n} employé(s) importé(s) dans l\'organigramme.', { n: nouveaux.length }));
         if (managersInconnus.length > 0) {
             const apercu = managersInconnus.slice(0, 4).map(e => `${e.prenom} ${e.nom}`).join(', ');
             const suite = managersInconnus.length > 4 ? '…' : '';
             toast(
-                `Manager non reconnu pour ${managersInconnus.length} employé(s) (${apercu}${suite}) — vérifie l'orthographe exacte dans la colonne Manager (ils sont provisoirement au sommet de l'organigramme).`,
+                t("Manager non reconnu pour {n} employé(s) ({apercu}{suite}) — vérifie l'orthographe exacte dans la colonne Manager (ils sont provisoirement au sommet de l'organigramme).",
+                    { n: managersInconnus.length, apercu, suite }),
                 "error"
             );
         }
         if (autoReferences.length > 0) {
             const apercu = autoReferences.slice(0, 4).map(e => `${e.prenom} ${e.nom}`).join(', ');
             toast(
-                `${apercu} ${autoReferences.length > 1 ? 'sont indiqués' : 'est indiqué'} comme son propre manager dans le CSV — laisse la case Manager vide pour la/les personne(s) tout en haut de l'organigramme.`,
+                t("{apercu} {verbe} comme son propre manager dans le CSV — laisse la case Manager vide pour la/les personne(s) tout en haut de l'organigramme.",
+                    { apercu, verbe: autoReferences.length > 1 ? t('sont indiqués') : t('est indiqué') }),
                 "error"
             );
         }
@@ -331,7 +333,7 @@ async function chargerEmployes() {
         .eq('org_id', currentOrg.id)
         .order('created_at', { ascending: false });
 
-    if (error) { toast("Erreur de chargement des employés.", "error"); return; }
+    if (error) { toast(t("Erreur de chargement des employés."), "error"); return; }
     employees = data || [];
     renderEmployeeList();
     renderOrgChart();
@@ -349,12 +351,12 @@ function renderEmployeeList() {
     Array.from(employeeListSelection).forEach(id => { if (!idsExistants.has(id)) employeeListSelection.delete(id); });
 
     if (employees.length === 0) {
-        container.innerHTML = `<p class="empty-hint">Aucun employé pour le moment.</p>`;
+        container.innerHTML = `<p class="empty-hint">${t('Aucun employé pour le moment.')}</p>`;
         mettreAJourBarreSelectionEmployes();
         return;
     }
     if (liste.length === 0) {
-        container.innerHTML = `<p class="empty-hint">Aucun résultat pour cette recherche.</p>`;
+        container.innerHTML = `<p class="empty-hint">${t('Aucun résultat pour cette recherche.')}</p>`;
         mettreAJourBarreSelectionEmployes();
         return;
     }
@@ -366,8 +368,8 @@ function renderEmployeeList() {
                 <span class="employee-meta">${escapeHtml(emp.poste) || '—'} · <span class="service-chip">${escapeHtml(emp.service)}</span></span>
             </div>
             <div class="employee-actions">
-                <button class="link-btn" onclick="modifierEmploye('${emp.id}')">Modifier</button>
-                <button class="link-btn link-btn-danger" onclick="supprimerEmploye('${emp.id}')">Supprimer</button>
+                <button class="link-btn" onclick="modifierEmploye('${emp.id}')">${t('Modifier')}</button>
+                <button class="link-btn link-btn-danger" onclick="supprimerEmploye('${emp.id}')">${t('Supprimer')}</button>
             </div>
         </div>
     `).join('');
@@ -413,20 +415,20 @@ async function supprimerEmployesSelectionnes() {
 
     const noms = selection.length <= 4
         ? selection.map(e => `${e.prenom} ${e.nom}`).join(', ')
-        : `${selection.length} employés`;
+        : t('{n} employés', { n: selection.length });
     const ok = await confirmerAction(
-        `Supprimer définitivement ${noms} ? Leur lien d'onboarding cessera de fonctionner. Les employés qui les avaient comme manager se retrouveront au sommet de l'organigramme.`
+        t("Supprimer définitivement {noms} ? Leur lien d'onboarding cessera de fonctionner. Les employés qui les avaient comme manager se retrouveront au sommet de l'organigramme.", { noms })
     );
     if (!ok) return;
 
     const btn = document.getElementById('employeeBulkDeleteBtn');
     const texteInitial = btn.innerHTML;
     btn.disabled = true;
-    btn.innerText = "Suppression en cours…";
+    btn.innerText = t("Suppression en cours…");
 
     const { error } = await supabaseClient.from('employees').delete().in('id', ids);
     if (error) {
-        toast("Erreur lors de la suppression.", "error");
+        toast(t("Erreur lors de la suppression."), "error");
         btn.innerHTML = texteInitial;
         btn.disabled = false;
         return;
@@ -434,7 +436,7 @@ async function supprimerEmployesSelectionnes() {
 
     if (ids.includes(editingEmployeeId)) viderFormulaireEmploye();
     employeeListSelection.clear();
-    toast(`${selection.length} employé(s) supprimé(s).`);
+    toast(t('{n} employé(s) supprimé(s).', { n: selection.length }));
     await chargerEmployes();
     btn.innerHTML = texteInitial;
     mettreAJourBarreSelectionEmployes();
@@ -510,7 +512,7 @@ function renderNoeudArbre(emp, enfantsDe, visites, profondeur) {
         <div class="org-node">
             <div class="org-node-row">
                 ${aDesEnfants
-                    ? `<button class="org-toggle-btn" title="${estReplie ? 'Deplier' : 'Replier'}" onclick="toggleNoeudOrganigramme('${emp.id}')">${estReplie ? '+' : '−'}</button>`
+                    ? `<button class="org-toggle-btn" title="${estReplie ? t('Deplier') : t('Replier')}" onclick="toggleNoeudOrganigramme('${emp.id}')">${estReplie ? '+' : '−'}</button>`
                     : `<span class="org-toggle-spacer"></span>`}
                 <span class="tree-avatar" style="background:${couleur}">${initiales(emp.prenom, emp.nom)}</span>
                 <div class="org-node-text">
@@ -520,8 +522,8 @@ function renderNoeudArbre(emp, enfantsDe, visites, profondeur) {
                 <span class="service-chip org-service" style="background:${couleur}22; color:${couleur}">${escapeHtml(emp.service)}</span>
                 ${aDesEnfants ? `<span class="org-child-count">${enfants.length}</span>` : ''}
                 <span class="org-node-icons">
-                    <button class="tree-icon-btn" title="Modifier" onclick="modifierEmploye('${emp.id}')">✎</button>
-                    <button class="tree-icon-btn" title="Supprimer" onclick="supprimerEmploye('${emp.id}')">✕</button>
+                    <button class="tree-icon-btn" title="${t('Modifier')}" onclick="modifierEmploye('${emp.id}')">✎</button>
+                    <button class="tree-icon-btn" title="${t('Supprimer')}" onclick="supprimerEmploye('${emp.id}')">✕</button>
                 </span>
             </div>
             ${aDesEnfants && !estReplie
@@ -535,13 +537,13 @@ function renderOrgChart() {
     const container = document.getElementById('orgChartContainer');
 
     if (employees.length === 0) {
-        container.innerHTML = `<p class="empty-hint">Ajoute des employés pour voir apparaître l'organigramme.</p>`;
+        container.innerHTML = `<p class="empty-hint">${t("Ajoute des employes pour voir apparaitre l'organigramme.")}</p>`;
         return;
     }
     const { enfantsDe, problemes } = construireArbre(employees);
     const racines = enfantsDe['__racine__'] || [];
     if (racines.length === 0) {
-        container.innerHTML = `<p class="empty-hint">Impossible de construire l'organigramme (vérifie les champs Manager).</p>`;
+        container.innerHTML = `<p class="empty-hint">${t("Impossible de construire l'organigramme (vérifie les champs Manager).")}</p>`;
         return;
     }
     const visites = new Set();
@@ -568,3 +570,12 @@ window.onload = async function () {
     populateTemplateSelect();
     await chargerEmployes();
 };
+
+// Appelé par i18n.js après un changement de langue.
+function onLanguageChangeRerender() {
+    if (typeof employees !== 'undefined' && employees.length) {
+        renderOrgChart();
+        renderEmployeeList();
+    }
+    if (typeof populateManagerSelect === 'function') populateManagerSelect();
+}
