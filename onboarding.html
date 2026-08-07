@@ -10,66 +10,69 @@
 </head>
 <body>
 
+    <button class="lang-toggle-btn lang-toggle-floating" onclick="basculerLangue()" title="Switch language / Changer de langue">EN</button>
+
     <main class="page onboarding-page">
-        <div id="loadingState" class="onboarding-loading">Chargement de ton espace…</div>
+        <div id="loadingState" class="onboarding-loading" data-i18n="Chargement de ton espace…">Chargement de ton espace…</div>
 
         <div id="errorState" class="onboarding-error hidden">
-            <h2>Lien invalide ou expiré</h2>
-            <p>Ce lien d'intégration n'existe pas ou a été révoqué. Contacte ton service RH pour en recevoir un nouveau.</p>
+            <h2 data-i18n="Lien invalide ou expiré">Lien invalide ou expiré</h2>
+            <p data-i18n="Ce lien d'intégration n'existe pas ou a été révoqué. Contacte ton service RH pour en recevoir un nouveau.">Ce lien d'intégration n'existe pas ou a été révoqué. Contacte ton service RH pour en recevoir un nouveau.</p>
         </div>
 
         <div id="contentState" class="hidden">
             <section class="card welcome-card">
                 <div id="empLogoSpace" class="welcome-logo-slot hidden"></div>
-                <h2 class="welcome-title">Bienvenue, <span id="empWelcomeName" class="accent"></span> 👋</h2>
+                <h2 class="welcome-title"><span data-i18n="Bienvenue,">Bienvenue,</span> <span id="empWelcomeName" class="accent"></span> 👋</h2>
                 <p class="welcome-sub">
-                    Tu es attendu le <strong id="empWelcomeDate">—</strong> chez
-                    <strong id="empWelcomeBoite"></strong>, en tant que
+                    <span data-i18n="Tu es attendu le">Tu es attendu le</span> <strong id="empWelcomeDate">—</strong> <span data-i18n="chez">chez</span>
+                    <strong id="empWelcomeBoite"></strong>, <span data-i18n="en tant que">en tant que</span>
                     <em id="empWelcomePoste"></em>.
                 </p>
                 <div class="welcome-grid">
                     <div class="welcome-tile">
-                        <span class="welcome-tile-label">Wi-Fi des bureaux</span>
+                        <span class="welcome-tile-label" data-i18n="Wi-Fi des bureaux">Wi-Fi des bureaux</span>
                         <span id="empWelcomeWifi" class="welcome-tile-value mono">—</span>
                     </div>
                     <div class="welcome-tile">
-                        <span class="welcome-tile-label">Documents à consulter</span>
-                        <div id="empDocsDownloadWrapper" class="welcome-docs">Aucun document annexe</div>
+                        <span class="welcome-tile-label" data-i18n="Documents à consulter">Documents à consulter</span>
+                        <div id="empDocsDownloadWrapper" class="welcome-docs" data-i18n="Aucun document annexe">Aucun document annexe</div>
                     </div>
                 </div>
             </section>
 
             <section class="card">
-                <h3 class="card-title">Ton équipe</h3>
+                <h3 class="card-title" data-i18n="Ton équipe">Ton équipe</h3>
                 <div id="teamContainer" class="team-list"></div>
             </section>
 
             <section id="fullChartSection" class="card hidden">
-                <h3 class="card-title">Organigramme de l'entreprise</h3>
+                <h3 class="card-title" data-i18n="Organigramme de l'entreprise">Organigramme de l'entreprise</h3>
                 <div id="fullChartContainer" class="org-chart-dynamic"></div>
             </section>
 
             <section id="checklistSection" class="card hidden">
-                <h3 class="card-title">Ta feuille de route</h3>
+                <h3 class="card-title" data-i18n="Ta feuille de route">Ta feuille de route</h3>
                 <div id="checklistContainer" class="checklist-employee"></div>
             </section>
 
             <section id="linksSection" class="card hidden">
-                <h3 class="card-title">Liens utiles</h3>
+                <h3 class="card-title" data-i18n="Liens utiles">Liens utiles</h3>
                 <div id="linksContainer" class="mini-list-view"></div>
             </section>
 
             <section id="contactsSection" class="card hidden">
-                <h3 class="card-title">Contacts clés</h3>
+                <h3 class="card-title" data-i18n="Contacts clés">Contacts clés</h3>
                 <div id="contactsContainer" class="mini-list-view"></div>
             </section>
         </div>
     </main>
 
     <footer class="app-footer">
-        <p>© 2026 Rootly — Plateforme RH &amp; Onboarding</p>
+        <p>© 2026 Rootly — <span data-i18n="Plateforme RH &amp; Onboarding">Plateforme RH &amp; Onboarding</span></p>
     </footer>
 
+    <script src="i18n.js"></script>
     <script src="onboarding.js"></script>
 </body>
 </html>
