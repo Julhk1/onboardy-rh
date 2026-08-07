@@ -115,7 +115,7 @@ function modifierEmploye(id) {
 async function supprimerEmploye(id) {
     const emp = employees.find(e => e.id === id);
     if (!emp) return;
-    const ok = confirm(`Supprimer définitivement ${emp.prenom} ${emp.nom} ? Son lien d'onboarding cessera de fonctionner.`);
+    const ok = await confirmerAction(`Supprimer définitivement ${emp.prenom} ${emp.nom} ? Son lien d'onboarding cessera de fonctionner.`);
     if (!ok) return;
 
     const { error } = await supabaseClient.from('employees').delete().eq('id', id);
@@ -289,7 +289,14 @@ function importerCSV(event) {
         const nomsConnus = new Set(
             employees.concat(nouveaux).map(e => normaliserNom(`${e.prenom} ${e.nom}`))
         );
-        const managersInconnus = nouveaux.filter(e => e.manager && !nomsConnus.has(normaliserNom(e.manager)));
+        const managersInconnus = nouveaux.filter(e =>
+            e.manager && !nomsConnus.has(normaliserNom(e.manager))
+        );
+        // Cas fréquent : quelqu'un indiqué comme son propre manager (ex : le
+        // CEO qui se met lui-même dans sa colonne Manager par erreur).
+        const autoReferences = nouveaux.filter(e =>
+            e.manager && normaliserNom(e.manager) === normaliserNom(`${e.prenom} ${e.nom}`)
+        );
 
         toast(`${nouveaux.length} employé(s) importé(s) dans l'organigramme.`);
         if (managersInconnus.length > 0) {
@@ -297,6 +304,13 @@ function importerCSV(event) {
             const suite = managersInconnus.length > 4 ? '…' : '';
             toast(
                 `Manager non reconnu pour ${managersInconnus.length} employé(s) (${apercu}${suite}) — vérifie l'orthographe exacte dans la colonne Manager (ils sont provisoirement au sommet de l'organigramme).`,
+                "error"
+            );
+        }
+        if (autoReferences.length > 0) {
+            const apercu = autoReferences.slice(0, 4).map(e => `${e.prenom} ${e.nom}`).join(', ');
+            toast(
+                `${apercu} ${autoReferences.length > 1 ? 'sont indiqués' : 'est indiqué'} comme son propre manager dans le CSV — laisse la case Manager vide pour la/les personne(s) tout en haut de l'organigramme.`,
                 "error"
             );
         }
@@ -360,16 +374,42 @@ function updateServiceSuggestions() {
 // ============================================================
 // ORGANIGRAMME VISUEL (arbre avec édition inline)
 // ============================================================
+// Construit l'arbre manager -> subordonnés. Casse aussi les références
+// circulaires (ex : quelqu'un indiqué comme son propre manager, ou une
+// chaîne A -> B -> A) en traitant la personne concernée comme un sommet,
+// plutôt que de faire échouer tout l'organigramme à cause d'une seule
+// ligne mal remplie. Retourne aussi la liste des personnes concernées
+// par un souci de ce type, pour pouvoir prévenir la RH.
 function construireArbre(liste) {
     const parNom = {};
     liste.forEach(e => { parNom[normaliserNom(`${e.prenom} ${e.nom}`)] = e; });
+
+    function faitPartieDunCycle(emp) {
+        const cleDepart = normaliserNom(`${emp.prenom} ${emp.nom}`);
+        const vus = new Set();
+        let courant = emp;
+        while (courant && courant.manager) {
+            const cleManager = normaliserNom(courant.manager);
+            if (cleManager === cleDepart) return true;
+            if (vus.has(cleManager)) return true;
+            vus.add(cleManager);
+            courant = parNom[cleManager];
+        }
+        return false;
+    }
+
     const enfantsDe = {};
+    const problemes = [];
     liste.forEach(e => {
-        const cleManager = e.manager && parNom[normaliserNom(e.manager)] ? normaliserNom(e.manager) : '__racine__';
+        const managerReconnu = e.manager && parNom[normaliserNom(e.manager)];
+        const dansUnCycle = managerReconnu && faitPartieDunCycle(e);
+        if (dansUnCycle) problemes.push(e);
+
+        const cleManager = (managerReconnu && !dansUnCycle) ? normaliserNom(e.manager) : '__racine__';
         if (!enfantsDe[cleManager]) enfantsDe[cleManager] = [];
         enfantsDe[cleManager].push(e);
     });
-    return enfantsDe;
+    return { enfantsDe, problemes };
 }
 
 // Mémorise quelles branches sont repliées (par id d'employé), pour que
@@ -423,7 +463,7 @@ function renderOrgChart() {
         container.innerHTML = `<p class="empty-hint">Ajoute des employés pour voir apparaître l'organigramme.</p>`;
         return;
     }
-    const enfantsDe = construireArbre(employees);
+    const { enfantsDe, problemes } = construireArbre(employees);
     const racines = enfantsDe['__racine__'] || [];
     if (racines.length === 0) {
         container.innerHTML = `<p class="empty-hint">Impossible de construire l'organigramme (vérifie les champs Manager).</p>`;
@@ -431,6 +471,15 @@ function renderOrgChart() {
     }
     const visites = new Set();
     container.innerHTML = `<div class="org-tree-list">${racines.map(r => renderNoeudArbre(r, enfantsDe, visites, 0)).join('')}</div>`;
+
+    if (problemes.length > 0) {
+        const apercu = problemes.slice(0, 4).map(e => `${e.prenom} ${e.nom}`).join(', ');
+        const suite = problemes.length > 4 ? '…' : '';
+        toast(
+            `${problemes.length} employé(s) (${apercu}${suite}) ont un Manager qui forme une boucle (ex : indiqué comme son propre manager) — ils sont provisoirement affichés au sommet. Corrige la colonne Manager sur leur fiche.`,
+            "error"
+        );
+    }
 }
 
 // ============================================================
