@@ -10,6 +10,8 @@ function formatDate(dateStr) {
     return `${d}/${m}/${y}`;
 }
 
+let dernieresDonnees = null;
+
 async function chargerEspacePersonnel() {
     const token = new URLSearchParams(window.location.search).get('token');
     if (!token) { afficherErreur(); return; }
@@ -18,11 +20,20 @@ async function chargerEspacePersonnel() {
         const res = await fetch(`/api/employee-view?token=${encodeURIComponent(token)}`);
         if (!res.ok) { afficherErreur(); return; }
         const { employee, organization, colleagues, chaineHierarchique, organigrammeComplet } = await res.json();
+        dernieresDonnees = { employee, organization, colleagues, chaineHierarchique: chaineHierarchique || [], organigrammeComplet };
         afficherContenu(employee, organization, colleagues, chaineHierarchique || [], organigrammeComplet);
     } catch (err) {
         console.error(err);
         afficherErreur();
     }
+}
+
+// Appelé par i18n.js après un changement de langue : ré-affiche le contenu
+// déjà reçu, sans re-télécharger les données.
+function onLanguageChangeRerender() {
+    if (!dernieresDonnees) return;
+    const { employee, organization, colleagues, chaineHierarchique, organigrammeComplet } = dernieresDonnees;
+    afficherContenu(employee, organization, colleagues, chaineHierarchique, organigrammeComplet);
 }
 
 function afficherErreur() {
@@ -50,7 +61,7 @@ function afficherContenu(employee, organization, colleagues, chaineHierarchique,
     const docs = organization?.documents || [];
     docsWrapper.innerHTML = docs.length
         ? docs.map(d => `<a href="${d.dataUrl}" download="${escapeHtml(d.name)}">⬇ ${escapeHtml(d.name)}</a>`).join('<br>')
-        : "Aucun document annexe";
+        : t("Aucun document annexe");
 
     const teamContainer = document.getElementById('teamContainer');
     const equipe = (colleagues || []).filter(c => !(c.prenom === employee.prenom && c.nom === employee.nom));
@@ -70,13 +81,13 @@ function afficherContenu(employee, organization, colleagues, chaineHierarchique,
     });
     html += `
         <div class="chain-item is-self">
-            <span class="chain-level">Toi</span>
+            <span class="chain-level">${t('Toi')}</span>
             <span>${escapeHtml(employee.prenom)} ${escapeHtml(employee.nom)} — ${escapeHtml(employee.poste) || '—'}</span>
         </div>
     </div>`;
 
     if (equipe.length > 0) {
-        html += `<div class="team-others-label">Collègues du service ${escapeHtml(employee.service || '')}</div>`;
+        html += `<div class="team-others-label">${t('Collègues du service {service}', { service: escapeHtml(employee.service || '') })}</div>`;
         html += `<div class="team-list">` + equipe.map(c =>
             `<div class="team-other">${escapeHtml(c.prenom)} ${escapeHtml(c.nom)} — ${escapeHtml(c.poste) || '—'}</div>`
         ).join('') + `</div>`;
@@ -172,7 +183,7 @@ function construireEtRendreArbre(liste) {
     });
 
     const racines = enfantsDe['__racine__'] || [];
-    if (racines.length === 0) return `<p class="empty-hint">Organigramme indisponible.</p>`;
+    if (racines.length === 0) return `<p class="empty-hint">${t('Organigramme indisponible.')}</p>`;
 
     const visites = new Set();
     function rendre(e) {
