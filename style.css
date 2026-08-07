@@ -47,12 +47,11 @@ body {
 .auth-loading-mark {
     background: var(--gold);
     color: var(--ink);
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 16px;
-    padding: 12px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
     border-radius: var(--radius-sm);
-    letter-spacing: 0.5px;
     animation: auth-pulse 1.1s ease-in-out infinite;
 }
 @keyframes auth-pulse {
@@ -65,7 +64,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--ink);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(184, 134, 59, 0.22), transparent 55%),
+        var(--ink);
     padding: 20px;
 }
 
@@ -75,7 +76,7 @@ body {
     padding: 32px;
     width: 100%;
     max-width: 380px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .brand-center { justify-content: center; margin-bottom: 24px; }
@@ -147,7 +148,7 @@ body {
 
 /* ---------- HEADER ---------- */
 .app-header {
-    background: var(--ink);
+    background: linear-gradient(180deg, var(--ink-soft), var(--ink));
     padding: 16px 32px;
     display: flex;
     align-items: center;
@@ -165,12 +166,11 @@ body {
 .brand-mark {
     background: var(--gold);
     color: var(--ink);
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 14px;
-    padding: 8px 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px;
     border-radius: var(--radius-sm);
-    letter-spacing: 0.5px;
 }
 
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
@@ -633,6 +633,23 @@ body {
     border-bottom: 1px solid var(--border);
 }
 
+.pending-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.pending-selected-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 3px 10px;
+}
+
 .pending-select-all {
     display: flex;
     align-items: center;
@@ -644,7 +661,7 @@ body {
 }
 .pending-select-all input { width: 16px; height: 16px; cursor: pointer; }
 
-#pendingBulkSendBtn:disabled { color: var(--text-muted); cursor: not-allowed; text-decoration: none; }
+#pendingBulkSendBtn:disabled, #pendingBulkSkipBtn:disabled { color: var(--text-muted); cursor: not-allowed; text-decoration: none; }
 
 .pending-checkbox {
     width: 17px;
