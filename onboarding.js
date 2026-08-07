@@ -123,7 +123,6 @@ function afficherContenu(employee, organization, colleagues, chaineHierarchique,
     if (organigrammeComplet && organigrammeComplet.length > 0) {
         document.getElementById('fullChartSection').classList.remove('hidden');
         document.getElementById('fullChartContainer').innerHTML = construireEtRendreArbre(organigrammeComplet);
-        ajusterEchelleOrganigramme(document.getElementById('fullChartContainer'));
     }
 }
 
@@ -135,6 +134,14 @@ function normaliserNomPersonne(s) {
         .trim()
         .toLowerCase()
         .replace(/\s+/g, ' ');
+}
+
+const COULEURS_SERVICE = ['#B8863B', '#2F7D5C', '#4A6FA5', '#A5504A', '#6B5B95', '#3E8E8E'];
+function couleurService(service) {
+    const s = service || "Général";
+    let hash = 0;
+    for (let i = 0; i < s.length; i++) hash = s.charCodeAt(i) + ((hash << 5) - hash);
+    return COULEURS_SERVICE[Math.abs(hash) % COULEURS_SERVICE.length];
 }
 
 function construireEtRendreArbre(liste) {
@@ -173,53 +180,24 @@ function construireEtRendreArbre(liste) {
         if (visites.has(cle)) return '';
         visites.add(cle);
         const enfants = enfantsDe[cle] || [];
+        const couleur = couleurService(e.service);
         return `
-            <li>
-                <div class="tree-box">
-                    <div class="tree-box-header">
-                        <span class="tree-avatar">${(e.prenom || '?').charAt(0)}${(e.nom || '?').charAt(0)}</span>
-                        <div class="tree-box-text">
-                            <span class="tree-name">${escapeHtml(e.prenom)} ${escapeHtml(e.nom)}</span>
-                            <span class="tree-role">${escapeHtml(e.poste) || '—'}</span>
-                        </div>
+            <div class="org-node">
+                <div class="org-node-row">
+                    <span class="org-toggle-spacer"></span>
+                    <span class="tree-avatar" style="background:${couleur}">${(e.prenom || '?').charAt(0)}${(e.nom || '?').charAt(0)}</span>
+                    <div class="org-node-text">
+                        <span class="tree-name">${escapeHtml(e.prenom)} ${escapeHtml(e.nom)}</span>
+                        <span class="tree-role">${escapeHtml(e.poste) || '—'}</span>
                     </div>
-                    <span class="service-chip tree-service">${escapeHtml(e.service)}</span>
+                    <span class="service-chip org-service" style="background:${couleur}22; color:${couleur}">${escapeHtml(e.service)}</span>
                 </div>
-                ${enfants.length ? `<ul>${enfants.map(rendre).join('')}</ul>` : ''}
-            </li>
+                ${enfants.length ? `<div class="org-children">${enfants.map(rendre).join('')}</div>` : ''}
+            </div>
         `;
     }
 
-    return `<div class="orgtree-scale-wrapper"><div class="orgtree"><ul>${racines.map(rendre).join('')}</ul></div></div>`;
-}
-
-function ajusterEchelleOrganigramme(container) {
-    const tree = container.querySelector('.orgtree');
-    if (!tree) return;
-    tree.style.transform = 'none';
-
-    const boites = tree.querySelectorAll('.tree-box');
-    if (boites.length === 0) return;
-
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    const refRect = container.getBoundingClientRect();
-    boites.forEach(boite => {
-        const r = boite.getBoundingClientRect();
-        minX = Math.min(minX, r.left - refRect.left);
-        minY = Math.min(minY, r.top - refRect.top);
-        maxX = Math.max(maxX, r.right - refRect.left);
-        maxY = Math.max(maxY, r.bottom - refRect.top);
-    });
-
-    const largeurNaturelle = maxX - minX;
-    const hauteurNaturelle = maxY - minY;
-    if (largeurNaturelle <= 0 || hauteurNaturelle <= 0) return;
-
-    const largeurDisponible = container.clientWidth - 20;
-    const hauteurDisponible = container.clientHeight - 20;
-    let echelle = Math.min(largeurDisponible / largeurNaturelle, hauteurDisponible / hauteurNaturelle);
-    echelle = Math.max(0.4, Math.min(echelle, 1.6));
-    tree.style.transform = `scale(${echelle})`;
+    return `<div class="org-tree-list">${racines.map(rendre).join('')}</div>`;
 }
 
 window.onload = chargerEspacePersonnel;
