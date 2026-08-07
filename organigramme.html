@@ -15,17 +15,19 @@
 
     <header class="app-header">
         <div class="brand">
-            <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V12"/><path d="M12 12L6.5 17.5"/><path d="M12 12L17.5 17.5"/><circle cx="6.5" cy="19" r="1.8"/><circle cx="17.5" cy="19" r="1.8"/></svg></span>
+            <span class="brand-mark" aria-label="Rootly"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.2"/><path d="M9 4V3.3A1.3 1.3 0 0 1 10.3 2h3.4A1.3 1.3 0 0 1 15 3.3V4"/><path d="M8.6 12.2l2.1 2.1 4.7-4.7"/><path d="M8.5 17h7"/></svg></span>
             <div class="brand-text">
                 <span class="brand-name">Rootly</span>
                 <span class="brand-tag">Organigramme</span>
             </div>
         </div>
-        <nav class="app-nav">
-            <a href="organigramme.html" class="app-nav-link is-active">Organigramme</a>
-            <a href="index.html?dashboard=1" class="app-nav-link">Onboarding</a>
-            <a href="evaluations.html" class="app-nav-link">Evaluations &amp; Remuneration</a>
-            <button class="view-btn logout-btn" onclick="deconnexion()">Deconnexion</button>
+        <button class="nav-toggle-btn" onclick="toggleMobileNav()" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg></button>
+        <nav class="app-nav" id="appNav">
+            <a href="organigramme.html" class="app-nav-link is-active" data-i18n="Organigramme">Organigramme</a>
+            <a href="index.html?dashboard=1" class="app-nav-link" data-i18n="Onboarding">Onboarding</a>
+            <a href="evaluations.html" class="app-nav-link" data-i18n="Evaluations &amp; Remuneration">Evaluations &amp; Remuneration</a>
+            <button class="lang-toggle-btn" onclick="basculerLangue()" title="Switch language / Changer de langue">EN</button>
+            <button class="view-btn logout-btn" onclick="deconnexion()" data-i18n="Deconnexion">Deconnexion</button>
         </nav>
     </header>
 
@@ -35,127 +37,127 @@
             <div class="col col-left">
 
                 <section class="card">
-                    <h3 class="card-title">Ajouter / modifier un employe</h3>
+                    <h3 class="card-title" data-i18n="Ajouter / modifier un employe">Ajouter / modifier un employe</h3>
 
                     <div id="editionBanner" class="duplicate-banner edition-banner hidden">
                         Modification de <strong id="editionNomLabel"></strong>.
-                        <button class="link-btn" onclick="viderFormulaireEmploye()">Annuler la modification</button>
+                        <button class="link-btn" onclick="viderFormulaireEmploye()" data-i18n="Annuler la modification">Annuler la modification</button>
                     </div>
 
                     <div class="field">
-                        <label for="templateSelect">Utiliser un modele de poste (optionnel)</label>
+                        <label for="templateSelect" data-i18n="Utiliser un modele de poste (optionnel)">Utiliser un modele de poste (optionnel)</label>
                         <select id="templateSelect" onchange="appliquerModelePoste()">
-                            <option value="">— Aucun modele —</option>
+                            <option value="" data-i18n="— Aucun modele —">— Aucun modele —</option>
                         </select>
                     </div>
 
                     <div class="field-row">
                         <div class="field">
-                            <label for="empPrenom">Prenom</label>
+                            <label for="empPrenom" data-i18n="Prenom">Prenom</label>
                             <input id="empPrenom" type="text">
                         </div>
                         <div class="field">
-                            <label for="empNom">Nom</label>
+                            <label for="empNom" data-i18n="Nom">Nom</label>
                             <input id="empNom" type="text">
                         </div>
                     </div>
 
                     <div class="field-row">
                         <div class="field">
-                            <label for="empPoste">Intitule du poste</label>
+                            <label for="empPoste" data-i18n="Intitule du poste">Intitule du poste</label>
                             <input id="empPoste" type="text">
                         </div>
                         <div class="field">
-                            <label for="empService">Service</label>
-                            <input id="empService" type="text" list="serviceSuggestions" placeholder="Finance, Tech, Ventes...">
+                            <label for="empService" data-i18n="Service">Service</label>
+                            <input id="empService" type="text" list="serviceSuggestions" placeholder="Finance, Tech, Ventes..." data-i18n-ph="Finance, Tech, Ventes...">
                             <datalist id="serviceSuggestions"></datalist>
                         </div>
                     </div>
 
                     <div class="field-row">
                         <div class="field">
-                            <label for="empManagerSelect">Manager direct</label>
+                            <label for="empManagerSelect" data-i18n="Manager direct">Manager direct</label>
                             <select id="empManagerSelect" onchange="gererChangementManager()">
-                                <option value="">— Aucun (sommet de l'organigramme) —</option>
-                                <option value="__externe__">Autre / externe (preciser)...</option>
+                                <option value="" data-i18n="— Aucun (sommet de l'organigramme) —">— Aucun (sommet de l'organigramme) —</option>
+                                <option value="__externe__" data-i18n="Autre / externe (preciser)...">Autre / externe (preciser)...</option>
                             </select>
-                            <input id="empManagerExterne" type="text" placeholder="Nom du manager externe" class="hidden manager-externe-input">
+                            <input id="empManagerExterne" type="text" placeholder="Nom du manager externe" class="hidden manager-externe-input" data-i18n-ph="Nom du manager externe">
                         </div>
                         <div class="field">
-                            <label for="empEmail">Email personnel</label>
+                            <label for="empEmail" data-i18n="Email personnel">Email personnel</label>
                             <input id="empEmail" type="email">
                         </div>
                     </div>
 
                     <div class="field">
-                        <label for="empDate">Date d'arrivee</label>
+                        <label for="empDate" data-i18n="Date d'arrivee">Date d'arrivee</label>
                         <input id="empDate" type="date">
                     </div>
 
                     <button id="empSubmitBtn" onclick="enregistrerEmploye()" class="btn-primary">
-                        Ajouter cet employe
+                        <span data-i18n="Ajouter cet employe">Ajouter cet employe</span>
                     </button>
                 </section>
 
                 <section class="card">
-                    <h3 class="card-title">Import en masse</h3>
-                    <p class="hint-text">
+                    <h3 class="card-title" data-i18n="Import en masse">Import en masse</h3>
+                    <p class="hint-text" data-i18n-html="Cree ou met a jour la structure uniquement — n'envoie aucun email.<br>Colonnes attendues : Prenom, Nom, Poste, Service, Manager, Email, Date (AAAA-MM-JJ).<br><strong>Manager</strong> : ecris juste le prenom et le nom du manager (ex : Caroline Courtel), exactement comme dans ses propres colonnes Prenom/Nom sur son autre ligne — pas besoin d'ajouter son poste. Laisse la case vide si la personne est tout en haut de l'organigramme.">
                         Cree ou met a jour la structure uniquement — n'envoie aucun email.<br>
                         Colonnes attendues : Prenom, Nom, Poste, Service, Manager, Email, Date (AAAA-MM-JJ).<br>
                         <strong>Manager</strong> : ecris juste le prenom et le nom du manager (ex : Caroline Courtel), exactement comme dans ses propres colonnes Prenom/Nom sur son autre ligne — pas besoin d'ajouter son poste. Laisse la case vide si la personne est tout en haut de l'organigramme.
                     </p>
                     <div class="card-title-row">
                         <span></span>
-                        <button class="link-btn" onclick="telechargerModeleExcel()">Modele CSV</button>
+                        <button class="link-btn" onclick="telechargerModeleExcel()" data-i18n="Modele CSV">Modele CSV</button>
                     </div>
                     <div class="upload-box upload-box-muted">
                         <input type="file" id="csvInput" accept=".csv" onchange="importerCSV(event)">
                         <div class="upload-hint">
                             <span class="upload-icon">^</span>
-                            Importer une liste d'employes
+                            <span data-i18n="Importer une liste d'employes">Importer une liste d'employes</span>
                         </div>
                     </div>
                 </section>
 
                 <section class="card">
-                    <h3 class="card-title">Modeles de poste</h3>
-                    <p class="hint-text">Cree un modele une fois, reutilise-le pour chaque futur recrutement sur ce poste.</p>
-                    <input id="templateNom" placeholder="Nom du modele (ex : Dev Front)">
-                    <input id="templatePoste" placeholder="Intitule du poste">
-                    <input id="templateService" placeholder="Service">
-                    <input id="templateManager" placeholder="Manager par defaut">
-                    <button class="link-btn" onclick="ajouterModelePoste()">+ Enregistrer le modele</button>
+                    <h3 class="card-title" data-i18n="Modeles de poste">Modeles de poste</h3>
+                    <p class="hint-text" data-i18n="Cree un modele une fois, reutilise-le pour chaque futur recrutement sur ce poste.">Cree un modele une fois, reutilise-le pour chaque futur recrutement sur ce poste.</p>
+                    <input id="templateNom" placeholder="Nom du modele (ex : Dev Front)" data-i18n-ph="Nom du modele (ex : Dev Front)">
+                    <input id="templatePoste" placeholder="Intitule du poste" data-i18n-ph="Intitule du poste">
+                    <input id="templateService" placeholder="Service" data-i18n-ph="Service">
+                    <input id="templateManager" placeholder="Manager par defaut" data-i18n-ph="Manager par defaut">
+                    <button class="link-btn" onclick="ajouterModelePoste()" data-i18n="+ Enregistrer le modele">+ Enregistrer le modele</button>
                     <div id="templatesListRH" class="mini-list"></div>
                 </section>
             </div>
 
             <div class="col col-right">
                 <section class="card">
-                    <h3 class="card-title">Organigramme</h3>
-                    <p class="hint-text">Clique sur les icones d'un profil pour le modifier ou le supprimer directement.</p>
+                    <h3 class="card-title" data-i18n="Organigramme">Organigramme</h3>
+                    <p class="hint-text" data-i18n="Clique sur les icones d'un profil pour le modifier ou le supprimer directement.">Clique sur les icones d'un profil pour le modifier ou le supprimer directement.</p>
                     <div id="orgChartContainer" class="org-chart-dynamic">
-                        <p class="empty-hint">Ajoute des employes pour voir apparaitre l'organigramme.</p>
+                        <p class="empty-hint" data-i18n="Ajoute des employes pour voir apparaitre l'organigramme.">Ajoute des employes pour voir apparaitre l'organigramme.</p>
                     </div>
                 </section>
 
                 <section class="card">
                     <div class="card-title-row">
-                        <h3 class="card-title">Liste des employes</h3>
+                        <h3 class="card-title" data-i18n="Liste des employes">Liste des employes</h3>
                         <div class="search-input-wrapper">
-                            <input id="employeeListSearch" type="text" placeholder="Rechercher..." oninput="renderEmployeeList()">
+                            <input id="employeeListSearch" type="text" placeholder="Rechercher..." data-i18n-ph="Rechercher..." oninput="renderEmployeeList()">
                         </div>
                     </div>
                     <div class="pending-toolbar">
                         <label class="pending-select-all">
                             <input type="checkbox" id="employeeSelectAll" onchange="toggleSelectionTousEmployes(this.checked)">
-                            Tout selectionner
+                            <span data-i18n="Tout selectionner">Tout selectionner</span>
                         </label>
                         <button id="employeeBulkDeleteBtn" class="link-btn link-btn-danger" onclick="supprimerEmployesSelectionnes()" disabled>
-                            Supprimer les selectionnes (<span id="employeeSelectedCount">0</span>)
+                            <span data-i18n="Supprimer les selectionnes">Supprimer les selectionnes</span> (<span id="employeeSelectedCount">0</span>)
                         </button>
                     </div>
                     <div id="employeeListContainer" class="employee-list scroll-panel">
-                        <p class="empty-hint">Aucun employe pour le moment.</p>
+                        <p class="empty-hint" data-i18n="Aucun employe pour le moment.">Aucun employe pour le moment.</p>
                     </div>
                 </section>
             </div>
@@ -166,6 +168,7 @@
         <p>© 2026 Rootly — Plateforme RH &amp; Onboarding</p>
     </footer>
 
+    <script src="i18n.js"></script>
     <script src="shared.js"></script>
     <script src="app-organigramme.js"></script>
 </body>
