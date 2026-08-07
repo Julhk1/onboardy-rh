@@ -145,6 +145,15 @@
                             <input id="employeeListSearch" type="text" placeholder="Rechercher..." oninput="renderEmployeeList()">
                         </div>
                     </div>
+                    <div class="pending-toolbar">
+                        <label class="pending-select-all">
+                            <input type="checkbox" id="employeeSelectAll" onchange="toggleSelectionTousEmployes(this.checked)">
+                            Tout selectionner
+                        </label>
+                        <button id="employeeBulkDeleteBtn" class="link-btn link-btn-danger" onclick="supprimerEmployesSelectionnes()" disabled>
+                            Supprimer les selectionnes (<span id="employeeSelectedCount">0</span>)
+                        </button>
+                    </div>
                     <div id="employeeListContainer" class="employee-list scroll-panel">
                         <p class="empty-hint">Aucun employe pour le moment.</p>
                     </div>
