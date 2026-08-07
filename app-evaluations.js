@@ -196,7 +196,7 @@ function renderEmployeeReviewList() {
 }
 
 async function viderNotesPreparation(employeeId) {
-    const ok = confirm("Vider les notes de préparation de cet employé ? Il pourra en réécrire de nouvelles avant son prochain entretien.");
+    const ok = await confirmerAction("Vider les notes de préparation de cet employé ? Il pourra en réécrire de nouvelles avant son prochain entretien.", { danger: false, texteOui: "Vider" });
     if (!ok) return;
     const { error } = await supabaseClient.from('employees').update({ prep_notes: '' }).eq('id', employeeId);
     if (error) { toast("Erreur lors de la suppression.", "error"); return; }
@@ -287,7 +287,7 @@ async function enregistrerEntretien() {
 }
 
 async function supprimerEntretien(reviewId) {
-    const ok = confirm("Supprimer définitivement cet entretien ?");
+    const ok = await confirmerAction("Supprimer définitivement cet entretien ?");
     if (!ok) return;
     const { error } = await supabaseClient.from('reviews').delete().eq('id', reviewId);
     if (error) { toast("Erreur lors de la suppression.", "error"); return; }
@@ -362,7 +362,7 @@ async function enregistrerRemuneration() {
 }
 
 async function supprimerRemuneration(compId) {
-    const ok = confirm("Supprimer définitivement cette entrée de rémunération ?");
+    const ok = await confirmerAction("Supprimer définitivement cette entrée de rémunération ?");
     if (!ok) return;
     const { error } = await supabaseClient.from('compensations').delete().eq('id', compId);
     if (error) { toast("Erreur lors de la suppression.", "error"); return; }
