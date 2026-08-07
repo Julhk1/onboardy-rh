@@ -228,7 +228,13 @@ function appliquerModelePoste() {
 // IMPORT CSV
 // ============================================================
 function telechargerModeleExcel() {
-    const csvContent = "data:text/csv;charset=utf-8,Prenom,Nom,Poste,Service,Manager,Email,Date\nLucas,Bernard,Développeur Front,Tech,Pierre Leroy (CTO),lucas.bernard@exemple.com,2026-09-01";
+    const lignes = [
+        "Prenom,Nom,Poste,Service,Manager,Email,Date",
+        "Caroline,Courtel,CEO,Management,,caroline.courtel@exemple.com,2026-01-01",
+        "Julien,Hobeika,CFO,Finance,Caroline Courtel,julien.hobeika@exemple.com,2026-09-01",
+        "Lucas,Bernard,Developpeur Front,Tech,Julien Hobeika,lucas.bernard@exemple.com,2026-09-01"
+    ];
+    const csvContent = "data:text/csv;charset=utf-8," + lignes.join("\n");
     const link = document.createElement("a");
     link.setAttribute("href", encodeURI(csvContent));
     link.setAttribute("download", "Modele_DayOne.csv");
@@ -277,7 +283,24 @@ function importerCSV(event) {
         const { error } = await supabaseClient.from('employees').insert(nouveaux);
         if (error) { toast("Erreur lors de l'import.", "error"); return; }
 
+        // Vérifie que chaque "Manager" renseigné correspond bien à quelqu'un
+        // (déjà existant ou tout juste importé) : sinon la personne se
+        // retrouverait silencieusement au sommet de l'organigramme par erreur.
+        const nomsConnus = new Set(
+            employees.concat(nouveaux).map(e => normaliserNom(`${e.prenom} ${e.nom}`))
+        );
+        const managersInconnus = nouveaux.filter(e => e.manager && !nomsConnus.has(normaliserNom(e.manager)));
+
         toast(`${nouveaux.length} employé(s) importé(s) dans l'organigramme.`);
+        if (managersInconnus.length > 0) {
+            const apercu = managersInconnus.slice(0, 4).map(e => `${e.prenom} ${e.nom}`).join(', ');
+            const suite = managersInconnus.length > 4 ? '…' : '';
+            toast(
+                `Manager non reconnu pour ${managersInconnus.length} employé(s) (${apercu}${suite}) — vérifie l'orthographe exacte dans la colonne Manager (ils sont provisoirement au sommet de l'organigramme).`,
+                "error"
+            );
+        }
+
         await chargerEmployes();
     };
     reader.readAsText(file);
