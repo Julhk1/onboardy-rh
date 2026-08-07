@@ -7,6 +7,7 @@ let pendingLinks = [];
 let pendingContacts = [];
 let pendingChecklist = [];
 let employees = [];
+let pendingSelection = new Set();
 
 // ============================================================
 // AUTHENTIFICATION RH
@@ -16,6 +17,7 @@ let loginMode = 'login';
 function setLoginMode(mode) {
     loginMode = mode;
     const passwordWrapper = document.getElementById('passwordFieldWrapper');
+    const confirmPasswordWrapper = document.getElementById('confirmPasswordFieldWrapper');
     const forgotBtn = document.getElementById('forgotPasswordBtn');
     const toggleBtn = document.getElementById('loginToggleBtn');
     const backBtn = document.getElementById('backToLoginBtn');
@@ -24,11 +26,13 @@ function setLoginMode(mode) {
     const passwordHint = document.getElementById('passwordHint');
 
     document.getElementById('loginError').classList.add('hidden');
+    document.getElementById('confirmPassword').value = "";
 
     if (mode === 'login') {
         titleEl.innerText = "Connexion";
         submitBtn.innerText = "Se connecter";
         passwordWrapper.classList.remove('hidden');
+        confirmPasswordWrapper.classList.add('hidden');
         forgotBtn.classList.remove('hidden');
         toggleBtn.classList.remove('hidden');
         toggleBtn.innerText = "Pas encore de compte ? Créer un espace RH";
@@ -38,6 +42,7 @@ function setLoginMode(mode) {
         titleEl.innerText = "Créer un espace RH";
         submitBtn.innerText = "Créer mon espace";
         passwordWrapper.classList.remove('hidden');
+        confirmPasswordWrapper.classList.remove('hidden');
         forgotBtn.classList.add('hidden');
         toggleBtn.classList.remove('hidden');
         toggleBtn.innerText = "Déjà un compte ? Se connecter";
@@ -47,6 +52,7 @@ function setLoginMode(mode) {
         titleEl.innerText = "Mot de passe oublié";
         submitBtn.innerText = "Envoyer le lien de réinitialisation";
         passwordWrapper.classList.add('hidden');
+        confirmPasswordWrapper.classList.add('hidden');
         forgotBtn.classList.add('hidden');
         toggleBtn.classList.add('hidden');
         backBtn.classList.remove('hidden');
@@ -115,6 +121,11 @@ async function soumettreLogin() {
         return;
     }
 
+    if (loginMode === 'signup' && password !== val('confirmPassword')) {
+        afficherErreurLogin("Les deux mots de passe ne correspondent pas.");
+        return;
+    }
+
     const btn = document.getElementById('loginSubmitBtn');
     btn.disabled = true;
     btn.innerText = "Un instant…";
@@ -124,8 +135,17 @@ async function soumettreLogin() {
             const { data, error } = await supabaseClient.auth.signUp({ email, password });
             if (error) throw error;
 
-            if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-                afficherErreurLogin("Un compte existe déjà avec cet email.");
+            // Supabase peut répondre en apparence "avec succès" même quand l'email
+            // existe déjà (pour éviter qu'on puisse deviner les emails inscrits).
+            // Deux indices permettent de le détecter :
+            // 1) le tableau identities est vide,
+            // 2) le compte a en fait été créé il y a longtemps (pas à l'instant).
+            const identitesVides = data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0;
+            const compteDejaAncien = data.user?.created_at
+                && (Date.now() - new Date(data.user.created_at).getTime()) > 10000;
+
+            if (identitesVides || compteDejaAncien) {
+                afficherErreurLogin("Un compte existe déjà avec cet email — connecte-toi plutôt.");
                 setLoginMode('login');
                 document.getElementById('loginEmail').value = email;
                 return;
@@ -383,12 +403,20 @@ function renderPendingList() {
     const container = document.getElementById('pendingListContainer');
     const terme = val('pendingSearch').toLowerCase();
     const pending = employees.filter(e => !e.invite_sent && (!terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme)));
+
+    // Retire de la sélection les employés qui ne sont plus "en attente"
+    // (ex : invitation envoyée entre-temps, ou fiche supprimée).
+    const idsEnAttente = new Set(employees.filter(e => !e.invite_sent).map(e => e.id));
+    Array.from(pendingSelection).forEach(id => { if (!idsEnAttente.has(id)) pendingSelection.delete(id); });
+
     if (pending.length === 0) {
         container.innerHTML = `<p class="empty-hint">${terme ? "Aucun résultat pour cette recherche." : "Aucun employé en attente d'invitation."}</p>`;
+        mettreAJourBarreSelection();
         return;
     }
     container.innerHTML = pending.map(emp => `
         <div class="employee-row employee-row-pending">
+            <input type="checkbox" class="pending-checkbox" aria-label="Selectionner ${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}" ${pendingSelection.has(emp.id) ? 'checked' : ''} onchange="toggleSelectionEmploye('${emp.id}', this.checked)">
             <div class="employee-info">
                 <span class="employee-name">${escapeHtml(emp.prenom)} ${escapeHtml(emp.nom)}</span>
                 <span class="employee-meta">${escapeHtml(emp.poste) || '—'} · <span class="service-chip">${escapeHtml(emp.service)}</span></span>
@@ -402,6 +430,38 @@ function renderPendingList() {
             </div>
         </div>
     `).join('');
+
+    mettreAJourBarreSelection();
+}
+
+// Met à jour le compteur, l'état du bouton d'envoi groupé et la case
+// "tout sélectionner" en fonction de la sélection actuelle.
+function mettreAJourBarreSelection() {
+    const countEl = document.getElementById('pendingSelectedCount');
+    const bulkBtn = document.getElementById('pendingBulkSendBtn');
+    const selectAllBox = document.getElementById('pendingSelectAll');
+    if (!countEl || !bulkBtn || !selectAllBox) return;
+
+    const terme = val('pendingSearch').toLowerCase();
+    const pending = employees.filter(e => !e.invite_sent && (!terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme)));
+
+    countEl.innerText = pendingSelection.size;
+    bulkBtn.disabled = pendingSelection.size === 0;
+    selectAllBox.checked = pending.length > 0 && pending.every(e => pendingSelection.has(e.id));
+    selectAllBox.disabled = pending.length === 0;
+}
+
+function toggleSelectionEmploye(employeeId, coche) {
+    if (coche) pendingSelection.add(employeeId); else pendingSelection.delete(employeeId);
+    mettreAJourBarreSelection();
+}
+
+function toggleSelectionTous(coche) {
+    const terme = val('pendingSearch').toLowerCase();
+    const pending = employees.filter(e => !e.invite_sent && (!terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme)));
+    if (coche) pending.forEach(e => pendingSelection.add(e.id));
+    else pending.forEach(e => pendingSelection.delete(e.id));
+    renderPendingList();
 }
 
 function renderSentList() {
@@ -442,7 +502,7 @@ async function envoyerInvitationDepuisListe(employeeId) {
     await chargerEmployes();
 }
 
-async function envoyerInvitation(emp) {
+async function envoyerInvitation(emp, silencieux = false) {
     const shareLink = `${window.location.origin}/onboarding.html?token=${emp.token}`;
     const sujet = (currentOrg.email_subject && currentOrg.email_subject.trim())
         ? currentOrg.email_subject.trim()
@@ -475,14 +535,43 @@ async function envoyerInvitation(emp) {
 
         if (res.ok) {
             await supabaseClient.from('employees').update({ invite_sent: true }).eq('id', emp.id);
-            toast(`Invitation envoyée à ${emp.email}`);
+            if (!silencieux) toast(`Invitation envoyée à ${emp.email}`);
+            return true;
         } else {
-            toast("La fonction /api/send-email n'est pas encore déployée — voir le README.", "error");
+            if (!silencieux) toast("La fonction /api/send-email n'est pas encore déployée — voir le README.", "error");
+            return false;
         }
     } catch (err) {
         console.error(err);
-        toast("Impossible de contacter le serveur d'envoi.", "error");
+        if (!silencieux) toast("Impossible de contacter le serveur d'envoi.", "error");
+        return false;
     }
+}
+
+// Envoie l'invitation à tous les employés actuellement cochés dans la liste
+// "Employés à onboarder".
+async function envoyerInvitationsSelectionnees() {
+    if (pendingSelection.size === 0) return;
+    const ids = Array.from(pendingSelection);
+    const btn = document.getElementById('pendingBulkSendBtn');
+    const texteInitial = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerText = "Envoi en cours…";
+
+    let succes = 0, echecs = 0;
+    for (const id of ids) {
+        const emp = employees.find(e => e.id === id);
+        if (!emp) continue;
+        const ok = await envoyerInvitation(emp, true);
+        if (ok) succes++; else echecs++;
+    }
+
+    pendingSelection.clear();
+    await chargerEmployes();
+    btn.innerHTML = texteInitial;
+
+    if (succes > 0) toast(`${succes} invitation${succes > 1 ? 's' : ''} envoyée${succes > 1 ? 's' : ''}.`);
+    if (echecs > 0) toast(`${echecs} invitation${echecs > 1 ? 's' : ''} n'${echecs > 1 ? 'ont' : 'a'} pas pu être envoyée${echecs > 1 ? 's' : ''}.`, "error");
 }
 
 // ============================================================
