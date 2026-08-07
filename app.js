@@ -29,28 +29,28 @@ function setLoginMode(mode) {
     document.getElementById('confirmPassword').value = "";
 
     if (mode === 'login') {
-        titleEl.innerText = "Connexion";
-        submitBtn.innerText = "Se connecter";
+        titleEl.innerText = t("Connexion");
+        submitBtn.innerText = t("Se connecter");
         passwordWrapper.classList.remove('hidden');
         confirmPasswordWrapper.classList.add('hidden');
         forgotBtn.classList.remove('hidden');
         toggleBtn.classList.remove('hidden');
-        toggleBtn.innerText = "Pas encore de compte ? Créer un espace RH";
+        toggleBtn.innerText = t("Pas encore de compte ? Créer un espace RH");
         backBtn.classList.add('hidden');
         passwordHint.classList.add('hidden');
     } else if (mode === 'signup') {
-        titleEl.innerText = "Créer un espace RH";
-        submitBtn.innerText = "Créer mon espace";
+        titleEl.innerText = t("Créer un espace RH");
+        submitBtn.innerText = t("Créer mon espace");
         passwordWrapper.classList.remove('hidden');
         confirmPasswordWrapper.classList.remove('hidden');
         forgotBtn.classList.add('hidden');
         toggleBtn.classList.remove('hidden');
-        toggleBtn.innerText = "Déjà un compte ? Se connecter";
+        toggleBtn.innerText = t("Déjà un compte ? Se connecter");
         backBtn.classList.add('hidden');
         passwordHint.classList.remove('hidden');
     } else if (mode === 'forgot') {
-        titleEl.innerText = "Mot de passe oublié";
-        submitBtn.innerText = "Envoyer le lien de réinitialisation";
+        titleEl.innerText = t("Mot de passe oublié");
+        submitBtn.innerText = t("Envoyer le lien de réinitialisation");
         passwordWrapper.classList.add('hidden');
         confirmPasswordWrapper.classList.add('hidden');
         forgotBtn.classList.add('hidden');
@@ -100,7 +100,7 @@ async function soumettreLogin() {
                 redirectTo: window.location.origin + window.location.pathname
             });
             if (error) throw error;
-            toast("Email envoyé — vérifie ta boîte mail (et les spams).");
+            toast(t("Email envoyé — vérifie ta boîte mail (et les spams)."));
             setLoginMode('login');
         } catch (err) {
             afficherErreurLogin(traduireErreurAuth(err.message));
@@ -174,14 +174,14 @@ async function soumettreNouveauMotDePasse() {
     const newPassword = val('newPassword');
     if (!motDePasseValide(newPassword)) {
         const el = document.getElementById('resetError');
-        el.innerText = "Le mot de passe doit contenir au moins 8 caractères, dont un chiffre.";
+        el.innerText = t("Le mot de passe doit contenir au moins 8 caractères, dont un chiffre.");
         el.classList.remove('hidden');
         return;
     }
     try {
         const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
         if (error) throw error;
-        toast("Mot de passe mis à jour. Te voilà connecté(e).");
+        toast(t("Mot de passe mis à jour. Te voilà connecté(e)."));
         document.getElementById('resetPasswordView').classList.add('hidden');
         const { data } = await supabaseClient.auth.getSession();
         if (data.session) await entrerDashboard(data.session.user);
@@ -210,6 +210,16 @@ function afficherErreurLogin(msg) {
 // ============================================================
 async function entrerDashboard(user) {
     currentUser = user;
+
+    // Par défaut, le site s'ouvre sur l'Organigramme après connexion.
+    // Le lien "Onboarding" du menu pointe vers index.html?dashboard=1
+    // pour afficher ce tableau de bord au lieu de rediriger.
+    const parametres = new URLSearchParams(window.location.search);
+    if (!parametres.has('dashboard')) {
+        window.location.href = 'organigramme.html';
+        return;
+    }
+
     document.getElementById('loginView').classList.add('hidden');
     document.getElementById('dashboardView').classList.remove('hidden');
     await chargerOuCreerOrganisation();
@@ -294,9 +304,9 @@ async function enregistrerOrganisation() {
         .update({ nom, wifi, logo_data_url: pendingLogoDataUrl, documents: pendingDocuments, email_subject, email_message })
         .eq('id', currentOrg.id);
 
-    if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
+    if (error) { toast(t("Erreur lors de l'enregistrement."), "error"); return; }
     currentOrg = { ...currentOrg, nom, wifi, logo_data_url: pendingLogoDataUrl, documents: pendingDocuments, email_subject, email_message };
-    toast("Informations entreprise enregistrées.");
+    toast(t("Informations entreprise enregistrées."));
 }
 
 // ============================================================
@@ -305,7 +315,7 @@ async function enregistrerOrganisation() {
 function ajouterLien() {
     const nom = val('linkNom');
     const url = val('linkUrl');
-    if (!nom || !url) { toast("Renseigne un nom et une URL.", "error"); return; }
+    if (!nom || !url) { toast(t("Renseigne un nom et une URL."), "error"); return; }
     pendingLinks.push({ nom, url });
     document.getElementById('linkNom').value = "";
     document.getElementById('linkUrl').value = "";
@@ -322,7 +332,7 @@ function ajouterContact() {
     const nom = val('contactNom');
     const role = val('contactRole');
     const contact = val('contactInfo');
-    if (!nom || !role) { toast("Renseigne au moins un nom et un rôle.", "error"); return; }
+    if (!nom || !role) { toast(t("Renseigne au moins un nom et un rôle."), "error"); return; }
     pendingContacts.push({ nom, role, contact });
     document.getElementById('contactNom').value = "";
     document.getElementById('contactRole').value = "";
@@ -339,7 +349,7 @@ function renderContactsListRH() {
 function ajouterEtapeChecklist() {
     const titre = val('checklistTitre');
     const description = val('checklistDesc');
-    if (!titre) { toast("Renseigne au moins un titre d'étape.", "error"); return; }
+    if (!titre) { toast(t("Renseigne au moins un titre d'étape."), "error"); return; }
     pendingChecklist.push({ titre, description });
     document.getElementById('checklistTitre').value = "";
     document.getElementById('checklistDesc').value = "";
@@ -358,24 +368,24 @@ async function enregistrerContenusOptionnels() {
         .from('organizations')
         .update({ useful_links: pendingLinks, key_contacts: pendingContacts, checklist: pendingChecklist })
         .eq('id', currentOrg.id);
-    if (error) { toast("Erreur lors de l'enregistrement.", "error"); return; }
+    if (error) { toast(t("Erreur lors de l'enregistrement."), "error"); return; }
     currentOrg = { ...currentOrg, useful_links: pendingLinks, key_contacts: pendingContacts, checklist: pendingChecklist };
-    toast("Contenus enregistrés — visibles sur les prochaines pages employé.");
+    toast(t("Contenus enregistrés — visibles sur les prochaines pages employé."));
 }
 
 async function viderContenusOptionnels() {
     if (!currentOrg) return;
-    const ok = await confirmerAction("Vider les liens, contacts et checklist ? Cette action est immédiate.");
+    const ok = await confirmerAction(t("Vider les liens, contacts et checklist ? Cette action est immédiate."));
     if (!ok) return;
     pendingLinks = []; pendingContacts = []; pendingChecklist = [];
     const { error } = await supabaseClient
         .from('organizations')
         .update({ useful_links: [], key_contacts: [], checklist: [] })
         .eq('id', currentOrg.id);
-    if (error) { toast("Erreur lors de la suppression.", "error"); return; }
+    if (error) { toast(t("Erreur lors de la suppression."), "error"); return; }
     currentOrg = { ...currentOrg, useful_links: [], key_contacts: [], checklist: [] };
     renderLinksListRH(); renderContactsListRH(); renderChecklistListRH();
-    toast("Contenus optionnels vidés.");
+    toast(t("Contenus optionnels vidés."));
 }
 
 // ============================================================
@@ -388,7 +398,7 @@ async function chargerEmployes() {
         .eq('org_id', currentOrg.id)
         .order('created_at', { ascending: false });
 
-    if (error) { toast("Erreur de chargement des employés.", "error"); return; }
+    if (error) { toast(t("Erreur de chargement des employés."), "error"); return; }
     employees = data || [];
     renderPendingList();
     renderSentList();
@@ -410,7 +420,7 @@ function renderPendingList() {
     Array.from(pendingSelection).forEach(id => { if (!idsEnAttente.has(id)) pendingSelection.delete(id); });
 
     if (pending.length === 0) {
-        container.innerHTML = `<p class="empty-hint">${terme ? "Aucun résultat pour cette recherche." : "Aucun employé en attente d'invitation."}</p>`;
+        container.innerHTML = `<p class="empty-hint">${terme ? t("Aucun résultat pour cette recherche.") : t("Aucun employe en attente d'invitation.")}</p>`;
         mettreAJourBarreSelection();
         return;
     }
@@ -422,11 +432,12 @@ function renderPendingList() {
                 <span class="employee-meta">${escapeHtml(emp.poste) || '—'} · <span class="service-chip">${escapeHtml(emp.service)}</span></span>
             </div>
             <select class="visibility-select" onchange="changerVisibilite('${emp.id}', this.value)">
-                <option value="equipe" ${emp.chart_visibility !== 'complet' ? 'selected' : ''}>Organigramme : équipe + N+1</option>
-                <option value="complet" ${emp.chart_visibility === 'complet' ? 'selected' : ''}>Organigramme : complet</option>
+                <option value="equipe" ${emp.chart_visibility !== 'complet' ? 'selected' : ''}>${t("Organigramme : équipe + N+1")}</option>
+                <option value="complet" ${emp.chart_visibility === 'complet' ? 'selected' : ''}>${t("Organigramme : complet")}</option>
             </select>
             <div class="employee-actions">
-                <button class="link-btn" onclick="envoyerInvitationDepuisListe('${emp.id}')">Envoyer l'invitation</button>
+                <button class="link-btn" onclick="envoyerInvitationDepuisListe('${emp.id}')">${t("Envoyer l'invitation")}</button>
+                <button class="link-btn" onclick="marquerSansInvitation('${emp.id}')">${t("Ne pas inviter")}</button>
             </div>
         </div>
     `).join('');
@@ -434,19 +445,22 @@ function renderPendingList() {
     mettreAJourBarreSelection();
 }
 
-// Met à jour le compteur, l'état du bouton d'envoi groupé et la case
+// Met à jour le libellé, l'état des deux boutons groupés et la case
 // "tout sélectionner" en fonction de la sélection actuelle.
 function mettreAJourBarreSelection() {
-    const countEl = document.getElementById('pendingSelectedCount');
-    const bulkBtn = document.getElementById('pendingBulkSendBtn');
+    const label = document.getElementById('pendingSelectedLabel');
+    const sendBtn = document.getElementById('pendingBulkSendBtn');
+    const skipBtn = document.getElementById('pendingBulkSkipBtn');
     const selectAllBox = document.getElementById('pendingSelectAll');
-    if (!countEl || !bulkBtn || !selectAllBox) return;
+    if (!label || !sendBtn || !skipBtn || !selectAllBox) return;
 
     const terme = val('pendingSearch').toLowerCase();
     const pending = employees.filter(e => !e.invite_sent && (!terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme)));
 
-    countEl.innerText = pendingSelection.size;
-    bulkBtn.disabled = pendingSelection.size === 0;
+    label.innerText = `${pendingSelection.size} ${t("selectionne(s)")}`;
+    label.classList.toggle('hidden', pendingSelection.size === 0);
+    sendBtn.disabled = pendingSelection.size === 0;
+    skipBtn.disabled = pendingSelection.size === 0;
     selectAllBox.checked = pending.length > 0 && pending.every(e => pendingSelection.has(e.id));
     selectAllBox.disabled = pending.length === 0;
 }
@@ -469,7 +483,7 @@ function renderSentList() {
     const terme = val('sentSearch').toLowerCase();
     const sent = employees.filter(e => e.invite_sent && (!terme || `${e.prenom} ${e.nom}`.toLowerCase().includes(terme)));
     if (sent.length === 0) {
-        container.innerHTML = `<p class="empty-hint">${terme ? "Aucun résultat pour cette recherche." : "Aucune invitation envoyée pour le moment."}</p>`;
+        container.innerHTML = `<p class="empty-hint">${terme ? t("Aucun résultat pour cette recherche.") : t("Aucune invitation envoyee pour le moment.")}</p>`;
         return;
     }
     container.innerHTML = sent.map(emp => `
@@ -479,10 +493,10 @@ function renderSentList() {
                 <span class="employee-meta">${escapeHtml(emp.poste) || '—'} · <span class="service-chip">${escapeHtml(emp.service)}</span></span>
             </div>
             <div class="employee-status ${emp.viewed_at ? 'status-viewed' : 'status-neutral'}">
-                ${emp.viewed_at ? 'Consulté' : 'Envoyé'}
+                ${emp.viewed_at ? t('Consulté') : t('Envoyé')}
             </div>
             <div class="employee-actions">
-                <button class="link-btn" onclick="envoyerInvitationDepuisListe('${emp.id}')">Renvoyer</button>
+                <button class="link-btn" onclick="envoyerInvitationDepuisListe('${emp.id}')">${t('Renvoyer')}</button>
             </div>
         </div>
     `).join('');
@@ -490,7 +504,7 @@ function renderSentList() {
 
 async function changerVisibilite(employeeId, valeur) {
     const { error } = await supabaseClient.from('employees').update({ chart_visibility: valeur }).eq('id', employeeId);
-    if (error) { toast("Erreur lors de la mise à jour.", "error"); return; }
+    if (error) { toast(t("Erreur lors de la mise à jour."), "error"); return; }
     const emp = employees.find(e => e.id === employeeId);
     if (emp) emp.chart_visibility = valeur;
 }
@@ -535,15 +549,15 @@ async function envoyerInvitation(emp, silencieux = false) {
 
         if (res.ok) {
             await supabaseClient.from('employees').update({ invite_sent: true }).eq('id', emp.id);
-            if (!silencieux) toast(`Invitation envoyée à ${emp.email}`);
+            if (!silencieux) toast(t('Invitation envoyée à {email}', { email: emp.email }));
             return true;
         } else {
-            if (!silencieux) toast("La fonction /api/send-email n'est pas encore déployée — voir le README.", "error");
+            if (!silencieux) toast(t("La fonction /api/send-email n'est pas encore déployée — voir le README."), "error");
             return false;
         }
     } catch (err) {
         console.error(err);
-        if (!silencieux) toast("Impossible de contacter le serveur d'envoi.", "error");
+        if (!silencieux) toast(t("Impossible de contacter le serveur d'envoi."), "error");
         return false;
     }
 }
@@ -570,8 +584,57 @@ async function envoyerInvitationsSelectionnees() {
     await chargerEmployes();
     btn.innerHTML = texteInitial;
 
-    if (succes > 0) toast(`${succes} invitation${succes > 1 ? 's' : ''} envoyée${succes > 1 ? 's' : ''}.`);
-    if (echecs > 0) toast(`${echecs} invitation${echecs > 1 ? 's' : ''} n'${echecs > 1 ? 'ont' : 'a'} pas pu être envoyée${echecs > 1 ? 's' : ''}.`, "error");
+    if (succes > 0) toast(t('{n} invitation(s) envoyée(s).', { n: succes }));
+    if (echecs > 0) toast(t('{n} invitation(s) n\'ont pas pu être envoyée(s).', { n: echecs }), "error");
+}
+
+// Marque un employé comme "déjà onboardé" sans lui envoyer d'invitation —
+// utile pour un ancien employé importé seulement pour l'organigramme.
+async function marquerSansInvitation(employeeId) {
+    const emp = employees.find(e => e.id === employeeId);
+    if (!emp) return;
+    const ok = await confirmerAction(
+        t('Marquer {nom} comme "déjà onboardé(e)" sans lui envoyer d\'invitation ?', { nom: `${emp.prenom} ${emp.nom}` }),
+        { danger: false, texteOui: t("Marquer sans invitation") }
+    );
+    if (!ok) return;
+
+    const { error } = await supabaseClient.from('employees').update({ invite_sent: true }).eq('id', employeeId);
+    if (error) { toast(t("Erreur lors de la mise à jour."), "error"); return; }
+    toast(t('{nom} marqué(e) comme onboardé(e), sans invitation.', { nom: `${emp.prenom} ${emp.nom}` }));
+    await chargerEmployes();
+}
+
+async function marquerSelectionnesSansInvitation() {
+    if (pendingSelection.size === 0) return;
+    const ids = Array.from(pendingSelection);
+    const selection = employees.filter(e => ids.includes(e.id));
+    if (selection.length === 0) return;
+
+    const noms = selection.length <= 4 ? selection.map(e => `${e.prenom} ${e.nom}`).join(', ') : t('{n} employés', { n: selection.length });
+    const ok = await confirmerAction(
+        t('Marquer {noms} comme "déjà onboardé(s)" sans leur envoyer d\'invitation ?', { noms }),
+        { danger: false, texteOui: t("Marquer sans invitation") }
+    );
+    if (!ok) return;
+
+    const skipBtn = document.getElementById('pendingBulkSkipBtn');
+    const texteInitial = skipBtn.innerText;
+    skipBtn.disabled = true;
+    skipBtn.innerText = t("Mise à jour…");
+
+    const { error } = await supabaseClient.from('employees').update({ invite_sent: true }).in('id', ids);
+    if (error) {
+        toast(t("Erreur lors de la mise à jour."), "error");
+        skipBtn.innerText = texteInitial;
+        skipBtn.disabled = false;
+        return;
+    }
+
+    pendingSelection.clear();
+    toast(t('{n} employé(s) marqué(s) comme onboardé(s), sans invitation.', { n: selection.length }));
+    await chargerEmployes();
+    skipBtn.innerText = texteInitial;
 }
 
 // ============================================================
@@ -609,3 +672,12 @@ window.onload = async function () {
         document.getElementById('loginView').classList.remove('hidden');
     }
 };
+
+// Appelé par i18n.js après un changement de langue, pour ré-afficher le
+// contenu généré en JS (listes d'employés) dans la nouvelle langue.
+function onLanguageChangeRerender() {
+    if (typeof employees !== 'undefined' && employees.length) {
+        renderPendingList();
+        renderSentList();
+    }
+}
