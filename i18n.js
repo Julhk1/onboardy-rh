@@ -11,6 +11,7 @@ const EN_DICT = {
     "Organigramme": "Org Chart",
     "Onboarding": "Onboarding",
     "Evaluations & Remuneration": "Reviews & Compensation",
+    "Evaluations": "Reviews",
     "Deconnexion": "Log out",
     "Rechercher...": "Search...",
     "Tout selectionner": "Select all",
